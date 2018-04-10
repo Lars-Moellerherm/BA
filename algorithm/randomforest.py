@@ -3,7 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import h5py as h5
-from confusionMatrix import plot_confusion_matrix
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.model_selection import cross_validate, train_test_split
 from sklearn.metrics import auc, roc_curve, confusion_matrix
@@ -13,25 +12,18 @@ from sklearn.tree import DecisionTreeClassifier
 def calc_with_RandomForestRegressor():
 
     # Import data in h5py
-    gammas = h5.File("MC_Daten/gammas.hdf5","r")
-    protons = h5.File("MC_Daten/protons.hdf5","r")
+    gammas = h5.File("../data/gammas.hdf5","r")
+    protons = h5.File("../data/protons.hdf5","r")
 
     # Converting to pandas
     gamma_array_df = pd.DataFrame(data=dict(gammas['array_events']))
     gamma_runs_df = pd.DataFrame(data=dict(gammas['runs']))
     gamma_telescope_df = pd.DataFrame(data=dict(gammas['telescope_events']))
 
-    proton_array_df = pd.DataFrame(data=dict(protons['array_events']))
-    proton_runs_df = pd.DataFrame(data=dict(protons['runs']))
-    proton_telescope_df = pd.DataFrame(data=dict(protons['telescope_events']))
-
     #merging of array and telescope data and shuffle of proton and gamma
     gamma_merge = pd.merge(gamma_array_df,gamma_telescope_df,on="array_event_id")
-    proton_merge = pd.merge(proton_array_df,proton_telescope_df,on="array_event_id")
 
-    data = pd.concat([gamma_merge , proton_merge])
-
-    data = shuffle(data)
+    data = shuffle(gamma_merge)
 
     # isolate mc data and drop unimportant information
 
@@ -54,28 +46,22 @@ def calc_with_RandomForestRegressor():
     test_pred = regr.fit(train,train_truth).predict(test)
 
     bin_edges = np.linspace(0,0.3,30)
-    plt.hist2d(test_pred, test_truth.values,bins=bin_edges, cmap="viridis")
-    plt.colorbar()
-    plt.grid()
-    plt.plot([0,0.3],[0,0.3],color="grey")
-    plt.show()
-    plt.close()
-    #print(test_pred[:10],test_truth.values[:10])
-
-    data2= pd.concat([data,mc_data['mc_corsika_primary_id']],axis=1)
-    train2, test2, train_truth2, test_truth2 = train_test_split(data2, truth, test_size = 0.5)
-
-    regr2 = RandomForestRegressor()
-    test_pred2 = regr2.fit(train2,train_truth2).predict(test2)
-
-    bin_edges = np.linspace(0,0.3,30)
-    plt.hist2d(test_pred, test_truth.values,bins=bin_edges, cmap="viridis")
+    plt.hist2d(test_pred, test_truth.values, bins=bin_edges, cmap="viridis")
     plt.colorbar()
     plt.grid()
     plt.plot([0,0.3],[0,0.3],color="grey")
     plt.show()
     plt.close()
 
+    error = test_pred-test_truth.values
+    bin_edges = np.linspace(-0.3,0.3,30)
+    plt.hist(error, bins=bin_edges)
+    plt.show()
+    plt.close()
+
+    plt.plot(test_truth.values,error,".")
+    plt.show()
+    plt.close()
 
 
 calc_with_RandomForestRegressor()

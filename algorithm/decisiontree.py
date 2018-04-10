@@ -11,8 +11,8 @@ from sklearn.tree import DecisionTreeClassifier
 
 def calc_with_DecissionTreeClassifier() :
     # Import data in h5py
-    gammas = h5.File("MC_Daten/gammas.hdf5","r")
-    protons = h5.File("MC_Daten/protons.hdf5","r")
+    gammas = h5.File("../data/gammas.hdf5","r")
+    protons = h5.File("../data/protons.hdf5","r")
 
     # Converting to pandas
     gamma_array_df = pd.DataFrame(data=dict(gammas['array_events']))
