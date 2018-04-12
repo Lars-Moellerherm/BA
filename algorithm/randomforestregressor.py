@@ -101,7 +101,7 @@ def calc_with_RandomForestRegressor():
     plt.xlabel('Predicted value / TeV')
     plt.ylabel('truth value / TeV')
     #plt.show()
-    plt.savefig('RF_Regression.pdf')
+    plt.savefig('plots/RF_Regression.pdf')
     plt.close()
 
     error = (predictions-truth.values)**2
@@ -111,7 +111,7 @@ def calc_with_RandomForestRegressor():
     plt.ylabel('counts')
     plt.title('the error of the Random Forest for Energy estimation')
     #plt.show()
-    plt.savefig('RF_Regression_errors.pdf')
+    plt.savefig('plots/RF_Regression_errors.pdf')
     plt.close()
 
     #plots with mean
@@ -126,7 +126,7 @@ def calc_with_RandomForestRegressor():
     plt.xlabel('Predicted value / TeV')
     plt.ylabel('truth value / TeV')
     #plt.show()
-    plt.savefig('RF_Regression_mean.pdf')
+    plt.savefig('plots/RF_Regression_mean.pdf')
     plt.close()
 
     error = (prediction_mean-truth_unique.values)**2
@@ -136,7 +136,7 @@ def calc_with_RandomForestRegressor():
     plt.ylabel('counts')
     plt.title('the error of the Random Forest for Energy estimation with mean')
     #plt.show()
-    plt.savefig('RF_Regression_errors_mean.pdf')
+    plt.savefig('plots/RF_Regression_errors_mean.pdf')
     plt.close()
 
 

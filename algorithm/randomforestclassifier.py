@@ -10,7 +10,7 @@ from sklearn.utils import shuffle
 from sklearn.tree import DecisionTreeClassifier
 from scipy import interp
 
-def calc_with_DecissionTreeClassifier() :
+def calc_with_RandomForestClassifier() :
     # Import data in h5py
     gammas = h5.File("../data/gammas.hdf5","r")
     protons = h5.File("../data/protons.hdf5","r")
@@ -59,8 +59,8 @@ def calc_with_DecissionTreeClassifier() :
     #plt.figure()
     confusionMatrix.plot_confusion_matrix(cm, classes=class_names, normalize=True,
     title='Normalized confusion matrix')
-    plt.show()
-    #plt.savefig('CM_RFClassifier.pdf')
+    #plt.show()
+    plt.savefig('plots/CM_RFClassifier.pdf')
     plt.close()
 
     # ROC curve for cross_validate
@@ -125,8 +125,8 @@ def calc_with_DecissionTreeClassifier() :
     plt.ylabel('True Positive Rate')
     plt.title("Receiver operating characteristic")
     plt.legend(loc="best")
-    plt.show()
-    #plt.savefig('ROC_RFClassifier.pdf')
+    #plt.show()
+    plt.savefig('plots/ROC_RFClassifier.pdf')
     plt.close()
     print(r'AUC without mean over event_id: %0.2f $\pm$ %0.2f' % (mean_auc,std_auc))
 
@@ -144,10 +144,10 @@ def calc_with_DecissionTreeClassifier() :
     plt.ylabel('True Positive Rate')
     plt.title("Receiver operating characteristic for meaned propabilitys")
     plt.legend(loc="best")
-    plt.show()
-    #plt.savefig('ROC_RFClassifier_meaned.pdf')
+    #plt.show()
+    plt.savefig('plots/ROC_RFClassifier_meaned.pdf')
     plt.close()
     print(r'AUC with mean over event_id: %0.2f $\pm$ %0.2f' % (mean_auc2,std_auc2))
 
 
-calc_with_DecissionTreeClassifier()
+calc_with_RandomForestClassifier()
