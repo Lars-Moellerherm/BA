@@ -34,7 +34,7 @@ def calc_with_knearestNeighbour():
 
     # kNN with cross validate, train and predict
 
-    kNN = KNeighborsRegressor()
+    kNN = KNeighborsRegressor(n_neighbors=3)
 
     predictions = cross_val_predict(kNN, data, y=truth, cv=6)
 
@@ -49,14 +49,14 @@ def calc_with_knearestNeighbour():
     plt.title("k nearest Neighbours Regression for energy estimation")
     plt.xlabel('Predicted value / TeV')
     plt.ylabel('truth value / TeV')
-    plt.show()
+    #plt.show()
     #plt.savefig('kNN_Regression.pdf')
     plt.close()
 
-    error = (predictions-truth.values)**2
-    bin_edges = np.linspace(0,10,30)
+    error = (predictions-truth.values)
+    bin_edges = np.linspace(-5,5,30)
     plt.hist(error,bins=bin_edges)
-    plt.xlabel(r'squared errors in $TeV^2$')
+    plt.xlabel(r'errors in $TeV$')
     plt.ylabel('counts')
     plt.title('the error of the kNN Regression for Energy estimation')
     plt.show()
