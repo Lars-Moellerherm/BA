@@ -31,6 +31,7 @@ def calc_with_RandomForestClassifier() :
 
     data = shuffle(data)
 
+    print(proton_runs_df['mc_max_energy'])
     # isolate mc data and drop unimportant information
 
     mc_attributes = list(['mc_az','mc_alt','mc_core_x','mc_core_y','mc_energy','mc_corsika_primary_id','mc_height_first_interaction'])
