@@ -1,4 +1,5 @@
 import itertools
+import functions as func
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -32,35 +33,11 @@ def calc_with_RandomForestRegressor():
 
     #calculate the mean scaled
 
-    ID = data['array_event_id']
-    unique_ID = ID.unique()
-    mean_scaled_width = pd.DataFrame({'mean_scaled_w':[],'array_event_id':[]})
-    mean_scaled_length = pd.DataFrame({'mean_scaled_l':[],'array_event_id':[]})
-    SW = (data.width - np.mean(data.width))/sc.stats.sem(data.width)
-    scaled_width = pd.DataFrame({'scaled_w':SW, 'array_event_id':ID})
-    SL = (data.length - np.mean(data.length))/sc.stats.sem(data.length)
-    scaled_length = pd.DataFrame({'scaled_l':SL, 'array_event_id':ID})
-
-    for i in unique_ID:
-        ntels = data.num_triggered_telescopes[data.array_event_id == i].iloc[0]
-        MSW = np.sum(scaled_width.scaled_w[scaled_width.array_event_id == i])
-        MSW = MSW/np.sqrt(ntels)
-        MSW = pd.Series(MSW)
-        MSW = pd.DataFrame({'mean_scaled_w':MSW,'array_event_id':i})
-        mean_scaled_width = pd.concat([mean_scaled_width,MSW], ignore_index=True)
-
-        MSL = np.sum(scaled_length.scaled_l[scaled_length.array_event_id == i])
-        MSL = MSL/np.sqrt(ntels)
-        MSL = pd.Series(MSL)
-        MSL = pd.DataFrame({'mean_scaled_l':MSL,'array_event_id':i})
-        mean_scaled_length = pd.concat([mean_scaled_length,MSL], ignore_index=True)
-
-
-    data = pd.merge(data,mean_scaled_width, on='array_event_id')
-    data = pd.merge(data, mean_scaled_length, on='array_event_id')
+    data = func.calc_mean_scaled_width_and_length(data)
 
     #shuffel
     data = shuffle(data)
+    data_2 = data
 
     #drop unimportant DATA
     mc_attributes = list(['mc_az','mc_alt','mc_core_x','mc_core_y','mc_energy','mc_corsika_primary_id','mc_height_first_interaction'])
@@ -79,96 +56,75 @@ def calc_with_RandomForestRegressor():
     RFr = RandomForestRegressor(max_depth=10, n_jobs=-1)
     predictions = cross_val_predict(RFr, data, truth, cv=10)
 
-    # Regression with mean over same array_event_id
-    ID = droped_data['array_event_id']
-    unique_ID = ID.unique()
-    pred_ID = pd.DataFrame({'predicted_energy':predictions, 'array_event_id':ID})
-    truth_ID = pd.DataFrame({'mc_energy':truth, 'array_event_id':ID})
-    truth_unique = pd.Series([], name='mc_energy')
 
-        # With weighted mean  INTENSITY
-    weight = data['intensity']
-    weight_ID = pd.DataFrame({'intensity': weight, 'array_event_id': ID})
-    prediction_w_mean = pd.Series([], name='predicted_energy')
+    prediction_w_mean, truth_unique = func.weighted_mean_over_ID(predictions, droped_data['array_event_id'], data['intensity'], truth)
 
-    for i in unique_ID:
-        #INTENSITY
-        x = weight_ID.intensity[weight_ID.array_event_id == i]
-        pred_w_mean = np.average(pred_ID.predicted_energy[pred_ID.array_event_id == i], weights=x)
-        pred_w_mean = pd.Series(pred_w_mean, name='predicted_energy')
-        prediction_w_mean = pd.concat([prediction_w_mean,pred_w_mean], ignore_index=True)
+    # use the prediction_w_mean for another RF
 
-        #make the truth unique
-        y = truth_ID.mc_energy[truth_ID.array_event_id == i].iloc[0]
-        y = pd.Series(y, name='mc_energy')
-        truth_unique = pd.concat([truth_unique, y], ignore_index=True)
+    data_2 = pd.merge(data_2, prediction_w_mean, on='array_event_id')
 
+    #drop unimportant DATA
+    truth_encaps = data_2['mc_energy']
+    data_2 = data_2.drop(mc_attributes, axis=1)
+
+    data_2 = data_2.drop(droped_information,axis=1)
+
+
+    #fit and pred
+    RFr2 = RandomForestRegressor(max_depth=10, n_jobs=-1)
+    predictions_encapsulated = cross_val_predict(RFr2, data_2, truth_encaps, cv=10)
+
+
+
+    min_energy = 0.003
+    max_energy = 50
     #PLOTS
         #Plots without mean
-    min_energy = np.log10(0.003)
-    max_energy = np.log10(50)
-    bin_edges = np.logspace(min_energy,max_energy,60)
-    plt.hist2d(predictions, truth.values, bins=bin_edges, cmap="viridis", cmin=1)
-    plt.grid(True,which='both')
-    plt.colorbar()
-    plt.plot([0.003,330],[0.003,330],color="grey", label= "correct prediction")
-    plt.legend()
-    plt.title("Random Forest Regression for energy estimation(R2score: %.2f)" % r2_score(predictions,truth.values))
-    plt.xlabel('Predicted value / TeV')
-    plt.ylabel('truth value / TeV')
-    plt.xscale('log')
-    plt.yscale('log')
-    plt.xlim(max_energy)
-    plt.ylim(max_energy)
-    #plt.show()
-    plt.savefig('plots/RF/mean_scaled/RF_Regression_MSV.pdf')
+    r2_1 = func.plot_hist2d(predictions,truth,min_energy,max_energy)
+    plt.title("RF(with MSV) for energy estimation(R2score: %.2f)" % r2_1)
+    plt.savefig("plots/RF/mean_scaled/RF_Regression_MSV.pdf")
     plt.close()
 
-    error = (predictions-truth.values)**2
-    bin_edges = np.logspace(np.log10(0.0001),np.log10(5),60)
-    plt.hist(error,bins=bin_edges)
-    plt.xlabel(r'squared errors in $TeV^2$')
-    plt.ylabel('counts')
-    plt.xscale('log')
-    plt.title('the error of the Random Forest for Energy estimation')
-    #plt.show()
-    plt.savefig('plots/RF/mean_scaled/RF_Regression_errors_MSV.pdf')
+    func.plot_error(predictions,truth)
+    plt.title('error of RF(with MSV) for Energy estimation')
+    plt.savefig("plots/RF/mean_scaled/RF_Regression_MSV_error.pdf")
     plt.close()
 
         #plots for weighted mean
 
             #intensity
-    bin_edges = np.logspace(min_energy,max_energy,60)
-    plt.hist2d(prediction_w_mean, truth_unique.values, bins=bin_edges, cmap="viridis", cmin=1)
-    plt.grid(True, which='both')
-    plt.colorbar()
-    plt.plot([0.003,330],[0.003,330],color="grey", label= "correct prediction")
-    plt.legend()
-    plt.title("RF Regression for energy estimation with weighted mean(intensity)(R2score: %0.2f)" % r2_score(prediction_w_mean,truth_unique.values) )
-    plt.xlabel('Predicted value / TeV')
-    plt.ylabel('truth value / TeV')
-    plt.xscale('log')
-    plt.yscale('log')
-    plt.xlim(max_energy)
-    plt.ylim(max_energy)
-    #plt.show()
+    r2_2 = func.plot_hist2d(prediction_w_mean['predicted_energy'],truth_unique,min_energy,max_energy)
+    plt.title("RF Regression for energy estimation with weighted mean(intensity)(R2score: %0.2f)" % r2_2 )
     plt.savefig('plots/RF/mean_scaled/RF_Regression_w_mean_MSV.pdf')
     plt.close()
 
-    error = (prediction_w_mean-truth_unique.values)**2
-    bin_edges = np.logspace(np.log10(0.0001),np.log10(5),60)
-    plt.hist(error,bins=bin_edges)
-    plt.xlabel(r'squared errors in $TeV^2$')
-    plt.ylabel('counts')
-    plt.xscale('log')
+
+    func.plot_error(prediction_w_mean['predicted_energy'],truth_unique)
     plt.title('the error of the RF for Energy estimation with weighted mean(intensity)')
     #plt.show()
     plt.savefig('plots/RF/mean_scaled/RF_Regression_errors_w_mean_MSV.pdf')
     plt.close()
 
+        #plots for encapsulated RF
+
+    r2_3 = func.plot_hist2d(predictions_encapsulated,truth_encaps,min_energy,max_energy)
+    plt.title("encapsulated RF Regression for energy estimation(R2score: %.2f)" % r2_score(predictions_encapsulated,truth_encaps.values))
+    #plt.show()
+    plt.savefig('plots/RF/mean_scaled/RF_Regression_MSV_encaps.pdf')
+    plt.close()
+
+    func.plot_error(predictions_encapsulated,truth_encaps)
+    plt.title('the error of the encapsulated RF for Energy estimation')
+    #plt.show()
+    plt.savefig('plots/RF/mean_scaled/RF_Regression_errors_MSV_encaps.pdf')
+    plt.close()
+
+
     #Print R2Score
-    print('Coefficient of determination for the RandomForestRegressor: %.2f' % r2_score(predictions,truth.values),
-        '\n Coefficient for determination for RF with weighted mean(intensity): %.2f' % r2_score(prediction_w_mean,truth_unique.values))
+    print('Coefficient of determination for the RandomForestRegressor: %.2f' % r2_1,
+        '\n Coefficient for determination for RF with weighted mean(intensity): %.2f' % r2_2,
+        '\n Coefficient for determination for encapsulated RF: %.2f' % r2_3)
+
 
 
 calc_with_RandomForestRegressor()
