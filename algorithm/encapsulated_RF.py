@@ -37,7 +37,6 @@ def calc_with_RandomForestRegressor():
 
     #shuffel
     data = shuffle(data)
-    data_2 = data
 
     #drop unimportant DATA
     mc_attributes = list(['mc_az','mc_alt','mc_core_x','mc_core_y','mc_energy','mc_corsika_primary_id','mc_height_first_interaction'])
@@ -59,20 +58,21 @@ def calc_with_RandomForestRegressor():
 
     prediction_w_mean, truth_unique = func.weighted_mean_over_ID(predictions, droped_data['array_event_id'], data['intensity'], truth)
 
+    data['array_event_id'] = droped_data['array_event_id']
+    truth_enc = pd.DataFrame({'mc_energy':truth_unique,'array_event_id':truth_unique.index})
+    data = pd.merge(data, prediction_w_mean, on='array_event_id')
+    data = pd.merge(data, truth_enc, on='array_event_id')
+    data = data.drop('array_event_id', axis=1)
+
     # use the prediction_w_mean for another RF
 
-    data_2 = pd.merge(data_2, prediction_w_mean, on='array_event_id')
-
-    #drop unimportant DATA
-    truth_encaps = data_2['mc_energy']
-    data_2 = data_2.drop(mc_attributes, axis=1)
-
-    data_2 = data_2.drop(droped_information,axis=1)
-
+    data = shuffle(data)
+    truth_encaps = data['mc_energy']
+    data = data.drop('mc_energy', axis = 1)
 
     #fit and pred
     RFr2 = RandomForestRegressor(max_depth=10, n_jobs=-1)
-    predictions_encapsulated = cross_val_predict(RFr2, data_2, truth_encaps, cv=10)
+    predictions_encapsulated = cross_val_predict(RFr2, data, truth_encaps, cv=10)
 
 
 

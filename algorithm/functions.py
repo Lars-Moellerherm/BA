@@ -6,30 +6,15 @@ from sklearn.metrics import r2_score
 
 def weighted_mean_over_ID(predictions, ID, weight, truth):
 
-    unique_ID = ID.unique()
-    pred_ID = pd.DataFrame({'predicted_energy':predictions, 'array_event_id':ID})
-    truth_ID = pd.DataFrame({'mc_energy':truth, 'array_event_id':ID})
-    truth_unique = pd.Series([], name='mc_energy')
+    pred = pd.DataFrame({'predicted_energy':predictions, 'array_event_id':ID, 'mc_energy':
+                        truth, 'weight': weight})
+    pred['weighted_data'] = pred['predicted_energy']*pred['weight']
+    x = pred.groupby('array_event_id')
+    prediction_w_mean = x['weighted_data'].sum()/x['weight'].sum()
+    predict = pd.DataFrame({'predicted_energy': prediction_w_mean,
+                            'array_event_id': prediction_w_mean.index})
 
-        # With weighted mean  INTENSITY
-    weight_ID = pd.DataFrame({'weights': weight, 'array_event_id': ID})
-    prediction_w_mean = pd.DataFrame({'predicted_energy': [], 'array_event_id': []})
-
-    for i in unique_ID:
-        #INTENSITY
-        x = weight_ID.weights[weight_ID.array_event_id == i]
-        pred_w_mean = np.average(pred_ID.predicted_energy[pred_ID.array_event_id == i], weights=x)
-        pred_w_mean = {'predicted_energy' : pd.Series([pred_w_mean]), 'array_event_id' : pd.Series([i])}
-        pred_w_mean = pd.DataFrame(pred_w_mean)
-        prediction_w_mean = pd.concat([prediction_w_mean,pred_w_mean], ignore_index=True)
-
-        #make the truth unique
-        y = truth_ID.mc_energy[truth_ID.array_event_id == i].iloc[0]
-        y = pd.Series(y, name='mc_energy')
-        truth_unique = pd.concat([truth_unique, y], ignore_index=True)
-
-
-    return prediction_w_mean, truth_unique
+    return predict, x.first()['mc_energy']
 
 
 def calc_mean_scaled_width_and_length(data):
@@ -90,3 +75,13 @@ def plot_error(predictions,truth):
     plt.xlabel(r'squared errors in $TeV^2$')
     plt.ylabel('counts')
     plt.xscale('log')
+
+
+def mean_over_ID(predictions, ID, truth):
+
+    pred = pd.DataFrame({'predicted_energy':predictions, 'array_event_id':ID, 'mc_energy':
+                        truth})
+    prediction_mean = pred.groupby('array_event_id').mean()
+    predict = pd.DataFrame({'predicted_energy': prediction_mean.loc[:,'predicted_energy'],
+                            'array_event_id': prediction_mean.index})
+    return predict, prediction_mean['mc_energy']
