@@ -4,8 +4,9 @@ import scipy as sc
 import matplotlib.pyplot as plt
 from sklearn.metrics import r2_score
 
-def weighted_mean_over_ID(predictions, ID, weight, truth):
-
+def weighted_mean_over_ID(predictions, weight, data):
+    ID = data['array_event_id']
+    truth = data['mc_energy']
     pred = pd.DataFrame({'predicted_energy':predictions, 'array_event_id':ID, 'mc_energy':
                         truth, 'weight': weight})
     pred['weighted_data'] = pred['predicted_energy']*pred['weight']
@@ -13,8 +14,9 @@ def weighted_mean_over_ID(predictions, ID, weight, truth):
     prediction_w_mean = x['weighted_data'].sum()/x['weight'].sum()
     predict = pd.DataFrame({'predicted_energy': prediction_w_mean,
                             'array_event_id': prediction_w_mean.index})
+    data = pd.merge(data, predict, on='array_event_id')
 
-    return predict, x.first()['mc_energy']
+    return data
 
 
 def calc_mean_scaled_width_and_length(data):

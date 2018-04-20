@@ -55,24 +55,27 @@ def calc_with_RandomForestRegressor():
     RFr = RandomForestRegressor(max_depth=10, n_jobs=-1)
     predictions = cross_val_predict(RFr, data, truth, cv=10)
 
+    # weighted mean 
 
-    prediction_w_mean, truth_unique = func.weighted_mean_over_ID(predictions, droped_data['array_event_id'], data['intensity'], truth)
-
+    data['mc_energy'] = truth
     data['array_event_id'] = droped_data['array_event_id']
-    truth_enc = pd.DataFrame({'mc_energy':truth_unique,'array_event_id':truth_unique.index})
-    data = pd.merge(data, prediction_w_mean, on='array_event_id')
-    data = pd.merge(data, truth_enc, on='array_event_id')
-    data = data.drop('array_event_id', axis=1)
+    data = func.weighted_mean_over_ID(predictions, data['intensity'], data)
+    prediction_w_mean = data['predicted_energy']
+    truth_w_mean = data['mc_energy']
+
 
     # use the prediction_w_mean for another RF
 
     data = shuffle(data)
     truth_encaps = data['mc_energy']
-    data = data.drop('mc_energy', axis = 1)
+    ID_encaps = data['array_event_id']
+    data = data.drop('array_event_id', axis=1)
+    data = data.drop('mc_energy', axis=1)
+    print(data,truth_encaps)
 
     #fit and pred
     RFr2 = RandomForestRegressor(max_depth=10, n_jobs=-1)
-    predictions_encapsulated = cross_val_predict(RFr2, data, truth_encaps, cv=10)
+    predictions_encaps = cross_val_predict(RFr2, data, truth_encaps, cv=10)
 
 
 
@@ -93,13 +96,13 @@ def calc_with_RandomForestRegressor():
         #plots for weighted mean
 
             #intensity
-    r2_2 = func.plot_hist2d(prediction_w_mean['predicted_energy'],truth_unique,min_energy,max_energy)
+    r2_2 = func.plot_hist2d(prediction_w_mean,truth_w_mean,min_energy,max_energy)
     plt.title("RF Regression for energy estimation with weighted mean(intensity)(R2score: %0.2f)" % r2_2 )
     plt.savefig('plots/RF/mean_scaled/RF_Regression_w_mean_MSV.pdf')
     plt.close()
 
 
-    func.plot_error(prediction_w_mean['predicted_energy'],truth_unique)
+    func.plot_error(prediction_w_mean,truth_w_mean)
     plt.title('the error of the RF for Energy estimation with weighted mean(intensity)')
     #plt.show()
     plt.savefig('plots/RF/mean_scaled/RF_Regression_errors_w_mean_MSV.pdf')
@@ -107,13 +110,13 @@ def calc_with_RandomForestRegressor():
 
         #plots for encapsulated RF
 
-    r2_3 = func.plot_hist2d(predictions_encapsulated,truth_encaps,min_energy,max_energy)
-    plt.title("encapsulated RF Regression for energy estimation(R2score: %.2f)" % r2_score(predictions_encapsulated,truth_encaps.values))
+    r2_3 = func.plot_hist2d(predictions_encaps,truth_encaps,min_energy,max_energy)
+    plt.title("encapsulated RF Regression for energy estimation(R2score: %.2f)" % r2_3)
     #plt.show()
     plt.savefig('plots/RF/mean_scaled/RF_Regression_MSV_encaps.pdf')
     plt.close()
 
-    func.plot_error(predictions_encapsulated,truth_encaps)
+    func.plot_error(predictions_encaps,truth_encaps)
     plt.title('the error of the encapsulated RF for Energy estimation')
     #plt.show()
     plt.savefig('plots/RF/mean_scaled/RF_Regression_errors_MSV_encaps.pdf')
