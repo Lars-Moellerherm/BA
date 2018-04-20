@@ -3,6 +3,7 @@ import numpy as np
 import scipy as sc
 import matplotlib.pyplot as plt
 from sklearn.metrics import r2_score
+from tqdm import tqdm
 
 def weighted_mean_over_ID(predictions, weight, data):
     ID = data['array_event_id']
@@ -30,7 +31,7 @@ def calc_mean_scaled_width_and_length(data):
     SL = (data.length - np.mean(data.length))/sc.stats.sem(data.length)
     scaled_length = pd.DataFrame({'scaled_l':SL, 'array_event_id':ID})
 
-    for i in unique_ID:
+    for i in tqdm(unique_ID):
         ntels = data.num_triggered_telescopes[data.array_event_id == i].iloc[0]
         MSW = np.sum(scaled_width.scaled_w[scaled_width.array_event_id == i])
         MSW = MSW/np.sqrt(ntels)
@@ -79,11 +80,14 @@ def plot_error(predictions,truth):
     plt.xscale('log')
 
 
-def mean_over_ID(predictions, ID, truth):
-
+def mean_over_ID(predictions, data):
+    ID = data['array_event_id']
+    truth = data['mc_energy']
     pred = pd.DataFrame({'predicted_energy':predictions, 'array_event_id':ID, 'mc_energy':
                         truth})
     prediction_mean = pred.groupby('array_event_id').mean()
     predict = pd.DataFrame({'predicted_energy': prediction_mean.loc[:,'predicted_energy'],
                             'array_event_id': prediction_mean.index})
-    return predict, prediction_mean['mc_energy']
+    data = pd.merge(data, predict, on='array_event_id')
+
+    return data

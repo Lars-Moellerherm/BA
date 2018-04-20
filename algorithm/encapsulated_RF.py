@@ -22,7 +22,7 @@ def calc_with_RandomForestRegressor():
     gamma_telescope_df = pd.DataFrame(data=dict(gammas['telescope_events']))
 
     #merging of array and telescope data and shuffle of proton and gamma
-    data = pd.merge(gamma_array_df,gamma_telescope_df,on="array_event_id")
+    data_merge = pd.merge(gamma_array_df,gamma_telescope_df,on="array_event_id")
 
     #prediction_attributes = list(['alt_prediction','az_prediction','core_x_prediction','core_y_prediction','gamma_energy_prediction_mean',
     #                                'gamma_energy_prediction_std_x','gamma_prediction_mean','gamma_prediction_std',
@@ -33,11 +33,11 @@ def calc_with_RandomForestRegressor():
 
     #calculate the mean scaled
 
-    data = func.calc_mean_scaled_width_and_length(data)
+    data2 = func.calc_mean_scaled_width_and_length(data_merge)
 
     #shuffel
-    data = shuffle(data)
-
+    #data = shuffle(data2)
+    data = data2
     #drop unimportant DATA
     mc_attributes = list(['mc_az','mc_alt','mc_core_x','mc_core_y','mc_energy','mc_corsika_primary_id','mc_height_first_interaction'])
     mc_data = data[mc_attributes]
@@ -55,7 +55,7 @@ def calc_with_RandomForestRegressor():
     RFr = RandomForestRegressor(max_depth=10, n_jobs=-1)
     predictions = cross_val_predict(RFr, data, truth, cv=10)
 
-    # weighted mean 
+    # weighted mean
 
     data['mc_energy'] = truth
     data['array_event_id'] = droped_data['array_event_id']
@@ -66,17 +66,15 @@ def calc_with_RandomForestRegressor():
 
     # use the prediction_w_mean for another RF
 
-    data = shuffle(data)
+    #data = shuffle(data)
     truth_encaps = data['mc_energy']
     ID_encaps = data['array_event_id']
     data = data.drop('array_event_id', axis=1)
     data = data.drop('mc_energy', axis=1)
-    print(data,truth_encaps)
 
     #fit and pred
     RFr2 = RandomForestRegressor(max_depth=10, n_jobs=-1)
     predictions_encaps = cross_val_predict(RFr2, data, truth_encaps, cv=10)
-
 
 
     min_energy = 0.003
