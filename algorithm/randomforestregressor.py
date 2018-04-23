@@ -23,8 +23,8 @@ def calc_with_RandomForestRegressor():
     #merging of array and telescope data and shuffle of proton and gamma
     gamma_merge = pd.merge(gamma_array_df,gamma_telescope_df,on="array_event_id")
 
-    #data = shuffle(gamma_merge)
-    data = gamma_merge
+    data = shuffle(gamma_merge)
+    #data = gamma_merge
     # isolate mc data and drop unimportant information
 
     mc_attributes = list(['mc_az','mc_alt','mc_core_x','mc_core_y','mc_energy','mc_corsika_primary_id','mc_height_first_interaction'])
@@ -32,7 +32,7 @@ def calc_with_RandomForestRegressor():
     data = data.drop(mc_attributes, axis=1)
 
     droped_information = list(['telescope_type_name','x','y','telescope_event_id','telescope_id','run_id_y','run_id_x','pointing_altitude',
-                                'camera_name','camera_id','array_event_id','pointing_azimuth','r'])
+                                'camera_name','camera_id','array_event_id','pointing_azimuth','r','phi','psi'])
     droped_data = data[droped_information]
     data = data.drop(droped_information,axis=1)
 
@@ -52,22 +52,21 @@ def calc_with_RandomForestRegressor():
     # Regression with mean over same array_event_id
 
 
-    #pd.options.mode.chained_assignment = None  # default='warn'
-
-
     data['mc_energy'] = truth
     data['array_event_id'] = droped_data['array_event_id']
+    data['predictions'] = predictions
 
-    data = func.mean_over_ID(predictions, data)
+    data = func.mean_over_ID(data)
     prediction_mean = data['predicted_energy']
     truth_mean = data['mc_energy']
     data = data.drop('predicted_energy',axis=1)
 
 
-    data = func.weighted_mean_over_ID(predictions, data['intensity'], data)
+    data = func.weighted_mean_over_ID(data['intensity'], data)
     prediction_w_mean = data['predicted_energy']
     truth_w_mean = data['mc_energy']
     data = data.drop('predicted_energy',axis=1)
+
 
     telescope = droped_data['telescope_type_name']
     mask= telescope == 'LST'
@@ -77,7 +76,7 @@ def calc_with_RandomForestRegressor():
     mask = telescope == 'SST'
     telescope.loc[mask]=4
     data['telescope_size'] = telescope
-    data = func.weighted_mean_over_ID(predictions, data['telescope_size'], data)
+    data = func.weighted_mean_over_ID(data['telescope_size'], data)
     prediction_w2_mean = data['predicted_energy']
     truth_w2_mean = data['mc_energy']
     data = data.drop('predicted_energy',axis=1)
