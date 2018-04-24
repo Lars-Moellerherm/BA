@@ -7,14 +7,14 @@ import h5py as h5
 import scipy as sc
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.model_selection import cross_validate, train_test_split, cross_val_predict, StratifiedKFold
-from sklearn.metrics import auc, roc_curve, confusion_matrix, r2_score
+from sklearn.metrics import r2_score, explained_variance_score, mean_squared_error
 from sklearn.utils import shuffle
 from sklearn.tree import DecisionTreeClassifier
 
 def calc_with_RandomForestRegressor():
 
     # Import data in h5py
-    gammas = h5.File("../data/gammas.hdf5","r")
+    gammas = h5.File("../data/gamma_dl3.hdf5","r")
 
     # Converting to pandas
     gamma_array_df = pd.DataFrame(data=dict(gammas['array_events']))
@@ -29,11 +29,11 @@ def calc_with_RandomForestRegressor():
     #shuffel
     data_MSV = shuffle(data_MSV1)
 
-    #prediction_attributes = list(['alt_prediction','az_prediction','core_x_prediction','core_y_prediction','gamma_energy_prediction_mean',
-    #                                'gamma_energy_prediction_std_x','gamma_prediction_mean','gamma_prediction_std',
-    #                                'gamma_energy_prediction','gamma_energy_prediction_std_y','gamma_prediction'])
-    #prediction_data = data[prediction_attributes]
-    #data = data.drop(prediction_attributes, axis=1)
+    prediction_attributes = list(['alt_prediction','az_prediction','core_x_prediction','core_y_prediction','gamma_energy_prediction_mean',
+                                    'gamma_energy_prediction_std_x','gamma_prediction_mean','gamma_prediction_std',
+                                    'gamma_energy_prediction','gamma_energy_prediction_std_y','gamma_prediction'])
+    prediction_data = data_MSV[prediction_attributes]
+    data_MSV = data_MSV.drop(prediction_attributes, axis=1)
 
     #print('Kai s prediction R2-score: ',r2_score(prediction_data['gamma_energy_prediction'],data['mc_energy']))
 
@@ -54,6 +54,8 @@ def calc_with_RandomForestRegressor():
     X=data_MSV.values
     y=truth.values
     predictions = cross_val_predict(RFr, X, y, cv=10)
+
+
     # weighted mean
     data_wmean = data_MSV.copy(deep=True)
     data_wmean['mc_energy'] = truth
@@ -65,7 +67,6 @@ def calc_with_RandomForestRegressor():
     truth_w_mean = data_wmean2['mc_energy'].copy(deep=True)
     data_wmean2 = data_wmean2.drop('predictions', axis=1)
 
-    print()
     # use the prediction_w_mean for another RF
 
     data_encaps = data_wmean.copy(deep=True)
@@ -74,9 +75,6 @@ def calc_with_RandomForestRegressor():
     data_encaps = data_encaps.drop('array_event_id', axis=1)
     data_encaps = data_encaps.drop('mc_energy', axis=1)
 
-    att=list(data_encaps)
-    ck = data_MSV[att[:9]].values != data_wmean[att[:9]].values
-    print(np.count_nonzero(ck))
     #fit and pred
     RFr2 = RandomForestRegressor(max_depth=10, n_jobs=-1)
     X=data_encaps.values
@@ -88,22 +86,39 @@ def calc_with_RandomForestRegressor():
     max_energy = 340
     #PLOTS
         #Plots without mean
+    plt.subplot(211)
     r2_1 = func.plot_hist2d(predictions,truth.values,min_energy,max_energy)
-    plt.title("RF(with MSV) for energy estimation(R2score: %.2f)" % r2_1)
-    plt.savefig("plots/RF/mean_scaled/RF_Regression_MSV.pdf")
-    plt.close()
-
-    func.plot_error(predictions,truth.values)
-    plt.title('error of RF(with MSV) for Energy estimation')
-    plt.savefig("plots/RF/mean_scaled/RF_Regression_MSV_error.pdf")
-    plt.close()
+    plt.title("RF(with MSV)(R2score: %.2f)" % r2_1)
 
         #plots for weighted mean
 
             #intensity
+    plt.subplot(223)
     r2_2 = func.plot_hist2d(prediction_w_mean.values,truth_w_mean.values,min_energy,max_energy)
-    plt.title("RF Regression for energy estimation with weighted mean(intensity)(R2score: %0.2f)" % r2_2 )
-    plt.savefig('plots/RF/mean_scaled/RF_Regression_w_mean_MSV.pdf')
+    plt.title("RFr w mean(inty)(%0.2f)" % r2_2 )
+
+
+
+        #plots for encapsulated RF
+    plt.subplot(224)
+    r2_3 = func.plot_hist2d(predictions_encaps,truth_encaps.values,min_energy,max_energy)
+    plt.title("encap RFr(%.2f)" % r2_3)
+    plt.subplots_adjust(wspace=0.35,hspace=0.45)
+    #plt.show()
+    plt.savefig('plots/RF/mean_scaled/RF_Regression_MSV_all.pdf')
+    plt.close()
+
+    #Error Plots
+    func.plot_error(predictions_encaps,truth_encaps.values)
+    plt.title('the error of the encapsulated RF for Energy estimation')
+    #plt.show()
+    plt.savefig('plots/RF/mean_scaled/RF_Regression_errors_MSV_encaps.pdf')
+    plt.close()
+
+
+    func.plot_error(predictions,truth.values)
+    plt.title('error of RF(with MSV) for Energy estimation')
+    plt.savefig("plots/RF/mean_scaled/RF_Regression_MSV_error.pdf")
     plt.close()
 
 
@@ -113,25 +128,17 @@ def calc_with_RandomForestRegressor():
     plt.savefig('plots/RF/mean_scaled/RF_Regression_errors_w_mean_MSV.pdf')
     plt.close()
 
-        #plots for encapsulated RF
-
-    r2_3 = func.plot_hist2d(predictions_encaps,truth_encaps.values,min_energy,max_energy)
-    plt.title("encapsulated RF Regression for energy estimation(R2score: %.2f)" % r2_3)
-    #plt.show()
-    plt.savefig('plots/RF/mean_scaled/RF_Regression_MSV_encaps.pdf')
-    plt.close()
-
-    func.plot_error(predictions_encaps,truth_encaps.values)
-    plt.title('the error of the encapsulated RF for Energy estimation')
-    #plt.show()
-    plt.savefig('plots/RF/mean_scaled/RF_Regression_errors_MSV_encaps.pdf')
-    plt.close()
-
 
     #Print R2Score
-    print('Coefficient of determination for the RandomForestRegressor: %.2f' % r2_1,
-        '\n Coefficient for determination for RF with weighted mean(intensity): %.2f' % r2_2,
-        '\n Coefficient for determination for encapsulated RF: %.2f' % r2_3)
+    print('RandomForestRegressor:\n\t Coefficient for determination: %.2f \n' % r2_1,
+            '\texplained_variance score: %.2f \n' % explained_variance_score(predictions,truth.values),
+            '\tmean squared error: %.2f \n' % mean_squared_error(predictions,truth.values),
+            'RF with weighted mean(intensity):\n\t Coefficient for determination: %.2f \n' % r2_2,
+            '\texplained_variance score: %.2f \n' % explained_variance_score(prediction_w_mean.values,truth_w_mean.values),
+            '\tmean squared error: %.2f \n' % mean_squared_error(prediction_w_mean.values,truth_w_mean.values),
+            'encapsulated RF:\n\t Coefficient of determination: %.2f\n' % r2_3,
+            '\texplained_variance score: %.2f \n' % explained_variance_score(predictions_encaps,truth_encaps.values),
+            '\tmean squared error: %.2f \n' % mean_squared_error(predictions_encaps,truth_encaps.values),)
 
 
 

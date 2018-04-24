@@ -37,8 +37,8 @@ def calc_with_RandomForestRegressor():
     data = data.drop(droped_information,axis=1)
 
     #prediction_attributes = list(['alt_prediction', 'az_prediction', 'core_x_prediction', 'core_y_prediction', 'gamma_energy_prediction_mean',
-    #                            'gamma_energy_prediction_std_x', 'gamma_prediction_mean', 'gamma_prediction_std',
-    #                            'gamma_energy_prediction', 'gamma_energy_prediction_std_y', 'gamma_prediction'])
+    #                           'gamma_energy_prediction_std_x', 'gamma_prediction_mean', 'gamma_prediction_std',
+    #                           'gamma_energy_prediction', 'gamma_energy_prediction_std_y', 'gamma_prediction'])
     #prediction_data = data[prediction_attributes]
     #data = data.drop(prediction_attributes, axis=1)
 
@@ -61,13 +61,13 @@ def calc_with_RandomForestRegressor():
     truth_mean = data['mc_energy']
     data = data.drop('predicted_energy',axis=1)
 
-
+        #Intensity weight
     data = func.weighted_mean_over_ID(data['intensity'], data)
     prediction_w_mean = data['predicted_energy']
     truth_w_mean = data['mc_energy']
     data = data.drop('predicted_energy',axis=1)
 
-
+        #telescope size weight
     telescope = droped_data['telescope_type_name']
     mask= telescope == 'LST'
     telescope.loc[mask]=23#size of the mirror
@@ -81,13 +81,59 @@ def calc_with_RandomForestRegressor():
     truth_w2_mean = data['mc_energy']
     data = data.drop('predicted_energy',axis=1)
 
+        #intensity squared weight
+    weight2 = data['intensity']**2
+    data = func.weighted_mean_over_ID(weight2, data)
+    prediction_w3_mean = data['predicted_energy']
+    truth_w3_mean = data['mc_energy']
+    data = data.drop('predicted_energy',axis=1)
+
+        #sqrt intensity weight
+    weight3 = data['intensity']**(1/2)
+    data = func.weighted_mean_over_ID(weight3, data)
+    prediction_w4_mean = data['predicted_energy']
+    truth_w4_mean = data['mc_energy']
+    data = data.drop('predicted_energy',axis=1)
+
     min_energy = 0.003
-    max_energy = 50
+    max_energy = 340
     #PLOTS
         #Plots without mean
+    plt.subplot(221)
     r2_1 = func.plot_hist2d(predictions,truth,min_energy,max_energy)
-    plt.title("RF for energy estimation(R2score: %.2f)" % r2_1)
-    plt.savefig("plots/RF/weighted/RF_Regression.pdf")
+    plt.title("RFr(R2score: %.2f)" % r2_1)
+
+
+
+        #Plots with mean
+    plt.subplot(222)
+    r2_2 = func.plot_hist2d(prediction_mean,truth_mean,min_energy,max_energy)
+    plt.title("RFr mean(%.2f)" % r2_2)
+
+
+        #plots for weighted mean
+
+            #intensity
+    plt.subplot(223)
+    r2_3 = func.plot_hist2d(prediction_w_mean,truth_w_mean,min_energy,max_energy)
+    plt.title("RFr w mean(inty)(%0.2f)" % r2_3 )
+
+
+
+        #plots for encapsulated RF
+    plt.subplot(224)
+    r2_4 = func.plot_hist2d(prediction_w2_mean,truth_w2_mean,min_energy,max_energy)
+    plt.title("RFr w mean(telsize) (%.2f)" % r2_4)
+    plt.subplots_adjust(wspace=0.45,hspace=0.45)
+    #plt.show()
+    plt.savefig('plots/RF/weighted/RF_Regression_all.pdf')
+    plt.close()
+
+
+    func.plot_error(prediction_w2_mean, truth_w2_mean)
+    plt.title('the error of RF with weighted mean (telescope size)')
+    #plt.show()
+    plt.savefig('plots/RF/weighted/RF_Regression_errors_w2_mean.pdf')
     plt.close()
 
     func.plot_error(predictions,truth)
@@ -95,23 +141,9 @@ def calc_with_RandomForestRegressor():
     plt.savefig("plots/RF/weighted/RF_Regression_error.pdf")
     plt.close()
 
-        #Plots with mean
-    r2_2 = func.plot_hist2d(prediction_mean,truth_mean,min_energy,max_energy)
-    plt.title("RF for energy estimation with mean(R2score: %.2f)" % r2_2)
-    plt.savefig("plots/RF/weighted/RF_Regression_mean.pdf")
-    plt.close()
-
     func.plot_error(prediction_mean,truth_mean)
     plt.title('error of RF with mean for Energy estimation')
     plt.savefig("plots/RF/weighted/RF_Regression_mean_error.pdf")
-    plt.close()
-
-        #plots for weighted mean
-
-            #intensity
-    r2_3 = func.plot_hist2d(prediction_w_mean,truth_w_mean,min_energy,max_energy)
-    plt.title("RF Regression with weighted mean(intensity)(R2score: %0.2f)" % r2_3 )
-    plt.savefig('plots/RF/weighted/RF_Regression_w_mean.pdf')
     plt.close()
 
 
@@ -121,25 +153,13 @@ def calc_with_RandomForestRegressor():
     plt.savefig('plots/RF/weighted/RF_Regression_errors_w_mean.pdf')
     plt.close()
 
-        #plots for encapsulated RF
-
-    r2_4 = func.plot_hist2d(prediction_w2_mean,truth_w2_mean,min_energy,max_energy)
-    plt.title("RF Regression with weighted mean(telescope size)(R2score: %.2f)" % r2_4)
-    #plt.show()
-    plt.savefig('plots/RF/weighted/RF_Regression_w2_mean.pdf')
-    plt.close()
-
-    func.plot_error(prediction_w2_mean, truth_w2_mean)
-    plt.title('the error of RF with weighted mean (telescope size)')
-    #plt.show()
-    plt.savefig('plots/RF/weighted/RF_Regression_errors_w2_mean.pdf')
-    plt.close()
-
 
     #Print R2Score
     print('Coefficient of determination for the RandomForestRegressor: %.2f' % r2_1,
         '\n Coefficient for determination for RF with mean: %.2f' % r2_2,
         '\n Coefficient for determination for RF with weighted mean(intensity): %.2f' % r2_3,
-        '\n Coefficient for determination for Rf with weighted mean(telescope size): %.2f' % r2_4)
+        '\n Coefficient for determination for Rf with weighted mean(telescope size): %.2f' % r2_4,
+        '\n Coefficient for determination for Rf with weighted mean(intensity squared): %.2f' % r2_score(prediction_w3_mean,truth_w3_mean),
+        '\n Coefficient for determination for Rf with weighted mean(sqrt intensity): %.2f' % r2_score(prediction_w4_mean,truth_w4_mean))
 
 calc_with_RandomForestRegressor()

@@ -45,7 +45,7 @@ def plot_hist2d(predictions,truth,min_energy,max_energy):
     #plt.grid(True,which='both')
     plt.colorbar()
     plt.plot([0.003,330],[0.003,330],color="grey", label= "correct prediction")
-    plt.legend()
+    #plt.legend()
     plt.xlabel('Predicted value / TeV')
     plt.ylabel('truth value / TeV')
     plt.xscale('log')
