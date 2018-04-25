@@ -38,10 +38,10 @@ def calc_mean_scaled_width_and_length(data):
 def plot_hist2d(predictions,truth,min_energy,max_energy):
     min_e = np.log10(min_energy)
     max_e = np.log10(max_energy)
-    bin_edges = np.logspace(min_e,max_e,60)
+    bin_edges = np.logspace(min_e,max_e,35)
     r2=r2_score(predictions,truth)
     d, bin1, bin2 = np.histogram2d(predictions, truth, bins=bin_edges)
-    plt.pcolormesh(bin1,bin2,d,cmap='viridis')
+    plt.pcolormesh(bin1,bin2,d,cmap='jet')
     #plt.grid(True,which='both')
     plt.colorbar()
     plt.plot([0.003,330],[0.003,330],color="grey", label= "correct prediction")
@@ -76,3 +76,25 @@ def mean_over_ID(data):
     data2 = pd.merge(data, predict, on='array_event_id')
 
     return data2
+
+def plot_rel_error(predictions, truth):
+    rel_error = (predictions-truth)/truth
+    rel_error = abs(rel_error)
+    bin_edges = np.logspace(np.log10(min(rel_error)),np.log10(max(rel_error)),50)
+    plt.hist(rel_error,bins=bin_edges)
+    plt.xlabel('relative error of prediction')
+    plt.ylabel('counts')
+    plt.xscale('log')
+
+    return rel_error.mean(), sc.stats.sem(rel_error)
+
+
+def plot_trueDIVpred(predictions, truth):
+    div = truth/predictions
+    bin_edges = np.logspace(np.log10(min(div)),np.log10(max(div)),50)
+    plt.hist(div,bins=bin_edges)
+    plt.xlabel('truth/prediction')
+    plt.ylabel('counts')
+    plt.xscale('log')
+
+    return div.mean(), sc.stats.sem(div)

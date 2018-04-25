@@ -47,6 +47,13 @@ RFr = RandomForestRegressor(max_depth=10, n_jobs=-1)
 X=data_merge.values
 y=truth.values
 predictions = cross_val_predict(RFr, X, y, cv=10)
-print('Coefficient of determination for the RandomForestRegressor: %.2f \n' % r2_score(predictions,y),
-'explained_variance score: %.2f \n' % explained_variance_score(predictions,y),
-'mean squared error: %.2f' % mean_squared_error(predictions,y))
+
+mean, std = func.plot_rel_error(predictions,y)
+plt.title(r'Relativer Fehler ($\mu$: %.2f,$\sigma$: %.2f)' % (mean, std))
+plt.show()
+plt.close()
+
+mean_div, std_div = func.plot_trueDIVpred(predictions,y)
+plt.title(r'Verhältnis von Truth zu Prediction ($\mu$: %.2f, $\sigma$: %.2f)' % (mean_div, std_div))
+plt.show()
+plt.close()

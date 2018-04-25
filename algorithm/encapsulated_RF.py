@@ -103,7 +103,7 @@ def calc_with_RandomForestRegressor():
     plt.subplot(224)
     r2_3 = func.plot_hist2d(predictions_encaps,truth_encaps.values,min_energy,max_energy)
     plt.title("encap RFr(%.2f)" % r2_3)
-    plt.subplots_adjust(wspace=0.35,hspace=0.45)
+    plt.subplots_adjust(wspace=0.45,hspace=0.45)
     #plt.show()
     plt.savefig('plots/RF/mean_scaled/RF_Regression_MSV_all.pdf')
     plt.close()

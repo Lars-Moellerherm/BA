@@ -13,7 +13,7 @@ from sklearn.tree import DecisionTreeClassifier
 def calc_with_RandomForestRegressor():
 
     # Import data in h5py
-    gammas = h5.File("../data/gammas.hdf5","r")
+    gammas = h5.File("../data/gamma_dl3.hdf5","r")
 
     # Converting to pandas
     gamma_array_df = pd.DataFrame(data=dict(gammas['array_events']))
@@ -36,18 +36,20 @@ def calc_with_RandomForestRegressor():
     droped_data = data[droped_information]
     data = data.drop(droped_information,axis=1)
 
-    #prediction_attributes = list(['alt_prediction', 'az_prediction', 'core_x_prediction', 'core_y_prediction', 'gamma_energy_prediction_mean',
-    #                           'gamma_energy_prediction_std_x', 'gamma_prediction_mean', 'gamma_prediction_std',
-    #                           'gamma_energy_prediction', 'gamma_energy_prediction_std_y', 'gamma_prediction'])
-    #prediction_data = data[prediction_attributes]
-    #data = data.drop(prediction_attributes, axis=1)
+    prediction_attributes = list(['alt_prediction', 'az_prediction', 'core_x_prediction', 'core_y_prediction', 'gamma_energy_prediction_mean',
+                               'gamma_energy_prediction_std_x', 'gamma_prediction_mean', 'gamma_prediction_std',
+                               'gamma_energy_prediction', 'gamma_energy_prediction_std_y', 'gamma_prediction'])
+    prediction_data = data[prediction_attributes]
+    data = data.drop(prediction_attributes, axis=1)
 
 
     truth=mc_data['mc_energy']
     #train, test, train_truth, test_truth = train_test_split(data, truth, test_size = 0.5)
 
     RFr = RandomForestRegressor(max_depth=10, n_jobs=-1)
-    predictions = cross_val_predict(RFr, data, truth, cv=10)
+    X=data.values
+    y=truth.values
+    predictions = cross_val_predict(RFr, X, y, cv=10)
 
     # Regression with mean over same array_event_id
 
