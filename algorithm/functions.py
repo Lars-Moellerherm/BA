@@ -39,10 +39,10 @@ def calc_mean_scaled_width_and_length(data):
 def plot_hist2d(predictions,truth,min_energy,max_energy):
     min_e = np.log10(min_energy)
     max_e = np.log10(max_energy)
-    bin_edges = np.logspace(min_e,max_e,70)
+    bin_edges = np.logspace(min_e,max_e,35)
     r2=r2_score(predictions,truth)
     d, bin1, bin2 = np.histogram2d(predictions, truth, bins=bin_edges)
-    plt.pcolormesh(bin1, bin2, d, cmap='viridis',vmax=d.max(), norm=LogNorm())
+    plt.pcolormesh(bin1, bin2, d, cmap='viridis', norm=LogNorm())
     #plt.grid(True,which='both')
     plt.colorbar()
     plt.plot([min_energy,max_energy],[min_energy,max_energy],color="grey", label= "correct prediction")
@@ -55,6 +55,7 @@ def plot_hist2d(predictions,truth,min_energy,max_energy):
     plt.ylim(max_e)
 
     return r2
+
 
 def plot_error(predictions,truth):
     error = (predictions-truth)**2
@@ -78,6 +79,7 @@ def mean_over_ID(data):
 
     return data2
 
+
 def plot_rel_error(predictions, truth):
     rel_error = (predictions-truth)/truth
     rel_error = abs(rel_error)
@@ -99,3 +101,14 @@ def plot_trueDIVpred(predictions, truth):
     plt.xscale('log')
 
     return div.mean(), sc.stats.sem(div)
+
+
+def plot_std_der_bins(predictions,bins):
+    df = pd.DataFrame({'predictions':predictions})
+    df['cut'] = pd.cut(x=predictions,bins=bins)
+    standard = df.groupby('cut').std()
+    standard['mean'] = df.groupby('cut').mean()
+    plt.plot(np.log10(standard['mean']),standard['predictions'],'x')
+    plt.xlabel(r'$\mu$ in jedem Bin / TeV')
+    plt.ylabel(r'$\sigma$ für jeden Bin')
+    plt.xscale('log')

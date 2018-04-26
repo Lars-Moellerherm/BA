@@ -1,0 +1,51 @@
+\documentclass{moderncv}
+\usepackage[scale=0.75]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage[T1]{fontenc}
+\moderncvstyle{classic}
+\moderncvcolor{burgundy}
+\firstname{Robin}
+\familyname{Möllerherm}
+\address{Kapellenstr. 28}{51103 Köln}
+\mobile{0157 38373868}
+\email{rmoelle3@smail.uni-koeln.de}
+\photo[110pt]{Robin.jpg}
+\begin{document}
+\maketitle
+\section{Personal Information}
+\cvitem{Date of Birth}{25.02.1997}
+\cvitem{Place of birth}{Mettingen}
+\cvitem{Marital Status}{single}
+\cvitem{Citizenship}{Germany}
+\section{Education}
+\cventry{2003 - 2007}{Grundschulabschluss}{Ludgeri-Schule Mettingen}{}{}{}
+\cventry{2007 - 2015}{Abitur}{Kardinal-von-Galen Gymnasium Mettingen}{Note: 2,0}{}{}
+\cventry{since 2016}{Universität zu Köln}{Studienfach: Bachelor Volkswirtschaftslehre}{4.~Sex
+mester}{Vorläufige Gesamtnote: 1,3}{}
+\section{Employment History}
+\cventry{04.2013 - 04.2014}{vacation job at the gardens of a  eines Privathaushalts}{}{}{}{}
+\cventry{07.2014 - 08.2014}{vacation job im Elektronikbereich bei der Firma Stark GmbH Recke}{}{}{}{}
+\cventry{10.2014 - 06.2015}{Aushilfstätigkeit im Gartenbereich eines Privathaushalts}{}{}{}{}
+\cventry{06.2015 - 09.2015}{Aushilfstätigkeit bei Kromschröder/Elster Group GmbH in Lotte}{}{}{}{}
+\cventry{07.2016 - 08.2016}{Aushilfstätigkeit bei Kromschröder/Elster Group GmbH in Lotte}{}{}{}{}
+\cventry{03.2018 - 04.2018}{Aushilfstätigkeit bei Kromschröder/Elster Group GmbH in Lotte}{}{}{}{}
+\section{Traineeships}
+\cventry{08.2009 bis 07.2013}{AG: Natur}{}{}{}{}
+\cventry{08.2012 bis 07.2014}{Pate der 5c/6c des Kardinal-von-Galen Gymnasiums}{}{}{}{}
+\cventry{01.2013 bis 02.2013}{Praktikum bei der VR-Bank Kreis Steinfurt eG.}{}{}{}{}
+\cventry{21.07.14 bis 25.07.14}{Praktikum bei der ALD AutoLeasing D GmbH in Hamburg}{}{}{}{}
+\section{Interests and Professional Qualifications}
+\cventry{Interessen/ Hobbys}{Fu\ss ball, Volleyball, Tennis, Politik}{}{}{}{}
+\cventry{Besondere Kenntnisse}{Führerschein B/BE}{}{}{}{}
+\cventry{Fremdsprachen}{Englisch (B2), Spanisch(B1/B2), Latein(Latinum)}{}{}{}{}
+\cventry{PC-Kenntnisse}{Grundkenntnisse in MS Office Programmen,\linebreak 10-Finger-Schreibsystem}{}{}{}{}
+\section{International Experience}
+\cventry{10.2015 bis 03.2016}{Work and Travel in Neuseeland}{Arbeiten: Milchbauer}{}{}{}
+\cventry{04.2016 bis 06.2016}{Backpacking Südostasien}{Indonesien,Malaysia,Myanmar,Thailand}{}{}{}
+\cventry{08.2018 bis 12.2018}{Auslandssemester in Peru,Lima}{Universidad ESAN}{}{}{}
+\vspace{2cm}
+\cvline{}{Cologne, the 08.04.2018}
+\vspace{1cm}
+\cvline{}{Robin Möllerherm}
+\end{document}
