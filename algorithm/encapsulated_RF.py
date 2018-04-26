@@ -14,7 +14,7 @@ from sklearn.tree import DecisionTreeClassifier
 def calc_with_RandomForestRegressor():
 
     # Import data in h5py
-    gammas = h5.File("../data/gamma_dl3.hdf5","r")
+    gammas = h5.File("../data/gammas.hdf5","r")
 
     # Converting to pandas
     gamma_array_df = pd.DataFrame(data=dict(gammas['array_events']))
@@ -29,11 +29,11 @@ def calc_with_RandomForestRegressor():
     #shuffel
     data_MSV = shuffle(data_MSV1)
 
-    prediction_attributes = list(['alt_prediction','az_prediction','core_x_prediction','core_y_prediction','gamma_energy_prediction_mean',
-                                    'gamma_energy_prediction_std_x','gamma_prediction_mean','gamma_prediction_std',
-                                    'gamma_energy_prediction','gamma_energy_prediction_std_y','gamma_prediction'])
-    prediction_data = data_MSV[prediction_attributes]
-    data_MSV = data_MSV.drop(prediction_attributes, axis=1)
+    #prediction_attributes = list(['alt_prediction','az_prediction','core_x_prediction','core_y_prediction','gamma_energy_prediction_mean',
+    #                                'gamma_energy_prediction_std_x','gamma_prediction_mean','gamma_prediction_std',
+    #                                'gamma_energy_prediction','gamma_energy_prediction_std_y','gamma_prediction'])
+    #prediction_data = data_MSV[prediction_attributes]
+    #data_MSV = data_MSV.drop(prediction_attributes, axis=1)
 
     #print('Kai s prediction R2-score: ',r2_score(prediction_data['gamma_energy_prediction'],data['mc_energy']))
 
@@ -48,7 +48,8 @@ def calc_with_RandomForestRegressor():
     data_MSV = data_MSV.drop(droped_information,axis=1)
     truth = mc_data['mc_energy']
 
-
+    print ("erster RF: ...")
+    print(list(data_MSV))
     #fit and predict
     RFr = RandomForestRegressor(max_depth=10, n_jobs=-1)
     X=data_MSV.values
@@ -69,19 +70,21 @@ def calc_with_RandomForestRegressor():
 
     # use the prediction_w_mean for another RF
 
-    data_encaps = data_wmean.copy(deep=True)
+    data_encaps = data_wmean2.copy(deep=True)
     truth_encaps = data_encaps['mc_energy'].copy(deep=True)
     ID_encaps = data_encaps['array_event_id'].copy(deep=True)
     data_encaps = data_encaps.drop('array_event_id', axis=1)
     data_encaps = data_encaps.drop('mc_energy', axis=1)
 
+    print ("zweiter RF: ...")
+    print(list(data_encaps))
     #fit and pred
     RFr2 = RandomForestRegressor(max_depth=10, n_jobs=-1)
     X=data_encaps.values
     y=truth_encaps.values
     predictions_encaps = cross_val_predict(RFr2, X, y, cv=10)
 
-
+    print("Plots: ...")
     min_energy = 0.003
     max_energy = 340
     #PLOTS

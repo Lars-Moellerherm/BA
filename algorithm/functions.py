@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import scipy as sc
 import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
 from sklearn.metrics import r2_score
 from tqdm import tqdm
 
@@ -38,13 +39,13 @@ def calc_mean_scaled_width_and_length(data):
 def plot_hist2d(predictions,truth,min_energy,max_energy):
     min_e = np.log10(min_energy)
     max_e = np.log10(max_energy)
-    bin_edges = np.logspace(min_e,max_e,35)
+    bin_edges = np.logspace(min_e,max_e,70)
     r2=r2_score(predictions,truth)
     d, bin1, bin2 = np.histogram2d(predictions, truth, bins=bin_edges)
-    plt.pcolormesh(bin1,bin2,d,cmap='jet')
+    plt.pcolormesh(bin1, bin2, d, cmap='viridis',vmax=d.max(), norm=LogNorm())
     #plt.grid(True,which='both')
     plt.colorbar()
-    plt.plot([0.003,330],[0.003,330],color="grey", label= "correct prediction")
+    plt.plot([min_energy,max_energy],[min_energy,max_energy],color="grey", label= "correct prediction")
     #plt.legend()
     plt.xlabel('Predicted value / TeV')
     plt.ylabel('truth value / TeV')
