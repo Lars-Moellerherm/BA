@@ -141,5 +141,5 @@ def calc_with_RandomForestRegressor():
             '\tmean squared error: %.2f \n' % mean_squared_error(predictions_encaps,truth_encaps.values),)
 
 
-
-calc_with_RandomForestRegressor()
+if __name__ == '__main__':
+	calc_with_RandomForestRegressor()
