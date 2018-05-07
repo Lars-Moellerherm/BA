@@ -4,7 +4,6 @@ import scipy as sc
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 from sklearn.metrics import r2_score
-from tqdm import tqdm
 
 def weighted_mean_over_ID(weight, data):
     weight2 = weight.copy(deep=True)
