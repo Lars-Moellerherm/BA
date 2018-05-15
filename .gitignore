@@ -23,6 +23,7 @@ node_modules
 
 #build-Folder
 build
+data
 
 *.hdf5
 *.aux

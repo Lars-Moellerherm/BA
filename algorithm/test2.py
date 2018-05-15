@@ -12,54 +12,52 @@ from sklearn.utils import shuffle
 from sklearn.tree import DecisionTreeClassifier
 
 
-# Import data in h5py
-gammas = h5.File("../data/gammas.hdf5","r")
+prediction, truth = np.genfromtxt("good_data/encaps_pred_data.txt", unpack=True)
+
+min_energy = 0.0001
+max_energy = 1
+bin_edges = np.logspace(np.log10(min_energy),np.log10(max_energy),50)
+
+func.plot_hist2d(prediction, truth, min_energy, max_energy, bin_edges)
+plt.savefig("plots/hist2d_tiefe_E.jpg")
+plt.close()
+
+min_energy = 100
+max_energy = max(truth)+50
+bin_edges = np.logspace(np.log10(min_energy),np.log10(max_energy),50)
+
+func.plot_hist2d(prediction, truth, min_energy, max_energy, bin_edges)
+plt.xlim(100,max_energy)
+plt.ylim(100,max_energy)
+plt.savefig("plots/hist2d_hohe_E.jpg")
+plt.close()
+
+gammas = h5.File("../data/3_gen/gammas.hdf5","r")
+
 # Converting to pandas
 gamma_array_df = pd.DataFrame(data=dict(gammas['array_events']))
 gamma_runs_df = pd.DataFrame(data=dict(gammas['runs']))
 gamma_telescope_df = pd.DataFrame(data=dict(gammas['telescope_events']))
 
+gamma_array_df = gamma_array_df
+gamma_runs_df = gamma_runs_df
+gamma_telescope_df = gamma_telescope_df
+
+
 #merging of array and telescope data and shuffle of proton and gamma
-data_merge = pd.merge(gamma_array_df,gamma_telescope_df,on="array_event_id")
+gamma_merge = pd.merge(gamma_array_df,gamma_telescope_df,on=list(["array_event_id",'run_id']))
+gamma_merge = gamma_merge.set_index(['run_id','array_event_id'])
+#there are some nan in width the needed to be deleted
+gamma_merge = gamma_merge.dropna(axis=0)
+data = gamma_merge
 
-#data_merge = shuffle(data_merge)
-
-plt.plot(data_merge.index,data_merge['mc_energy'],'.')
-plt.xlabel('index')
-plt.ylabel('Energy in TeV')
-plt.savefig("plots/correlation_between_index_and_energy.pdf")
-plt.close()
-
-mc_attributes = list(['mc_az','mc_alt','mc_core_x','mc_core_y','mc_energy','mc_corsika_primary_id','mc_height_first_interaction'])
-mc_data = data_merge[mc_attributes]
-data_merge.drop(mc_attributes, axis=1, inplace=True)
-
-
-droped_information = list(['psi','phi','telescope_type_name','x','y','telescope_event_id','telescope_id','run_id_y','run_id_x','pointing_altitude',
-                            'camera_name','camera_id','pointing_azimuth','r','array_event_id'])
-droped_data = data_merge[droped_information].copy(deep=True)
-data_merge.drop(droped_information,axis=1, inplace=True)
-truth = mc_data['mc_energy'].copy(deep=True)
-
-
-#fit and predict
-RFr = RandomForestRegressor(max_depth=10, n_jobs=-1)
-X=data_merge.values
-y=truth.values
-predictions = cross_val_predict(RFr, X, y, cv=10)
-
-mean, std = func.plot_rel_error(predictions,y)
-plt.title(r'Relativer Fehler ($\mu$: %.2f,$\sigma$: %.2f)' % (mean, std))
-plt.savefig('plots/try2.pdf')
-plt.close()
-
-mean_div, std_div = func.plot_trueDIVpred(predictions,y)
-plt.title(r'Verhältnis von Truth zu Prediction ($\mu$: %.2f, $\sigma$: %.2f)' % (mean_div, std_div))
-plt.savefig('plots/try1.pdf')
-plt.close()
-
-bin_edges = np.logspace(np.log10(0.003),np.log10(340),50)
-func.plot_std_der_bins(predictions,bin_edges)
-plt.title('simple RandomForest')
-plt.savefig('plots/try.pdf')
+energy =  data['mc_energy']
+minimum= min(energy)
+maximum = max(energy)
+bin_edges = np.logspace(np.log10(minimum),np.log10(maximum))
+plt.hist(energy,bins=bin_edges)
+plt.title("Energyspektrum mit Min: %.5f und Max: %.5f" % (minimum,maximum))
+plt.xlabel("Energy in TeV")
+plt.xscale('log')
+plt.savefig("plots/energiespektrum.jpg")
 plt.close()
