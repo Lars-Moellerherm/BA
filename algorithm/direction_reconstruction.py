@@ -34,7 +34,9 @@ parser.add_argument('--diffuse', type=bool, default=True, help="Wanna have the d
 parser.add_argument('--size', type=int, default=103663, help="How much data you want to enquire?")
 
 
-def low_energy_pred():
+
+def direction_recon():
+
     args = parser.parse_args()
 
     data_size = args.size-1
@@ -95,83 +97,29 @@ def low_energy_pred():
 
         print("Finished with calculating Mean Scaled Values ... \n")
 
+
     data = shuffle(data)
 
-    #Energiespektrum erstellen
-    energy =  data['mc_energy']
-    minimum= min(energy)
-    maximum = max(energy)
-    bin_edges = np.logspace(np.log10(minimum),np.log10(maximum))
-    plt.hist(energy,bins=bin_edges)
-    plt.title("Energyspektrum mit Min: %.5f und Max: %.5f" % (minimum,maximum))
-    plt.xlabel("Energy in TeV")
-    plt.xscale('log')
-    plt.savefig("plots/energiespektrum_mit_diffuse.jpg")
-    plt.close()
+
 
     #drop unimportant DATA
     mc_attributes = list(['mc_az','mc_alt','mc_core_x','mc_core_y','mc_energy','mc_corsika_primary_id','mc_height_first_interaction'])
     mc_data = data[mc_attributes]
     data = data.drop(mc_attributes, axis=1)
-    droped_information = list(['psi','phi','telescope_type_name','x','y','telescope_id','pointing_altitude',
+    droped_information = list(['phi','telescope_type_name','telescope_id','pointing_altitude',
                                 'camera_name','camera_id','pointing_azimuth','r'])
     droped_data = data[droped_information].copy(deep=True)
     data = data.drop(droped_information,axis=1)
     prediction_attributes = list(['h_max_prediction','alt_prediction','az_prediction','core_x_prediction','core_y_prediction'])
     prediction_data = data[prediction_attributes]
     data = data.drop(prediction_attributes, axis=1)
-    truth = mc_data['mc_energy']
-    #fit and predict
-    RFr = RandomForestRegressor(max_depth=10, n_jobs=-1)
-    print("We use these attributes for the first RF: \n ",list(data))
+
+    
 
 
-    X=data.values
-    y=truth.values
-    y = np.log(y)
-    predictions = cross_val_predict(RFr, X, y, cv=10)
-
-    #Energiespektrum nach transformation
-    energy =  y
-    minimum= min(energy)
-    maximum = max(energy)
-    bin_edges = np.logspace(np.log10(minimum),np.log10(maximum))
-    plt.hist(energy,bins=bin_edges)
-    plt.title("Energyspektrum mit Min: %.5f und Max: %.5f" % (minimum,maximum))
-    plt.xlabel("Energy in TeV")
-    plt.xscale('log')
-    plt.savefig("plots/energiespektrum_mit_diffuse_after.jpg")
-    plt.close()
-
-    y = np.exp(y)
-    predictions = np.exp(predictions)
-
-    z=np.array([predictions,y])
-    np.savetxt("data/low_energy_pred_data.txt",z.T)
 
 
-    print('RandomForestRegressor:\n\t Coefficient for determination: %.2f \n' % r2_score(predictions,truth.values),
-            '\texplained_variance score: %.2f \n' % explained_variance_score(predictions,truth.values),
-            '\tmean squared error: %.2f \n' % mean_squared_error(predictions,truth.values),
-            "Finished with the first prediction ... \n")
-
-
-    min_energy = 0.0001
-    max_energy = 1
-    bin_edges = np.logspace(np.log10(min_energy),np.log10(max_energy),50)
-
-    func.plot_hist2d(predictions, y, min_energy, max_energy, bin_edges)
-    plt.savefig("plots/low_energy_low.jpg")
-    plt.close()
-
-    min_energy = 0.0001
-    max_energy = 350
-    bin_edges = np.logspace(np.log10(min_energy),np.log10(max_energy),50)
-
-    func.plot_hist2d(predictions, y, min_energy, max_energy, bin_edges)
-    plt.savefig("plots/low_energy_whole.jpg")
-    plt.close()
 
 
 if __name__ == '__main__':
-	low_energy_pred()
+    direction_recon()

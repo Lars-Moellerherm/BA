@@ -51,13 +51,25 @@ gamma_merge = gamma_merge.set_index(['run_id','array_event_id'])
 gamma_merge = gamma_merge.dropna(axis=0)
 data = gamma_merge
 
+def poisson(k,lamb,C):
+    return lamb**k/sc.misc.factorial(k)*np.exp(-lamb) + C
+
 energy =  data['mc_energy']
+N = energy.shape[0]
+hist,bin = np.histogram(energy,range=(0,0.2))
+params, pcov = sc.optimize.curve_fit(poisson,bin[1:],hist/N,p0=(3,5))
+x = np.linspace(0,0.2,60)
+plt.plot(x, poisson(x,*params),'r-')
+plt.plot(bin[1:], hist/N, 'b.')
+plt.show()
+plt.close()
+
+
 minimum= min(energy)
 maximum = max(energy)
-bin_edges = np.logspace(np.log10(minimum),np.log10(maximum))
+bin_edges = np.linspace(minimum,0.2)
 plt.hist(energy,bins=bin_edges)
 plt.title("Energyspektrum mit Min: %.5f und Max: %.5f" % (minimum,maximum))
 plt.xlabel("Energy in TeV")
-plt.xscale('log')
 plt.savefig("plots/energiespektrum.jpg")
 plt.close()
