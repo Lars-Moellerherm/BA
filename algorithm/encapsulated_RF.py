@@ -104,12 +104,12 @@ def encaps_RF():
 
         #calculate the mean scaled
         data = func.calc_mean_scaled_width_and_length(data)
-        data = shuffle(data)
+
 
         print("Finished with calculating Mean Scaled Values ... \n")
 
     if(args.step > 0 & args.step < 4):
-
+        data = shuffle(data)
         #drop unimportant DATA
         mc_attributes = list(['mc_az','mc_alt','mc_core_x','mc_core_y','mc_energy','mc_corsika_primary_id','mc_height_first_interaction'])
         mc_data = data[mc_attributes]

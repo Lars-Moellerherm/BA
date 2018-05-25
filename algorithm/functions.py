@@ -100,12 +100,33 @@ def plot_trueDIVpred(predictions, truth):
     return div.mean(), sc.stats.sem(div)
 
 
-def plot_std_der_bins(predictions,bins):
-    df = pd.DataFrame({'predictions':predictions})
-    df['cut'] = pd.cut(x=predictions,bins=bins)
+def plot_std_der_bins(predictions,truth,bins):
+    df = pd.DataFrame({'predictions':predictions,'truth':truth})
+    df['cut'] = pd.cut(x=df['truth'],bins=bins)
     standard = df.groupby('cut').std()
-    standard['mean'] = df.groupby('cut').mean()
-    plt.plot(np.log10(standard['mean']),standard['predictions'],'x')
+    standard['mean'] = df.groupby('cut').mean()['truth']
+    plt.plot(standard['mean'],standard['predictions'],'x')
     plt.xlabel(r'$\mu$ in jedem Bin / TeV')
     plt.ylabel(r'$\sigma$ für jeden Bin')
     plt.xscale('log')
+
+
+def plot_R2_per_bin(prediction, truth, bins):
+    df = pd.DataFrame({'prediction':prediction,'truth':truth})
+    label = np.arange(1,bins.size)
+    left_edge_df = pd.DataFrame(data = bins[:-1], index = label,columns=['bin'])
+    df['cut'] = pd.cut(x=df['truth'],bins=bins,labels=label)
+    n=0
+    y = np.ones(bins.size-1)
+    grouped = df.groupby('cut')
+    for i in label:
+        if(df['cut'].isin([i]).sum()):
+            group = grouped.get_group(i)
+            y[n] = r2_score(group['prediction'],group['truth'])
+        else:
+            y[n]=0.0
+        n+=1
+    plt.plot(left_edge_df,y,'.')
+    plt.xscale('log')
+    plt.xlabel('left bin edge in TeV')
+    plt.ylabel('r2 score')
