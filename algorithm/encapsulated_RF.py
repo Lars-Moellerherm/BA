@@ -131,7 +131,6 @@ def encaps_RF():
         X=data.values
         y=truth.values
         predictions = cross_val_predict(RFr, X, y, cv=10)
-
         z=np.array([predictions,y])
 
         np.savetxt("data/encaps_pred_data.txt",z.T)
