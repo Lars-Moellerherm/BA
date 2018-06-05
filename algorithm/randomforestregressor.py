@@ -6,7 +6,7 @@ import h5py as h5
 import functions as func
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.model_selection import cross_validate, train_test_split, cross_val_predict, StratifiedKFold
-from sklearn.metrics import auc, roc_curve, confusion_matrix, r2_score
+from sklearn.metrics import r2_score, explained_variance_score, mean_squared_error
 from sklearn.utils import shuffle
 from sklearn.tree import DecisionTreeClassifier
 import argparse
@@ -19,52 +19,40 @@ parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpForm
                                         1: Just the prediction from the RFRegressor
                                         2: The mean and the weighted mean with intensity and telescope size.
                                         3: The mean weighted with intensity squared und por 1/2
-                                    ''')
-parser.add_argument('--steps', type=int, default=3)
+
+                                        Decide if you want to consider the diffused gammas with --diffuse
+                                            -default: True
+
+                                        Decide how big your data should be with --size
+                                            -you get --size events from gammas and diffuse gammas
+                                             if you set --diffuse on True
+                                            -default is 103663
+                                    '''))
+parser.add_argument('--steps', type=int, default=2)
+parser.add_argument('--size', type=int, default=103663, help="How much data you want to enquire?")
+parser.add_argument('--diffuse', type=bool, default=True, help="Wanna have the diffuse gammas?")
 
 def RF_regressor():
 
     args = parser.parse_args()
+    data_size = args.size-1
 
     if(args.steps > 0 & args.steps < 4):
-      # Import data in h5py
-      gammas = h5.File("../data/gamma_dl3.hdf5","r")
+      data = func.reading_data(args.diffuse,data_size)
 
-      # Converting to pandas
-      gamma_array_df = pd.DataFrame(data=dict(gammas['array_events']))
-      gamma_runs_df = pd.DataFrame(data=dict(gammas['runs']))
-      gamma_telescope_df = pd.DataFrame(data=dict(gammas['telescope_events']))
-
-      #merging of array and telescope data and shuffle of proton and gamma
-      gamma_merge = pd.merge(gamma_array_df,gamma_telescope_df,on="array_event_id")
-
-      data = shuffle(gamma_merge)
+      data = shuffle(data)
       #data = gamma_merge
       # isolate mc data and drop unimportant information
 
-      mc_attributes = list(['mc_az','mc_alt','mc_core_x','mc_core_y','mc_energy','mc_corsika_primary_id','mc_height_first_interaction'])
-      mc_data = data[mc_attributes]
-      data = data.drop(mc_attributes, axis=1)
-
-      droped_information = list(['telescope_type_name','x','y','telescope_event_id','telescope_id','run_id_y','run_id_x','pointing_altitude',
-                                  'camera_name','camera_id','array_event_id','pointing_azimuth','r','phi','psi'])
-      droped_data = data[droped_information]
-      data = data.drop(droped_information,axis=1)
-
-      #prediction_attributes = list(['alt_prediction', 'az_prediction', 'core_x_prediction', 'core_y_prediction', 'gamma_energy_prediction_mean',
-        #                        'gamma_energy_prediction_std_x', 'gamma_prediction_mean', 'gamma_prediction_std',
-        #                         'gamma_energy_prediction', 'gamma_energy_prediction_std_y', 'gamma_prediction'])
-      #prediction_data = data[prediction_attributes]
-      #data = data.drop(prediction_attributes, axis=1)
-
-
-      truth=mc_data['mc_energy']
+      data, droped_data = func.drop_data(data)
+      truth = droped_data['mc_energy']
 
       print("Finished reading data... \n")
 
       #train, test, train_truth, test_truth = train_test_split(data, truth, test_size = 0.5)
 
       RFr = RandomForestRegressor(max_depth=10, n_jobs=-1)
+      print("We use these attributes for the RF: \n ",list(data))
       X=data.values
       y=truth.values
       predictions = cross_val_predict(RFr, X, y, cv=10)
@@ -73,7 +61,8 @@ def RF_regressor():
       np.savetxt("data/RFr_pred_data.txt",z.T)
 
       print('Coefficient of determination for the RandomForestRegressor: %.2f \n' % r2_score(predictions,y),
-            '\tmean squared error: %.2f \n' % mean_squared_error(predictions,y),
+            '\t explained_variance score: %.2f \n' % explained_variance_score(predictions,truth.values),
+            '\t mean squared error: %.2f \n' % mean_squared_error(predictions,y),
             "Finished predicting... \n")
 
 
@@ -82,7 +71,6 @@ def RF_regressor():
 
 
         data['mc_energy'] = truth
-        data['array_event_id'] = droped_data['array_event_id']
         data['predictions'] = predictions
 
         data = func.mean_over_ID(data)
@@ -97,29 +85,74 @@ def RF_regressor():
         data = data.drop('predicted_energy',axis=1)
 
             #telescope size weight
-        telescope = droped_data['telescope_type_name']
+        telescope = droped_data['telescope_type_name'].copy(deep=True)
         mask= telescope == 'LST'
         telescope.loc[mask]=23#size of the mirror
         mask = telescope == 'MST'
         telescope.loc[mask]=12
         mask = telescope == 'SST'
         telescope.loc[mask]=4
-        data['telescope_size'] = telescope
+        telescope = telescope.to_frame('telescope_size')
+        #telescope = telescope.reset_index()
+        #data = data.reset_index()
+        data = pd.concat([data.sort_index(),telescope.sort_index()],axis=1)
+        #data = data.set_index(list(['run_id','array_event_id']))
         data = func.weighted_mean_over_ID(data['telescope_size'], data)
         prediction_w2_mean = data['predicted_energy']
         truth_w2_mean = data['mc_energy']
         data = data.drop('predicted_energy',axis=1)
+        data = data.drop('telescope_size',axis=1)
+
+            #telescope kind weight
+        telescope_sens = droped_data['telescope_type_name'].copy(deep=True)
+        telescope_sens = telescope_sens.to_frame()
+        truth_w3 = droped_data['mc_energy']
+        telescope_sens = pd.concat([telescope_sens,truth_w3],axis=1)
+        mask = (telescope_sens['telescope_type_name'] == 'LST') & (telescope_sens['mc_energy'] > 3.0) # not in requiered energy range
+        telescope_sens[mask] = 0.1
+        mask = (telescope_sens['telescope_type_name'] == 'LST') & (telescope_sens['mc_energy']>0.15) & (telescope_sens['mc_energy']<3) #not in full sensitivity
+        telescope_sens[mask] = 1
+        mask = (telescope_sens['telescope_type_name'] == 'LST') & (telescope_sens['mc_energy']<0.15) # not in requiered energy range
+        telescope_sens[mask] = 2
+        mask = (telescope_sens['telescope_type_name'] == 'MST') & (telescope_sens['mc_energy'] > 50.0) # not in requiered energy range
+        telescope_sens[mask] = 0.1
+        mask = (telescope_sens['telescope_type_name'] == 'MST') & (telescope_sens['mc_energy'] < 0.08) # not in requiered energy range
+        telescope_sens[mask] = 0.1
+        mask = (telescope_sens['telescope_type_name'] == 'MST') & (telescope_sens['mc_energy']>5.0) & (telescope_sens['mc_energy']<50.0) #not in full sensitivity
+        telescope_sens[mask] = 1
+        mask = (telescope_sens['telescope_type_name'] == 'MST') & (telescope_sens['mc_energy']>0.08) & (telescope_sens['mc_energy']<0.15) #not in full sensitivity
+        telescope_sens[mask] = 1
+        mask = (telescope_sens['telescope_type_name'] == 'MST') & (telescope_sens['mc_energy']<5) & (telescope_sens['mc_energy']>0.15) # not in requiered energy range
+        telescope_sens[mask] = 2
+        mask = (telescope_sens['telescope_type_name'] == 'SST') & (telescope_sens['mc_energy'] > 300.0)
+        telescope_sens[mask] = 0.1
+        mask = (telescope_sens['telescope_type_name'] == 'SST') & (telescope_sens['mc_energy'] < 1.0)
+        telescope_sens[mask] = 0.1
+        mask = (telescope_sens['telescope_type_name'] == 'SST') & (telescope_sens['mc_energy']>1.0) & (telescope_sens['mc_energy']<5.0) #not in full sensitivity
+        telescope_sens[mask] = 1
+        mask = (telescope_sens['telescope_type_name'] == 'SST') & (telescope_sens['mc_energy']<300.0) & (telescope_sens['mc_energy']>5.0) # not in requiered energy range
+        telescope_sens[mask] = 2
+        telescope_sens = telescope_sens.drop('mc_energy',axis=1)
+        data = pd.concat([data,telescope_sens.sort_index()],axis=1)
+        data = func.weighted_mean_over_ID(data['telescope_type_name'], data)
+        prediction_w3_mean = data['predicted_energy']
+        truth_w3_mean = data['mc_energy']
+        data = data.drop('predicted_energy',axis=1)
+        data = data.drop('telescope_type_name',axis=1)
 
         # writing data
 
         z = np.array([prediction_mean.values,truth_mean.values])
         np.savetxt("data/RFr_pred_mean_data.txt",z.T)
-
+        print(prediction_w_mean.shape,truth_w_mean.shape)
         z = np.array([prediction_w_mean.values,truth_w_mean.values])
         np.savetxt("data/RFr_pred_wI_mean_data.txt",z.T)
 
         z = np.array([prediction_w2_mean.values,truth_w2_mean.values])
         np.savetxt("data/RFr_pred_wT_mean_data.txt", z.T)
+
+        z = np.array([prediction_w3_mean.values,truth_w3_mean.values])
+        np.savetxt("data/RFr_pred_wS_mean_data.txt", z.T)
 
         print('\n Coefficient for determination for RF with mean: %.2f' % r2_score(prediction_mean.values,truth_mean.values),
         '\tmean squared error: %.2f \n' % mean_squared_error(prediction_mean.values,truth_mean.values),
@@ -127,21 +160,23 @@ def RF_regressor():
         '\tmean squared error: %.2f \n' % mean_squared_error(prediction_w_mean.values,truth_w_mean.values),
         '\n Coefficient for determination for Rf with weighted mean(telescope size): %.2f' % r2_score(prediction_w2_mean.values,truth_w2_mean.values),
         '\tmean squared error: %.2f \n' % mean_squared_error(prediction_w2_mean.values,truth_w2_mean.values),
+        '\n Coefficient for determination for Rf with weighted mean(telescope sensitivity): %.2f' % r2_score(prediction_w3_mean.values,truth_w3_mean.values),
+        '\tmean squared error: %.2f \n' % mean_squared_error(prediction_w3_mean.values,truth_w3_mean.values),
         "Finished with calculating the means (Step 2)...")
 
     if(args.steps == 3):
             #intensity squared weight
         weight2 = data['intensity']**2
         data = func.weighted_mean_over_ID(weight2, data)
-        prediction_w3_mean = data['predicted_energy']
-        truth_w3_mean = data['mc_energy']
+        prediction_w4_mean = data['predicted_energy']
+        truth_w4_mean = data['mc_energy']
         data = data.drop('predicted_energy',axis=1)
 
             #sqrt intensity weight
         weight3 = data['intensity']**(1/2)
         data = func.weighted_mean_over_ID(weight3, data)
-        prediction_w4_mean = data['predicted_energy']
-        truth_w4_mean = data['mc_energy']
+        prediction_w5_mean = data['predicted_energy']
+        truth_w5_mean = data['mc_energy']
         data = data.drop('predicted_energy',axis=1)
 
         print('\n Coefficient for determination for Rf with weighted mean(intensity squared): %.2f' % r2_score(prediction_w3_mean,truth_w3_mean),
@@ -150,5 +185,5 @@ def RF_regressor():
 
 
 
-if __name__ == __main__:
+if __name__ == '__main__':
     RF_regressor()

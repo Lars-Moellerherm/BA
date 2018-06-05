@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import scipy as sc
+import h5py as h5
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 from sklearn.metrics import r2_score
@@ -66,12 +67,11 @@ def plot_error(predictions,truth):
 def mean_over_ID(data):
     truth = data['mc_energy'].copy(deep=True)
     predictions = data['predictions'].copy(deep=True)
-    pred = pd.DataFrame({'predicted_energy':predictions, 'mc_energy':
-                        truth})
+    pred = pd.DataFrame({'predicted_energy':predictions})
     prediction_mean = pred.groupby(level=list(['array_event_id','run_id'])).mean()
     prediction_mean = prediction_mean.reset_index()
     data = data.reset_index()
-    data2 = pd.merge(data, predict, on=list(['run_id','array_event_id']))
+    data2 = pd.merge(data, prediction_mean, on=list(['run_id','array_event_id']))
     data2 = data2.set_index(['run_id','array_event_id'])
 
     return data2
@@ -130,5 +130,73 @@ def plot_R2_per_bin(prediction, truth, bins):
         n+=1
     plt.plot(bin_df['bin'],y,'.')
     plt.xscale('log')
-    plt.xlabel('left bin edge in TeV')
+    plt.xlabel('bin center in TeV')
     plt.ylabel('r2 score')
+
+
+def reading_data(diffuse,data_size1):
+    # Import data in h5py
+    gammas = h5.File("../data/3_gen/gammas.hdf5","r")
+
+    # Converting to pandas
+    gamma_array_df = pd.DataFrame(data=dict(gammas['array_events']))
+    gamma_runs_df = pd.DataFrame(data=dict(gammas['runs']))
+    gamma_telescope_df = pd.DataFrame(data=dict(gammas['telescope_events']))
+    max_size = gamma_array_df.shape[0]
+    if(data_size1 >= max_size):
+        data_size = max_size-1
+    else:
+        data_size = data_size1
+    gamma_array_df = gamma_array_df.iloc[:data_size]
+    gamma_runs_df = gamma_runs_df.iloc[:data_size]
+    gamma_telescope_df = gamma_telescope_df.iloc[:data_size]
+
+
+    #merging of array and telescope data and shuffle of proton and gamma
+    gamma_merge = pd.merge(gamma_array_df,gamma_telescope_df,on=list(["array_event_id",'run_id']))
+    gamma_merge = gamma_merge.set_index(['run_id','array_event_id'])
+    #there are some nan in width the needed to be deleted
+    gamma_merge = gamma_merge.dropna(axis=0)
+    data = gamma_merge
+
+
+    if(diffuse):
+        gammas_diffuse = h5.File("../data/3_gen/gammas_diffuse.hdf5","r")
+
+        gamma_diffuse_array_df = pd.DataFrame(data=dict(gammas_diffuse['array_events']))
+        max_size_diffuse = gamma_diffuse_array_df.shape[0]
+        if(data_size1-1 >= max_size_diffuse):
+            data_size = max_size_diffuse-1
+        else:
+            data_size = data_size1
+
+        gamma_diffuse_array_df = gamma_diffuse_array_df.iloc[:data_size]
+        gamma_diffuse_runs_df = pd.DataFrame(data=dict(gammas_diffuse['runs']))
+        gamma_diffuse_runs_df = gamma_diffuse_runs_df.iloc[:data_size]
+        gamma_diffuse_telescope_df = pd.DataFrame(data=dict(gammas_diffuse['telescope_events']))
+        gamma_diffuse_telescope_df = gamma_diffuse_telescope_df.iloc[:data_size]
+        gamma_diffuse_merge = pd.merge(gamma_diffuse_array_df,gamma_diffuse_telescope_df,on=list(['array_event_id','run_id']))
+        gamma_diffuse_merge = gamma_diffuse_merge.set_index(['run_id','array_event_id'])
+        gamma_diffuse_merge = gamma_diffuse_merge.dropna(axis=0)
+        gamma_diffuse_merge = gamma_diffuse_merge.reset_index()
+        gamma_merge = gamma_merge.reset_index()
+        data = pd.concat([gamma_merge,gamma_diffuse_merge])
+        data = data.set_index(['run_id','array_event_id'])
+        data = data.dropna(axis=1)
+        print("Using diffused data...")
+
+    return data;
+
+
+def drop_data(data):
+
+    droped_information = list(['psi','phi','telescope_type_name','x','y','telescope_id','pointing_altitude',
+                                'camera_name','camera_id','pointing_azimuth','r','distance_to_core',
+                                'mc_az','mc_alt','mc_core_x','mc_core_y','mc_energy','mc_corsika_primary_id',
+                                'mc_height_first_interaction','h_max_prediction','alt_prediction','az_prediction',
+                                'core_x_prediction','core_y_prediction'])
+    droped_data = data[droped_information].copy(deep=True)
+    data = data.drop(droped_information,axis=1)
+
+
+    return data, droped_data
