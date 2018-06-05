@@ -5,7 +5,7 @@
 % Erstellt von Maximilian Nöthe, <maximilian.noethe@tu-dortmund.de>
 % ausgelegt für lualatex und Biblatex mit biber
 
-% Kompilieren mit 
+% Kompilieren mit
 % lualatex dateiname.tex
 % biber dateiname.bcf
 % lualatex dateiname.tex
@@ -66,7 +66,7 @@
 \setmathfont{Latin Modern Math}
 
 % nice, small fracs for the text with \sfrac{}{}
-\usepackage{xfrac}  
+\usepackage{xfrac}
 
 
 %------------------------------------------------------------------------------
@@ -77,6 +77,7 @@
   locale=DE,
   separate-uncertainty=true,
   per-mode=symbol-or-fraction,
+  binary-units=true
 ]{siunitx}
 \sisetup{math-micro=\text{µ},text-micro=µ}
 
@@ -120,7 +121,7 @@
                    % in the references.bib use langid={en} for english sources
 ]{biblatex}
 \addbibresource{references.bib}  % die Bibliographie einbinden
-\DefineBibliographyStrings{german}{andothers = {{et\,al\adddot}}} 
+\DefineBibliographyStrings{german}{andothers = {{et\,al\adddot}}}
 
 %------------------------------------------------------------------------------
 %------------------------------ Sonstiges: ------------------------------------
@@ -134,10 +135,10 @@
 %-------------------------    Angaben zur Arbeit   ----------------------------
 %------------------------------------------------------------------------------
 
-\author{Maximilian Nöthe}
+\author{Lars Möllerherm}
 \title{\LaTeX-Dokumentenklasse und Vorlage für Abschlussarbeiten an der TU Dortmund}
 \date{2014}
-\birthplace{Castrop-Rauxel}
+\birthplace{Mettingen}
 \chair{Lehrstuhl für Experimentelle Physik V}
 \division{Fakultät Physik}
 \thesisclass{Bachelor of Science}
@@ -150,7 +151,6 @@
 
 \begin{document}
 \frontmatter
-\input{content/hints.tex}
 \maketitle
 
 % Gutachterseite
@@ -163,9 +163,9 @@
 \mainmatter
 % Hier beginnt der Inhalt mit Seite 1 in arabischen Ziffern
 \input{content/01_einleitung.tex}
-\input{content/02_struktur.tex}
-\input{content/03_grundlagen.tex}
-\input{content/04_figs_tabs.tex}
+\input{content/02_theoretische_grundlage.tex}
+\input{content/03_ergebnisse.tex}
+\input{content/04_zusammenfassung_und_ausblick.tex}
 
 \appendix
 % Hier beginnt der Anhang, nummeriert in lateinischen Buchstaben
