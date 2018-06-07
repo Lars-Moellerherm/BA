@@ -1,0 +1,98 @@
+\PassOptionsToPackage{unicode}{hyperref}
+\documentclass[aspectratio=1610, professionalfonts, 9pt]{beamer}
+
+\usefonttheme[onlymath]{serif}
+\usetheme[showtotalframes]{tudo}
+
+
+\usepackage{polyglossia}
+\setmainlanguage{english}
+
+% Mathematik
+\usepackage{multicol}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{xparse}
+\usepackage{braket}
+\usepackage{units}
+\usepackage[locale=DE,separate-uncertainty=true,per-mode=reciprocal,output-decimal-marker={,},]{siunitx}
+\usepackage[section]{placeins}
+\usepackage{pdflscape}
+\usepackage{expl3}
+\usepackage{bookmark}
+%Komma als Dezimaltrenner in der mathe Umgebung, um in Umgebungen wie [0, 2] ein Leerzeichen nach dem Komma zu erhalten einfach eins setzen
+\usepackage{icomma}
+\usepackage{cancel}
+\usepackage{hyperref}
+\usepackage{bookmark}
+\usepackage{subfigure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%-------------Hier Titel/Autor/Grafik/Lehrstuhl eintragen--------------%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Titel:
+\title{Gamma-Hadron seperation by Random Forrest classification in sklearn for CTAs
+real-time analysis}
+%Autor
+\author[R.~Dominik]{Rune Dominik}
+%Lehrstuhl/Fakultät
+\institute[Experimentelle Physik Vb]{Experimentelle Physik Vb \\  Fakultät Physik}
+
+\begin{document}
+
+\maketitle
+
+\section{Data}
+  \begin{frame}{Used MC data and attributes}
+    \begin{itemize}
+      \item Used MC data: CTA Prod 3b - pointlike gamma and proton (around 5.500.000 events).
+
+      \item Used attributes:
+      \begin{itemize}
+        \item length
+        \item width
+        \item skewness
+        \item curtosis
+        \item intensity
+        \item telescope type
+      \end{itemize}
+
+      \item Try different weights for multi-telescope prediction merging:
+      \begin{itemize}
+        \item Simple, arithmetic mean.
+        \item Telescope based information: Focal length and mirror size.
+        \item Array based information: Distance to core.
+      \end{itemize}
+    \end{itemize}
+  \end{frame}
+
+
+\section{Estimator performance}
+  \begin{frame}{Estimator performance befor merging}
+    \begin{itemize}
+      \item Used estimator: scikit learn RandomForrestClassifier.
+      \item Used hyperparameters: Out-of-the-box estimator with maximal depth cap
+            around 15 (evaluated by GridSearch).
+      \item Estimation by 5 time CV.
+    \end{itemize}
+    % Input: 2 grafics: Complete ROC_Score ofa_and_ofe and Energy_binned ROC_Score
+    % ofa_and_ofe.
+  \end{frame}
+
+
+  \begin{frame}{Estimator performance after merging}
+    % Input: Complete ROC_Score for different weigths and Energy_binned ROC for
+    % best over-all performing.
+  \end{frame}
+
+  % Maybe nested modell.
+
+\section{Conclusion}
+  \begin{frame}{Conclusion}
+    % Suggest further study of weigthing by best weigth.
+    % Possible problems: Bugs in MCs
+  \end{frame}
+
+\end{document}
