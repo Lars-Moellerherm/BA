@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import scipy as sc
+import h5py as h5
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 from sklearn.metrics import r2_score
@@ -39,11 +40,13 @@ def plot_hist2d(predictions,truth,min_energy,max_energy,bin_edges):
     max_e = np.log10(max_energy)
     r2=r2_score(predictions,truth)
     d, bin1, bin2 = np.histogram2d(predictions, truth, bins=bin_edges)
+    fig, ax = plt.subplots(figsize=(7, 5))
     plt.pcolormesh(bin1, bin2, d, cmap='viridis', norm=LogNorm())
     #plt.grid(True,which='both')
     plt.colorbar()
     plt.plot([min_energy,max_energy],[min_energy,max_energy],color="grey", label= "correct prediction")
     #plt.legend()
+    ax.text(0.2, 0.95,'R2_score: %.2f'% r2, ha='center', va='center', transform=ax.transAxes,size='medium',bbox=dict(boxstyle="round",facecolor='grey',alpha=0.1))
     plt.ylabel('Predicted value / TeV')
     plt.xlabel('truth value / TeV')
     plt.xscale('log')
@@ -66,12 +69,11 @@ def plot_error(predictions,truth):
 def mean_over_ID(data):
     truth = data['mc_energy'].copy(deep=True)
     predictions = data['predictions'].copy(deep=True)
-    pred = pd.DataFrame({'predicted_energy':predictions, 'mc_energy':
-                        truth})
+    pred = pd.DataFrame({'predicted_energy':predictions})
     prediction_mean = pred.groupby(level=list(['array_event_id','run_id'])).mean()
     prediction_mean = prediction_mean.reset_index()
     data = data.reset_index()
-    data2 = pd.merge(data, predict, on=list(['run_id','array_event_id']))
+    data2 = pd.merge(data, prediction_mean, on=list(['run_id','array_event_id']))
     data2 = data2.set_index(['run_id','array_event_id'])
 
     return data2
@@ -128,7 +130,101 @@ def plot_R2_per_bin(prediction, truth, bins):
         else:
             y[n]=0.0
         n+=1
-    plt.plot(bin_df['bin'],y,'.')
-    plt.xscale('log')
-    plt.xlabel('left bin edge in TeV')
-    plt.ylabel('r2 score')
+    maxi = y.min()
+    f, (ax,ax2) = plt.subplots(2,1,sharex=True)
+
+    ax2.plot(bin_df['bin'],y,'.')
+    ax.plot(bin_df['bin'],y,'.')
+    ax2.set_ylim(maxi-1,maxi+1)
+    ax.set_ylim(-4,1)
+    ax2.set_xscale('log')
+    ax.set_xscale('log')
+    ax.spines['bottom'].set_visible(False)
+    ax2.spines['top'].set_visible(False)
+    ax.xaxis.tick_top()
+    ax.tick_params(labeltop='off')
+    ax2.xaxis.tick_bottom()
+
+
+    d = .015  # how big to make the diagonal lines in axes coordinates
+    # arguments to pass to plot, just so we don't keep repeating them
+    kwargs = dict(transform=ax.transAxes, color='k', clip_on=False)
+    ax.plot((-d, +d), (-d, +d), **kwargs)        # top-left diagonal
+    ax.plot((1 - d, 1 + d), (-d, +d), **kwargs)  # top-right diagonal
+
+    kwargs.update(transform=ax2.transAxes)  # switch to the bottom axes
+    ax2.plot((-d, +d), (1 - d, 1 + d), **kwargs)  # bottom-left diagonal
+    ax2.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)  # bottom-right diagonal
+    ax2.set_xlabel('bin center in TeV')
+    ax2.set_ylabel('r2 score')
+
+
+
+def reading_data(diffuse,data_size1):
+    # Import data in h5py
+    gammas = h5.File("../data/gammas.hdf5","r")
+
+    # Converting to pandas
+    gamma_array_df = pd.DataFrame(data=dict(gammas['array_events']))
+    gamma_runs_df = pd.DataFrame(data=dict(gammas['runs']))
+    gamma_telescope_df = pd.DataFrame(data=dict(gammas['telescope_events']))
+    max_size = gamma_array_df.shape[0]
+    if(data_size1 >= max_size):
+        data_size = max_size-1
+    else:
+        data_size = data_size1
+    gamma_array_df = gamma_array_df.iloc[:data_size]
+    gamma_runs_df = gamma_runs_df.iloc[:data_size]
+    gamma_telescope_df = gamma_telescope_df.iloc[:data_size]
+
+
+    #merging of array and telescope data and shuffle of proton and gamma
+    gamma_merge = pd.merge(gamma_array_df,gamma_telescope_df,on=list(["array_event_id",'run_id']))
+    gamma_merge = gamma_merge.set_index(['run_id','array_event_id'])
+    #there are some nan in width the needed to be deleted
+    gamma_merge = gamma_merge.dropna(axis=0)
+    data = gamma_merge
+
+
+    if(diffuse):
+        gammas_diffuse = h5.File("../data/3_gen/gammas_diffuse.hdf5","r")
+
+        gamma_diffuse_array_df = pd.DataFrame(data=dict(gammas_diffuse['array_events']))
+        max_size_diffuse = gamma_diffuse_array_df.shape[0]
+        if(data_size1-1 >= max_size_diffuse):
+            data_size = max_size_diffuse-1
+        else:
+            data_size = data_size1
+
+        gamma_diffuse_array_df = gamma_diffuse_array_df.iloc[:data_size]
+        gamma_diffuse_runs_df = pd.DataFrame(data=dict(gammas_diffuse['runs']))
+        gamma_diffuse_runs_df = gamma_diffuse_runs_df.iloc[:data_size]
+        gamma_diffuse_telescope_df = pd.DataFrame(data=dict(gammas_diffuse['telescope_events']))
+        gamma_diffuse_telescope_df = gamma_diffuse_telescope_df.iloc[:data_size]
+        gamma_diffuse_merge = pd.merge(gamma_diffuse_array_df,gamma_diffuse_telescope_df,on=list(['array_event_id','run_id']))
+        gamma_diffuse_merge = gamma_diffuse_merge.set_index(['run_id','array_event_id'])
+        gamma_diffuse_merge = gamma_diffuse_merge.dropna(axis=0)
+        gamma_diffuse_merge = gamma_diffuse_merge.reset_index()
+        gamma_merge = gamma_merge.reset_index()
+        data = pd.concat([gamma_merge,gamma_diffuse_merge])
+        data = data.set_index(['run_id','array_event_id'])
+        data = data.dropna(axis=1)
+        print("Using diffused data...")
+
+    return data;
+
+
+def drop_data(data):
+
+    droped_information = list(data)
+    print(droped_information)
+    used = ['length', 'width','num_triggered_telescopes','intensity', 'kurtosis','skewness']
+    if( droped_information.count('scaled_length')==1):
+        used.append('scaled_length')
+        used.append('scaled_width')
+    droped_information = [e for e in droped_information if e not in used]
+    droped_data = data[droped_information].copy(deep=True)
+    data = data.drop(droped_information,axis=1)
+
+
+    return data, droped_data

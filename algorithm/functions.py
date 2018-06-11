@@ -128,15 +128,38 @@ def plot_R2_per_bin(prediction, truth, bins):
         else:
             y[n]=0.0
         n+=1
-    plt.plot(bin_df['bin'],y,'.')
-    plt.xscale('log')
-    plt.xlabel('bin center in TeV')
-    plt.ylabel('r2 score')
+    maxi = y.min()
+    f, (ax,ax2) = plt.subplots(2,1,sharex=True)
+
+    ax.plot(bin_df['bin'],y,'.')
+    ax2.plot(bin_df['bin'],y,'.')
+    ax.set_ylim(maxi-1,maxi+1)
+    ax2.set_ylim(-4,1)
+    ax2.set_xscale('log')
+    ax.set_xscale('log')
+    ax.spines['bottom'].set_visible(False)
+    ax2.spines['top'].set_visible(False)
+    ax.xaxis.tick_top()
+    ax.tick_params(labeltop='off')
+    ax2.xaxis.tick_bottom()
+
+
+    d = .015  # how big to make the diagonal lines in axes coordinates
+    # arguments to pass to plot, just so we don't keep repeating them
+    kwargs = dict(transform=ax.transAxes, color='k', clip_on=False)
+    ax.plot((-d, +d), (-d, +d), **kwargs)        # top-left diagonal
+    ax.plot((1 - d, 1 + d), (-d, +d), **kwargs)  # top-right diagonal
+
+    kwargs.update(transform=ax2.transAxes)  # switch to the bottom axes
+    ax2.plot((-d, +d), (1 - d, 1 + d), **kwargs)  # bottom-left diagonal
+    ax2.plot((1 - d, 1 + d), (1 - d, 1 + d), **kwargs)  # bottom-right diagonal
+    ax2.set_xlabel('bin center in TeV')
+    ax2.set_ylabel('r2 score')
 
 
 def reading_data(diffuse,data_size1):
     # Import data in h5py
-    gammas = h5.File("../data/3_gen/gammas.hdf5","r")
+    gammas = h5.File("../data/gammas.hdf5","r")
 
     # Converting to pandas
     gamma_array_df = pd.DataFrame(data=dict(gammas['array_events']))
@@ -190,11 +213,13 @@ def reading_data(diffuse,data_size1):
 
 def drop_data(data):
 
-    droped_information = list(['psi','phi','telescope_type_name','x','y','telescope_id','pointing_altitude',
-                                'camera_name','camera_id','pointing_azimuth','r','distance_to_core',
-                                'mc_az','mc_alt','mc_core_x','mc_core_y','mc_energy','mc_corsika_primary_id',
-                                'mc_height_first_interaction','h_max_prediction','alt_prediction','az_prediction',
-                                'core_x_prediction','core_y_prediction'])
+    droped_information = list(data)
+    print(droped_information)
+    used = ['length', 'width','num_triggered_telescopes','intensity', 'kurtosis','skewness']
+    if( droped_information.count('scaled_length')==1):
+        used.append('scaled_length')
+        used.append('scaled_width')
+    droped_information = [e for e in droped_information if e not in used]
     droped_data = data[droped_information].copy(deep=True)
     data = data.drop(droped_information,axis=1)
 

@@ -27,10 +27,14 @@ parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpForm
                                             -you get --size events from gammas and diffuse gammas
                                              if you set --diffuse on True
                                             -default is 103663
+
+                                        Decide if you wanna have the mean sclaled values for length and width
+                                            -default. True
                                     '''))
 parser.add_argument('--steps', type=int, default=2)
 parser.add_argument('--size', type=int, default=103663, help="How much data you want to enquire?")
-parser.add_argument('--diffuse', type=bool, default=True, help="Wanna have the diffuse gammas?")
+parser.add_argument('--diffuse', type=bool, default=False, help="Wanna have the diffuse gammas?")
+parser.add_argument('--msv', type=bool, default=False, help="Wanna have the Mean scaled values?")
 
 def RF_regressor():
 
@@ -39,6 +43,9 @@ def RF_regressor():
 
     if(args.steps > 0 & args.steps < 4):
       data = func.reading_data(args.diffuse,data_size)
+
+      if(args.msv):
+        data = func.calc_mean_scaled_width_and_length(data)
 
       data = shuffle(data)
       #data = gamma_merge

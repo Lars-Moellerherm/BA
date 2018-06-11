@@ -33,10 +33,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Titel:
-\title{Gamma-Hadron seperation by Random Forrest classification in sklearn for CTAs
+\title{Energy Reconstruction by Random Forrest Regressor in sklearn for CTAs
 real-time analysis}
 %Autor
-\author[R.~Dominik]{Rune Dominik}
+\author[L.~Möllerherm]{Lars Möllerherm}
 %Lehrstuhl/Fakultät
 \institute[Experimentelle Physik Vb]{Experimentelle Physik Vb \\  Fakultät Physik}
 
@@ -45,49 +45,47 @@ real-time analysis}
 \maketitle
 
 \section{Data}
-  \begin{frame}{Used MC data and attributes}
+  \begin{frame}
+    \frametitle{Steps done for a better Reconstruction}
     \begin{itemize}
-      \item Used MC data: CTA Prod 3b - pointlike gamma and proton (around 5.500.000 events).
+      \item data: Monte Carlo data (gen_3) - pointlike and diffuse gamma (events).
 
-      \item Used attributes:
+      \item Used attributes for the RF:
       \begin{itemize}
         \item length
         \item width
         \item skewness
         \item curtosis
         \item intensity
-        \item telescope type
+        \item mean scaled width an length
       \end{itemize}
 
-      \item Try different weights for multi-telescope prediction merging:
+      \item steps:
       \begin{itemize}
-        \item Simple, arithmetic mean.
-        \item Telescope based information: Focal length and mirror size.
-        \item Array based information: Distance to core.
+        \item taking avarage over telescopes, which have seen the same event.
+        \item taking an weighted mean(weights: intensity, telescope size, telescope sensitivity).
+        \item taking the weighted(itensity) mean as a new attribute for another RF.
       \end{itemize}
     \end{itemize}
+
   \end{frame}
 
 
-\section{Estimator performance}
-  \begin{frame}{Estimator performance befor merging}
-    \begin{itemize}
-      \item Used estimator: scikit learn RandomForrestClassifier.
-      \item Used hyperparameters: Out-of-the-box estimator with maximal depth cap
-            around 15 (evaluated by GridSearch).
-      \item Estimation by 5 time CV.
-    \end{itemize}
-    % Input: 2 grafics: Complete ROC_Score ofa_and_ofe and Energy_binned ROC_Score
-    % ofa_and_ofe.
+\section{Performance}
+  \begin{frame}{Performance for different weights}
+      %Graphics
   \end{frame}
 
 
-  \begin{frame}{Estimator performance after merging}
+  \begin{frame}{Performance for the nested modell}
     % Input: Complete ROC_Score for different weigths and Energy_binned ROC for
     % best over-all performing.
   \end{frame}
 
-  % Maybe nested modell.
+  \begin{frame}{Importanance of the Attributes}
+    % Input: Complete ROC_Score for different weigths and Energy_binned ROC for
+    % best over-all performing.
+  \end{frame}
 
 \section{Conclusion}
   \begin{frame}{Conclusion}
