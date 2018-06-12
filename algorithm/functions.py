@@ -40,11 +40,13 @@ def plot_hist2d(predictions,truth,min_energy,max_energy,bin_edges):
     max_e = np.log10(max_energy)
     r2=r2_score(predictions,truth)
     d, bin1, bin2 = np.histogram2d(predictions, truth, bins=bin_edges)
+    fig, ax = plt.subplots(figsize=(7, 5))
     plt.pcolormesh(bin1, bin2, d, cmap='viridis', norm=LogNorm())
     #plt.grid(True,which='both')
     plt.colorbar()
     plt.plot([min_energy,max_energy],[min_energy,max_energy],color="grey", label= "correct prediction")
     #plt.legend()
+    ax.text(0.2, 0.95,'R2_score: %.2f'% r2, ha='center', va='center', transform=ax.transAxes,size='medium',bbox=dict(boxstyle="round",facecolor='grey',alpha=0.1))
     plt.ylabel('Predicted value / TeV')
     plt.xlabel('truth value / TeV')
     plt.xscale('log')
@@ -131,10 +133,10 @@ def plot_R2_per_bin(prediction, truth, bins):
     maxi = y.min()
     f, (ax,ax2) = plt.subplots(2,1,sharex=True)
 
-    ax.plot(bin_df['bin'],y,'.')
     ax2.plot(bin_df['bin'],y,'.')
-    ax.set_ylim(maxi-1,maxi+1)
-    ax2.set_ylim(-4,1)
+    ax.plot(bin_df['bin'],y,'.')
+    ax2.set_ylim(maxi-1,maxi+1)
+    ax.set_ylim(-4,1)
     ax2.set_xscale('log')
     ax.set_xscale('log')
     ax.spines['bottom'].set_visible(False)
@@ -157,15 +159,16 @@ def plot_R2_per_bin(prediction, truth, bins):
     ax2.set_ylabel('r2 score')
 
 
+
 def reading_data(diffuse,data_size1):
     # Import data in h5py
-    gammas = h5.File("../data/gammas.hdf5","r")
-
+    gammas = h5.File("../data/3_gen/gammas.hdf5","r")
+    print(data_size1)
     # Converting to pandas
     gamma_array_df = pd.DataFrame(data=dict(gammas['array_events']))
     gamma_runs_df = pd.DataFrame(data=dict(gammas['runs']))
     gamma_telescope_df = pd.DataFrame(data=dict(gammas['telescope_events']))
-    max_size = gamma_array_df.shape[0]
+    max_size = gamma_telescope_df.shape[0]
     if(data_size1 >= max_size):
         data_size = max_size-1
     else:
@@ -176,7 +179,7 @@ def reading_data(diffuse,data_size1):
 
 
     #merging of array and telescope data and shuffle of proton and gamma
-    gamma_merge = pd.merge(gamma_array_df,gamma_telescope_df,on=list(["array_event_id",'run_id']))
+    gamma_merge = pd.merge(gamma_telescope_df,gamma_array_df,on=list(["array_event_id",'run_id']))
     gamma_merge = gamma_merge.set_index(['run_id','array_event_id'])
     #there are some nan in width the needed to be deleted
     gamma_merge = gamma_merge.dropna(axis=0)
@@ -187,16 +190,17 @@ def reading_data(diffuse,data_size1):
         gammas_diffuse = h5.File("../data/3_gen/gammas_diffuse.hdf5","r")
 
         gamma_diffuse_array_df = pd.DataFrame(data=dict(gammas_diffuse['array_events']))
-        max_size_diffuse = gamma_diffuse_array_df.shape[0]
+        gamma_diffuse_runs_df = pd.DataFrame(data=dict(gammas_diffuse['runs']))
+        gamma_diffuse_telescope_df = pd.DataFrame(data=dict(gammas_diffuse['telescope_events']))
+
+        max_size_diffuse = gamma_diffuse_telescope_df.shape[0]
         if(data_size1-1 >= max_size_diffuse):
             data_size = max_size_diffuse-1
         else:
             data_size = data_size1
 
         gamma_diffuse_array_df = gamma_diffuse_array_df.iloc[:data_size]
-        gamma_diffuse_runs_df = pd.DataFrame(data=dict(gammas_diffuse['runs']))
         gamma_diffuse_runs_df = gamma_diffuse_runs_df.iloc[:data_size]
-        gamma_diffuse_telescope_df = pd.DataFrame(data=dict(gammas_diffuse['telescope_events']))
         gamma_diffuse_telescope_df = gamma_diffuse_telescope_df.iloc[:data_size]
         gamma_diffuse_merge = pd.merge(gamma_diffuse_array_df,gamma_diffuse_telescope_df,on=list(['array_event_id','run_id']))
         gamma_diffuse_merge = gamma_diffuse_merge.set_index(['run_id','array_event_id'])
@@ -214,8 +218,8 @@ def reading_data(diffuse,data_size1):
 def drop_data(data):
 
     droped_information = list(data)
-    print(droped_information)
-    used = ['length', 'width','num_triggered_telescopes','intensity', 'kurtosis','skewness']
+    used = ['length','width','num_triggered_telescopes','intensity','kurtosis','skewness','total_intensity',
+            'telescope_type_id','num_triggered_lst','num_triggered_mst','num_triggered_sst']
     if( droped_information.count('scaled_length')==1):
         used.append('scaled_length')
         used.append('scaled_width')

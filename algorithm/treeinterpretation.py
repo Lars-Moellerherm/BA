@@ -19,7 +19,7 @@ data, droped_data = func.drop_data(data)
 truth = droped_data['mc_energy']
 
 #fit and predict
-RFr = RandomForestRegressor(max_depth=10, n_jobs=-1)
+RFr = RandomForestRegressor(max_depth=10, n_jobs=-1, n_estimators=10)
 X=data.values
 y=truth.values
 trainX,testX,trainY,testY = train_test_split(X,y)
@@ -41,7 +41,7 @@ for i in range(len(testX[:4])):
     m+=1
 
 
-RF = RandomForestRegressor(max_depth=30,n_jobs=-1)
+RF = RandomForestRegressor(n_jobs=-1,n_estimators=200)
 X=data.values
 y=truth.values
 trainX,testX,trainY,testY = train_test_split(X,y)
@@ -74,5 +74,5 @@ position_ticks = np.arange(0,X.shape[1])+1
 plt.boxplot(data,notch=False)
 plt.xticks(position_ticks,[names[i] for i in indices],rotation=90)
 plt.tight_layout()
-plt.savefig("plots/feautureimportance_boxplot.jpg")
+plt.savefig("plots/feautureimportance_boxplot.pdf")
 plt.close()

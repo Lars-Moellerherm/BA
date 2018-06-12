@@ -33,7 +33,7 @@ parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpForm
                                     '''))
 parser.add_argument('--steps', type=int, default=2)
 parser.add_argument('--size', type=int, default=103663, help="How much data you want to enquire?")
-parser.add_argument('--diffuse', type=bool, default=False, help="Wanna have the diffuse gammas?")
+parser.add_argument('--diffuse', type=bool, default=True, help="Wanna have the diffuse gammas?")
 parser.add_argument('--msv', type=bool, default=False, help="Wanna have the Mean scaled values?")
 
 def RF_regressor():
@@ -58,7 +58,7 @@ def RF_regressor():
 
       #train, test, train_truth, test_truth = train_test_split(data, truth, test_size = 0.5)
 
-      RFr = RandomForestRegressor(max_depth=10, n_jobs=-1)
+      RFr = RandomForestRegressor(max_depth=10, n_jobs=-1,n_estimators=200)
       print("We use these attributes for the RF: \n ",list(data))
       X=data.values
       y=truth.values

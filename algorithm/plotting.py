@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import functions as func
 import numpy as np
 import argparse
+from scipy import stats
 
 parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
                                 description=argparse._textwrap.dedent('''\
@@ -21,7 +22,7 @@ def plot():
     min_energy = 0.003
     max_energy = 340
     bin_edge = np.logspace(np.log10(min_energy),np.log10(max_energy),35)
-    bin_edge2 = np.logspace(np.log10(min_energy),np.log10(max_energy),15)
+    bin_edge2 = np.logspace(np.log10(min_energy),np.log10(max_energy),35)
 
       ############PLotting of encapsulated_RF.py################
     if(args.steps == 1) or (args.steps == 0):
@@ -54,7 +55,6 @@ def plot():
 
             #plot for weighted mean(dist to core)
         r2_4 = func.plot_hist2d(prediction_w2_mean,truth_w2_mean,min_energy,max_energy,bin_edge)
-        plt.title("RFr w mean(dist_to_core)(R2score: %.2f)" % r2_4)
         plt.savefig("plots/RF/mean_scaled/Rf_Regression_MSV_w2_mean.jpg")
         plt.close()
 
@@ -215,33 +215,28 @@ def plot():
 
         #######Energy PLOTS#######
             #Plots without mean
-        plt.subplot(221)
         r2_1 = func.plot_hist2d(predictions,truth,min_energy,max_energy,bin_edge)
-        plt.title("RFr(R2score: %.2f)" % r2_1)
+        plt.savefig("plots/RF/weighted/RF.jpg")
+        plt.close()
 
             #Plots with mean
-        plt.subplot(222)
         r2_2 = func.plot_hist2d(prediction_mean,truth_mean,min_energy,max_energy,bin_edge)
-        plt.title("RFr mean(%.2f)" % r2_2)
+        plt.savefig("plots/RF/weighted/RF_mean.jpg")
+        plt.close()
 
                 #intensity
-        plt.subplot(223)
         r2_3 = func.plot_hist2d(prediction_w_mean,truth_w_mean,min_energy,max_energy,bin_edge)
-        plt.title("RFr w mean(inty)(%0.2f)" % r2_3 )
+        plt.savefig("plots/RF/weighted/RF_wI.jpg")
+        plt.close()
 
                 #telescope size
-        plt.subplot(224)
         r2_4 = func.plot_hist2d(prediction_w2_mean,truth_w2_mean,min_energy,max_energy,bin_edge)
-        plt.title("RFr w mean(telsize) (%.2f)" % r2_4)
-        plt.subplots_adjust(wspace=0.45,hspace=0.45)
-        #plt.show()
-        plt.savefig('plots/RF/weighted/RF_Regression_all.jpg')
+        plt.savefig('plots/RF/weighted/RF_wT.jpg')
         plt.close()
 
                 #sensitivity
         r2_5 = func.plot_hist2d(prediction_w3_mean,truth_w3_mean,min_energy,max_energy,bin_edge)
-        plt.title("RFr w mean(sensitivity)(R2score: %.2f)" % r2_5)
-        plt.savefig("plots/RF/weighted/Rf_Regression_MSV_w3_mean.jpg")
+        plt.savefig("plots/RF/weighted/Rf_wS.jpg")
         plt.close()
 
 
@@ -379,38 +374,77 @@ def plot():
 
         ###### R2-plots ######
             #Plots without mean
-        plt.subplot(211)
         func.plot_R2_per_bin(predictions,truth,bin_edge2)
-        plt.title("RFr R2 per bin")
+        plt.savefig('plots/RF/weighted/RF_R2.jpg')
+        plt.close('all')
 
             #weighted mean (intensity)
-        plt.subplot(223)
         func.plot_R2_per_bin(prediction_w_mean,truth_w_mean,bin_edge2)
-        plt.title("RFr w mean(inty) R2 per bin")
+        plt.savefig('plots/RF/weighted/RF_wI_R2.jpg')
+        plt.close('all')
 
             #with mean
-        plt.subplot(224)
         func.plot_R2_per_bin(prediction_mean,truth_mean,bin_edge2)
-        plt.title("RFr with mean  R2 per bin")
-        plt.subplots_adjust(wspace=0.45,hspace=0.45)
-        #plt.show()
-        plt.savefig('plots/RF/weighted/RF_Regression_R2_all.jpg')
-        plt.close()
+        plt.savefig('plots/RF/weighted/RF_mean_R2.jpg')
+        plt.close('all')
 
-            #plot for weighted mean(dist to core)
+            #plot for weighted mean(telescope size)
         func.plot_R2_per_bin(prediction_w2_mean,truth_w2_mean,bin_edge2)
-        plt.title("RFr w mean(telescope size) R2 per bin")
-        plt.savefig("plots/RF/weighted/Rf_Regression_w2_mean_R2.jpg")
-        plt.close()
+        plt.savefig("plots/RF/weighted/Rf_wT_R2.jpg")
+        plt.close('all')
 
         func.plot_R2_per_bin(prediction_w3_mean,truth_w3_mean,bin_edge2)
-        plt.title("RFr w mean(sensitivity) R2 per bin")
-        plt.savefig("plots/RF/weighted/Rf_Regression_w3_mean_R2.jpg")
-        plt.close()
+        plt.savefig("plots/RF/weighted/Rf_wS_R2.jpg")
+        plt.close('all')
 
         print("R2 per bin plots finished ... \n")
 
+
+
+
+        ################## std und mean of rel error per bin  ################################
+        def percentilesigma(y):
+            return np.percentile(y,q=68.3)
+
+            ######### für weighted mean #################################
+        rel_error = np.abs((truth-predictions)/truth)
+        rel_error_w_mean = np.abs((truth_w_mean-prediction_w_mean)/truth_w_mean)
+        rel_error_w3_mean= np.abs((truth_w3_mean-prediction_w3_mean)/truth_w3_mean)
+        perc, bins_p, binnumber_p = stats.binned_statistic(truth,rel_error,statistic=percentilesigma,bins=bin_edge)
+        perc_w_mean, bins_p_w_mean, binnumber_p_w_mean = stats.binned_statistic(truth_w_mean,rel_error_w_mean,statistic=percentilesigma,bins=bin_edge)
+        perc_w3_mean, bins_p_w3_mean, binnumber_p_w3_mean = stats.binned_statistic(truth_w3_mean,rel_error_w3_mean,statistic=percentilesigma,bins=bin_edge)
+
+
+        bin_p = (bins_p[:-1]+bins_p[1:])/2
+        plt.plot(bin_p,perc,'rx',label='RF with MSV')
+        plt.plot(bin_p,perc_w_mean,'bx',label='with weighted mean(intensity)')
+        plt.plot(bin_p,perc_w3_mean,'gx',label='with weighted mean(sensitivity)')
+        plt.legend(loc='best')
+        plt.xscale('log')
+        plt.xlabel("Energy / TeV")
+        plt.tight_layout()
+        plt.savefig("plots/RF/weighted/RF_rel_std.jpg")
+        plt.close()
+
+
+        mean, bins_m, binnumber_m = stats.binned_statistic(truth,rel_error,statistic='mean',bins=bin_edge)
+        mean_w_mean, bins_m_w_mean, binnumber_m_w_mean = stats.binned_statistic(truth_w_mean,rel_error_w_mean,statistic='mean',bins=bin_edge)
+        mean_w3_mean, bins_m_w3_mean, binnumber_m_w3_mean = stats.binned_statistic(truth_w3_mean,rel_error_w3_mean,statistic='mean',bins=bin_edge)
+
+        bin_m = (bins_m[:-1]+bins_m[1:])/2
+        plt.plot(bin_m,mean,'r.',label='RF with MSV')
+        plt.plot(bin_m,mean_w_mean,'b.',label='with weighted mean(intensity)')
+        plt.plot(bin_m,mean_w3_mean,'g.',label='with weighted mean(sensitivity)')
+        plt.legend(loc='best')
+        plt.xscale('log')
+        plt.xlabel("Energy / TeV")
+        plt.tight_layout()
+        plt.savefig("plots/RF/weighted/RF_rel_mean.jpg")
+        plt.close()
+
+        print("Finished with the mean and std of rel error per bin plots")
         print("Finished with all plots for RandomForestRegressor.py \n")
+
 
 if __name__ == '__main__' :
     plot()

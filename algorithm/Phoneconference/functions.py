@@ -162,7 +162,7 @@ def plot_R2_per_bin(prediction, truth, bins):
 
 def reading_data(diffuse,data_size1):
     # Import data in h5py
-    gammas = h5.File("../data/gammas.hdf5","r")
+    gammas = h5.File("../data/3_gen/gammas.hdf5","r")
 
     # Converting to pandas
     gamma_array_df = pd.DataFrame(data=dict(gammas['array_events']))
