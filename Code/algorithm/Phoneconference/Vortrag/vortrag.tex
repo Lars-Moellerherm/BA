@@ -44,7 +44,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Titel:
-\title{Optimimizing the Energy Reconstruction for CTAs analysis by combining predictions of different Telescope IDs}
+\title{Improving Energy Regression by combining predictors}
 %Autor
 \author[L.~Möllerherm]{Lars Möllerherm}
 %Lehrstuhl/Fakultät
@@ -58,7 +58,7 @@
   \begin{frame}
     \frametitle{Steps done for a better Reconstruction}
     \begin{itemize}
-      \item data: Monte Carlo data (PROD3(B)) \- pointlike gamma (?? events).
+      \item data: Monte Carlo data (PROD3(B)) \- pointlike gamma (203710 events).
 
       \item Used attributes for the RF:
       \begin{itemize}
@@ -67,16 +67,16 @@
         \item skewness
         \item kurtosis
         \item intensity and total intensity
-        \item scaled width an length
+        \item mean over scaled width an length \cite[104]{HESS}: $SW =\frac{w(q,p)-\langle w(q,p) \rangle}{\sigma_w(q,p)}$  $SL = \frac{l(q,p)-\langle l(q,p) \rangle}{\sigma_l(q,p)}$
         \item num triggered telescopes(lst; mst; sst)
         \item telescope type id
       \end{itemize}
 
       \item steps:
       \begin{itemize}
-        \item taking scaled width and length  \cite[104]{HESS}: $SW =\frac{w(q,p)-\langle w(q,p) \rangle}{\sigma_w(q,p)}$  $SL = \frac{l(q,p)-\langle l(q,p) \rangle}{\sigma_l(q,p)}$
-        \item taking an weighted mean(weight: sensitivity [$2 = \text{full sensitivity}$; $1 = \text{required energy range}$; $0.1 = \text{out of energy range}$]).
-        \item taking the weighted(sensitivity) mean as a new attribute for another RF.
+        \item predicting with these attributes
+        \item taking an weighted mean(weight: intensity).
+        \item taking the weighted(intensity) mean as a new attribute for another RF, which trains and tests again on every telescope.
       \end{itemize}
     \end{itemize}
 
@@ -97,31 +97,18 @@
           \begin{figure}
             \centering
             \includegraphics[width=\textwidth]{Plots/RF_MSV_wI_mean.pdf}
-            \caption{Building the average over the telescopes which have seen the same event, by using the intensity as a weight.}
+            \caption{Building the average over the telescopes, which have seen the same event, by using the intensity as a weight.}
           \end{figure}
         \end{column}
       \end{columns}
   \end{frame}
 
   \begin{frame}
-    \begin{columns}
-        \begin{column}{0.5\textwidth}
-          \begin{figure}
-            \centering
-            \includegraphics[width=\textwidth]{Plots/RF_MSV_encaps.pdf}
-            \caption{Taking the weighted mean as a new attribute for a second Random Forest Regressor.}
-          \end{figure}
-        \end{column}
-        \begin{column}{0.5\textwidth}
-          Attributes of the second RandomForest:
-          \begin{itemize}
-            \item weighted mean(sensitivity) of prediction
-            \item mean(std, max, min) of the prediction of all LST(MST, SST)
-            \item mean(std) of scaled values
-          \end{itemize}
-        \end{column}
-    \end{columns}
-
+      \begin{figure}
+        \centering
+        \includegraphics[width=0.6\textwidth]{Plots/RF_MSV_encaps.pdf}
+        \caption{Taking the weighted mean as a new attribute for a second Random Forest Regressor.}
+      \end{figure}
   \end{frame}
 
   \begin{frame}
@@ -150,17 +137,24 @@
         \begin{figure}
           \centering
           \includegraphics[width=\textwidth]{Plots/feautureimportance_boxplot.pdf}
-          \caption{Importance of the used attributes bei the first prediction.}
+          \caption{Importance of the used attributes by the first prediction.}
         \end{figure}
       \end{column}
       \begin{column}{0.5\textwidth}
         \begin{figure}
           \centering
           \includegraphics[width=\textwidth]{Plots/feautureimportance_boxplot_secondForest.pdf}
-          \caption{Importance of the used attributes bei the second prediction.}
+          \caption{Importance of the used attributes by the second prediction.}
         \end{figure}
       \end{column}
     \end{columns}
+  \end{frame}
+\section{Outlook}
+  \begin{frame}{Outlook}
+    \begin{itemize}
+      \item trying to build a second Random Forest which just trains on every event and not on every telesecope
+      \item Using attributes like averaged prediction, num triggered telescopes, averaged prediction of LST, \dots
+    \end{itemize}
   \end{frame}
 \section{References}
   \printbibliography
