@@ -36,7 +36,7 @@ parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpForm
                                             -default is 10000000
                                     '''))
 parser.add_argument('--step', type=int, default=3)
-parser.add_argument('--msv', type=bool, default=True, help="Wanna have the Mean Scaled Value?")
+parser.add_argument('--sv', type=bool, default=True, help="Wanna have the Scaled Value?")
 parser.add_argument('--diffuse', type=bool, default=False, help="Wanna have the diffuse gammas?")
 parser.add_argument('--size', type=int, default=10000000, help="How much data you want to enquire?")
 
@@ -54,10 +54,10 @@ def encaps_RF():
 
 
     print("Finished with reading Data ... \n")
-    if(args.msv):
+    if(args.sv):
 
         #calculate the mean scaled
-        data = func.calc_mean_scaled_width_and_length(data)
+        data = func.calc_scaled_width_and_length(data)
 
 
         print("Finished with calculating Mean Scaled Values ... \n")
@@ -69,7 +69,7 @@ def encaps_RF():
         truth = droped_data['mc_energy']
 
         #fit and predict
-        RFr = RandomForestRegressor(max_depth=10, n_jobs=-1,n_estimators=10)
+        RFr = RandomForestRegressor(max_depth=10, n_jobs=3,n_estimators=200)
         print("We use these attributes for the first RF: \n ",list(data))
         X=data.values
         y=truth.values
@@ -146,89 +146,112 @@ def encaps_RF():
         pred1 = pd.DataFrame({'predicted_energy':predictions, 'mc_energy':truth})
         pred1 = pred1.drop('mc_energy',axis=1)
         pred_lst = pred1[droped_data['telescope_type_name']=='LST']
+        prediction_lst_max = pred_lst.groupby(level=list(['run_id','array_event_id'])).max()
+        prediction_lst_min = pred_lst.groupby(level=list(['run_id','array_event_id'])).min()
         prediction_lst = pred_lst.groupby(level=list(['run_id','array_event_id'])).mean()
         prediction_lst_std =  pred_lst.groupby(level=list(['run_id','array_event_id'])).std()
-        prediction_lst.columns = ['mean_of_lst_pred']
-        prediction_lst_std.columns = ['std_of_lst_pred']
+        prediction_lst_max.columns = ['max_lst_pred']
+        prediction_lst_min.columns = ['min_lst_pred']
+        prediction_lst.columns = ['mean_lst_pred']
+        prediction_lst_std.columns = ['std_lst_pred']
 
         pred_mst = pred1[droped_data['telescope_type_name']=='MST']
+        prediction_mst_max = pred_mst.groupby(level=list(['run_id','array_event_id'])).max()
+        prediction_mst_min = pred_mst.groupby(level=list(['run_id','array_event_id'])).min()
         prediction_mst = pred_mst.groupby(level=list(['run_id','array_event_id'])).mean()
         prediction_mst_std =  pred_mst.groupby(level=list(['run_id','array_event_id'])).std()
-        prediction_mst.columns = ['mean_of_mst_pred']
-        prediction_mst_std.columns = ['std_of_mst_pred']
+        prediction_mst.columns = ['mean_mst_pred']
+        prediction_mst_std.columns = ['std_mst_pred']
+        prediction_mst_max.columns = ['max_mst_pred']
+        prediction_mst_min.columns = ['min_mst_pred']
 
         pred_sst = pred1[droped_data['telescope_type_name']=='SST']
+        prediction_sst_max = pred_sst.groupby(level=list(['run_id','array_event_id'])).max()
+        prediction_sst_min = pred_sst.groupby(level=list(['run_id','array_event_id'])).min()
         prediction_sst = pred_sst.groupby(level=list(['run_id','array_event_id'])).mean()
         prediction_sst_std =  pred_sst.groupby(level=list(['run_id','array_event_id'])).std()
-        prediction_sst.columns = ['mean_of_sst_pred']
-        prediction_sst_std.columns = ['std_of_sst_pred']
+        prediction_sst.columns = ['mean_sst_pred']
+        prediction_sst_std.columns = ['std_sst_pred']
+        prediction_sst_max.columns = ['max_sst_pred']
+        prediction_sst_min.columns = ['min_sst_pred']
 
-        data_encaps = pd.concat([data_encaps,prediction_lst,prediction_lst_std,prediction_mst,prediction_mst_std,prediction_sst,prediction_sst_std],axis=1)
+        data_encaps = pd.concat([data_encaps,prediction_lst,prediction_lst_std,prediction_mst,prediction_mst_std,
+                                prediction_sst,prediction_sst_std,prediction_lst_min,prediction_lst_max,
+                                prediction_mst_min,prediction_mst_max,prediction_sst_min,prediction_sst_max],axis=1)
+
+        msl = data['scaled_length'].groupby(level=list(['run_id','array_event_id'])).mean()
+        msw = data['scaled_width'].groupby(level=list(['run_id','array_event_id'])).mean()
+        msl=msl.rename('mean_scaled_length')
+        msw=msw.rename('mean_scaled_width')
+        sl_std = data['scaled_length'].groupby(level=list(['run_id','array_event_id'])).std()
+        sw_std = data['scaled_width'].groupby(level=list(['run_id','array_event_id'])).std()
+        sl_std=sl_std.rename('std_scaled_length')
+        sw_std=sw_std.rename('std_scaled_width')
+        data_encaps = pd.concat([data_encaps,msl,msw,sl_std,sw_std],axis=1)
 
             ##### if there is no lst or sst or mst who has seen this event, I set the mean and std on 0
         data_encaps = data_encaps.fillna(0)
-        print(data_encaps)
+        data_encaps = pd.concat([data_encaps,truth_wS],axis=1)
 
 
-        #data_encaps = data_wmean.copy(deep=True)
-        #data_encaps = shuffle(data_encaps)
-        #truth_encaps = data_encaps['mc_energy'].copy(deep=True)
-        #data_encaps = data_encaps.drop('mc_energy', axis=1)
-#
-        ##fit and pred
-        #RFr2 = RandomForestRegressor(max_depth=10, n_jobs=-1,n_estimators=10)
-        #print("We use these attributes for the second RF: \n ",list(data_encaps))
-        #X=data_encaps.values
-        #y=truth_encaps.values
-        #predictions_encaps = cross_val_predict(RFr2, X, y, cv=10)
-#
-        #z=np.array([predictions_encaps,truth_encaps.values])
-#
-        #np.savetxt("data/encaps_encaps_pred_data.txt",z.T)
-#
-        #print('encapsulated RF:\n\t Coefficient of determination: %.2f\n' % r2_score(predictions_encaps,truth_encaps.values),
-        #'\texplained_variance score: %.2f \n' % explained_variance_score(predictions_encaps,truth_encaps.values),
-        #'\tmean squared error: %.2f \n' % mean_squared_error(predictions_encaps,truth_encaps.values),
-        #"Finished with the encapsulated prediction \n")
-#
-#
-#
+        data_encaps = shuffle(data_encaps)
+        truth_encaps = data_encaps['mc_energy'].copy(deep=True)
+        data_encaps = data_encaps.drop('mc_energy', axis=1)
+
+        #fit and pred
+        RFr2 = RandomForestRegressor(max_depth=10, n_jobs=3,n_estimators=30)
+        print("We use these attributes for the second RF: \n ",list(data_encaps))
+        X=data_encaps.values
+        y=truth_encaps.values
+        predictions_encaps = cross_val_predict(RFr2, X, y, cv=10)
+
+        z=np.array([predictions_encaps,truth_encaps.values])
+
+        np.savetxt("data/encaps_encaps_pred_data.txt",z.T)
+
+        print('encapsulated RF:\n\t Coefficient of determination: %.2f\n' % r2_score(predictions_encaps,truth_encaps.values),
+        '\texplained_variance score: %.2f \n' % explained_variance_score(predictions_encaps,truth_encaps.values),
+        '\tmean squared error: %.2f \n' % mean_squared_error(predictions_encaps,truth_encaps.values),
+        "Finished with the encapsulated prediction \n")
+
+
+
         ############ tree interpretation of the second forest ###########################
-#
-#
-        #RF = RandomForestRegressor(max_depth=10,n_jobs=-1,n_estimators=200)
-        #trainX,testX,trainY,testY = train_test_split(X,y)
-        #RF.fit(trainX,trainY)
-        #feature = RF.feature_importances_
-        #std = np.std([tree.feature_importances_ for tree in RF.estimators_],
-        #             axis=0)
-        #indices = np.argsort(feature)[::-1]
-        #names = list(data_encaps)
-        ## Print the feature ranking
-        #print("Feature ranking:")
-#
-        #for f in range(X.shape[1]):
-        #    print("%d. feature %s (%f)" % (f + 1, names[indices[f]], feature[indices[f]]))
-#
-        #plt.figure()
-        #plt.title("Feature importances")
-        #plt.bar(range(X.shape[1]), feature[indices],
-        #       color="b", yerr=std[indices], align="center",)
-        #plt.xticks(range(X.shape[1]),[names[i] for i in indices],rotation=90)
-        #plt.xlim([-1, X.shape[1]])
-        #plt.tight_layout()
-        #plt.savefig("plots/feautureimportance_secondForest.jpg")
-        #plt.close()
-#
-        #data=np.array([tree.feature_importances_ for tree in RF.estimators_])
-        #data=data[:,indices]
-        #position_ticks = np.arange(0,X.shape[1])+1
-        #plt.boxplot(data,notch=False)
-        #plt.xticks(position_ticks,[names[i] for i in indices],rotation=90)
-        #plt.tight_layout()
-        #plt.savefig("plots/feautureimportance_boxplot_secondForest.pdf")
-        #plt.close()
-#
+
+
+        RF = RandomForestRegressor(max_depth=10,n_jobs=3,n_estimators=30)
+        trainX,testX,trainY,testY = train_test_split(X,y)
+        RF.fit(trainX,trainY)
+        feature = RF.feature_importances_
+        std = np.std([tree.feature_importances_ for tree in RF.estimators_],
+                     axis=0)
+        indices = np.argsort(feature)[::-1]
+        names = list(data_encaps)
+        # Print the feature ranking
+        print("Feature ranking:")
+
+        for f in range(X.shape[1]):
+            print("%d. feature %s (%f)" % (f + 1, names[indices[f]], feature[indices[f]]))
+
+        plt.figure()
+        plt.title("Feature importances")
+        plt.bar(range(X.shape[1]), feature[indices],
+               color="b", yerr=std[indices], align="center",)
+        plt.xticks(range(X.shape[1]),[names[i] for i in indices],rotation=90)
+        plt.xlim([-1, X.shape[1]])
+        plt.tight_layout()
+        plt.savefig("plots/feautureimportance_secondForest.jpg")
+        plt.close()
+
+        data=np.array([tree.feature_importances_ for tree in RF.estimators_])
+        data=data[:,indices]
+        position_ticks = np.arange(0,X.shape[1])+1
+        plt.boxplot(data,notch=False)
+        plt.xticks(position_ticks,[names[i] for i in indices],rotation=90)
+        plt.tight_layout()
+        plt.savefig("plots/feautureimportance_boxplot_secondForest.pdf")
+        plt.close()
+
 
 
 
