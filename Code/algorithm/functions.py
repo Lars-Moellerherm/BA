@@ -6,31 +6,28 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 from sklearn.metrics import r2_score
 
-def weighted_mean_over_ID(weight, data):
-    weight2 = weight.copy(deep=True)
-    predictions = data['predictions'].copy(deep=True)
-    truth = data['mc_energy'].copy(deep=True)
-    pred = pd.DataFrame({'predicted_energy':predictions, 'mc_energy':
-                        truth, 'weight': weight2})
+def weighted_mean_over_ID(weight, predictions, truth):
+    pred = pd.DataFrame({'predicted_energy':predictions,'weight': weight,'array_event_id':truth['array_event_id'],'run_id':truth['run_id']})
     pred['weighted_data'] = pred['predicted_energy']*pred['weight']
-    x = pred.groupby(level=list(['array_event_id','run_id']))
+    x = pred.groupby(by=['run_id','array_event_id'],sort=False)
+    stand = x.std()
     prediction_w_mean = x['weighted_data'].sum()/x['weight'].sum()
-    prediction_w_mean = prediction_w_mean.to_frame('predicted_energy')
+    prediction_w_mean = prediction_w_mean.to_frame('weighted_prediction')
     prediction_w_mean = prediction_w_mean.reset_index()
-    data = data.reset_index()
-    data2 = pd.merge(data,prediction_w_mean, on=list(['array_event_id','run_id']))
-    data2 = data2.set_index(list(['run_id','array_event_id']))
-    return data2
+    return prediction_w_mean, stand
 
 
 def calc_scaled_width_and_length(data):
     SW = (data.width - np.mean(data.width))/sc.stats.sem(data.width)
     SL = (data.length - np.mean(data.length))/sc.stats.sem(data.length)
     SV = pd.DataFrame({'scaled_length':SL, 'scaled_width':SW})
-    #MSV = SV.groupby(level=list(['array_event_id','run_id'])).mean()
-    data2 = pd.concat([data,SV],axis=1)
-    return data2
+    MSV = SV.groupby(level=list(['array_event_id','run_id'])).mean()
+    MSV = MSV.reset_index()
+    data = data.reset_index()
+    data2 = pd.merge(data,MSV,on=['array_event_id','run_id'])
+    data2 = data2.set_index(['run_id','array_event_id'])
 
+    return data2
 
 def plot_hist2d(predictions,truth,min_energy,max_energy,bin_edges):
     min_e = np.log10(min_energy)

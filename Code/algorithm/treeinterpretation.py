@@ -10,9 +10,9 @@ from sklearn.metrics import r2_score, explained_variance_score, mean_squared_err
 from sklearn.utils import shuffle
 
 
-data_size =10000
+data_size = 203710
 data = func.reading_data(True,data_size)
-data = func.calc_mean_scaled_width_and_length(data)
+data = func.calc_scaled_width_and_length(data)
 data = shuffle(data)
 #drop unimportant DATA
 data, droped_data = func.drop_data(data)
@@ -51,7 +51,9 @@ std = np.std([tree.feature_importances_ for tree in RF.estimators_],
              axis=0)
 
 indices = np.argsort(feature)[::-1]
-
+names[-1]='mean_scaled_width'
+names[-2]='mean_scaled_length'
+print(names)
 # Print the feature ranking
 print("Feature ranking:")
 

@@ -35,7 +35,7 @@ parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpForm
                                              if you set --diffuse on True
                                             -default is 10000000
                                     '''))
-parser.add_argument('--step', type=int, default=3)
+parser.add_argument('--step', type=int, default=2)
 parser.add_argument('--sv', type=bool, default=True, help="Wanna have the Scaled Value?")
 parser.add_argument('--diffuse', type=bool, default=False, help="Wanna have the diffuse gammas?")
 parser.add_argument('--size', type=int, default=10000000, help="How much data you want to enquire?")
@@ -66,87 +66,129 @@ def encaps_RF():
         data = shuffle(data)
         #drop unimportant DATA
         data, droped_data = func.drop_data(data)
-        data['weight'] = droped_data['telescope_type_name']
+
+        #data['weight'] = droped_data['telescope_type_name']
         truth = droped_data['mc_energy']
 
         #fit and predict
         RFr = RandomForestRegressor(max_depth=10, n_jobs=-1,n_estimators=10)
+        data = data
+        truth = truth
+        X_train_i, X_test_i, y_train_i, y_test_i = train_test_split(data.index,truth.index,test_size=0.5)
+        X_train = data.loc[X_train_i]
+        X_test = data.loc[X_test_i]
+        y_train = truth.loc[y_train_i]
+        y_test = truth.loc[y_test_i]
+        X_train = X_train.reset_index()
+        y_train = y_train.reset_index()
+        X_test = X_test.reset_index()
+        y_test = y_test.reset_index()
+        #X_train = X_train.drop('weight',axis=1)
+        #weight = X_test['weight']
+        #X_test = X_test.drop('weight',axis=1)
 
-        X_train, X_test, y_train, y_test = train_test_split(data,truth,test_size=0.66)
-        X_train = X_train.drop('weight',axis=1)
-        weight = X_test['weight']
-        X_test = X_test.drop('weight',axis=1)
-        print("We use these attributes for the first RF: \n ",list(X_test))
-        RFr.fit(X_train, y_train)
-        predictions = RFr.predict(X_test)
-        z=np.array([predictions,y_test.values])
+        X1 = X_train.drop(['array_event_id','run_id'],axis=1)
+        X2 = X_test.drop(['array_event_id','run_id'],axis=1)
+        print("We use these attributes for the first RF: \n ",list(X1))
+        RFr.fit(X1.values, y_train['mc_energy'].values)
+        predictions = RFr.predict(X2.values)
 
+        z=np.array([predictions,y_test['mc_energy'].values])
         np.savetxt("data/encaps_pred_data.txt",z.T)
 
-        print('RandomForestRegressor:\n\t Coefficient for determination: %.2f \n' % r2_score(predictions,y_test.values),
-                '\texplained_variance score: %.2f \n' % explained_variance_score(predictions,y_test.values),
-                '\tmean squared error: %.2f \n' % mean_squared_error(predictions,y_test.values),
+        print('RandomForestRegressor:\n\t Coefficient for determination: %.2f \n' % r2_score(predictions,y_test['mc_energy'].values),
+                '\texplained_variance score: %.2f \n' % explained_variance_score(predictions,y_test['mc_energy'].values),
+                '\tmean squared error: %.2f \n' % mean_squared_error(predictions,y_test['mc_energy'].values),
                 "Finished with the first prediction ... \n")
 
     if(args.step > 1):
         # weighted mean over sensitivity
-        telescope_sens = weight
-        telescope_sens = telescope_sens.to_frame()
-        telescope_sens['pred'] = predictions
-        telescope_sens2 = telescope_sens.copy(deep=True)
-        mask = (telescope_sens['weight'] == 'LST') & (telescope_sens['pred'] > 3.0) # not in requiered energy range
-        telescope_sens2[mask] = 0.1
-        mask = (telescope_sens['weight'] == 'LST') & (telescope_sens['pred']>0.15) & (telescope_sens['pred']<3) #not in full sensitivity
-        telescope_sens2[mask] = 1
-        mask = (telescope_sens['weight'] == 'LST') & (telescope_sens['pred']<0.15) # not in requiered energy range
-        telescope_sens2[mask] = 2
-        mask = (telescope_sens['weight'] == 'MST') & (telescope_sens['pred'] > 50.0) # not in requiered energy range
-        telescope_sens2[mask] = 0.1
-        mask = (telescope_sens['weight'] == 'MST') & (telescope_sens['pred'] < 0.08) # not in requiered energy range
-        telescope_sens2[mask] = 0.1
-        mask = (telescope_sens['weight'] == 'MST') & (telescope_sens['pred']>5.0) & (telescope_sens['pred']<50.0) #not in full sensitivity
-        telescope_sens2[mask] = 1
-        mask = (telescope_sens['weight'] == 'MST') & (telescope_sens['pred']>0.08) & (telescope_sens['pred']<0.15) #not in full sensitivity
-        telescope_sens2[mask] = 1
-        mask = (telescope_sens['weight'] == 'MST') & (telescope_sens['pred']<5) & (telescope_sens['pred']>0.15) # not in requiered energy range
-        telescope_sens2[mask] = 2
-        mask = (telescope_sens['weight'] == 'SST') & (telescope_sens['pred'] > 300.0)
-        telescope_sens2[mask] = 0.1
-        mask = (telescope_sens['weight'] == 'SST') & (telescope_sens['pred'] < 1.0)
-        telescope_sens2[mask] = 0.1
-        mask = (telescope_sens['weight'] == 'SST') & (telescope_sens['pred']>1.0) & (telescope_sens['pred']<5.0) #not in full sensitivity
-        telescope_sens2[mask] = 1
-        mask = (telescope_sens['weight'] == 'SST') & (telescope_sens['pred']<300.0) & (telescope_sens['pred']>5.0) # not in requiered energy range
-        telescope_sens2[mask] = 2
-        telescope_sens2 = telescope_sens2.drop('pred',axis=1)
-        pred = pd.DataFrame({'predicted_energy':predictions,'mc_energy':y_test})
-        pred['weight']=telescope_sens2['weight']
-        pred['weighted_data'] = pred['predicted_energy']*pred['weight']
-        x = pred.groupby(level=['run_id','array_event_id'],sort=False)
-        prediction_wS = x['weighted_data'].sum()/x['weight'].sum()
-        prediction_wS = prediction_wS.to_frame('predicted_energy')
-        y_test1 = y_test.reset_index()
-        truth_wS = y_test1.drop_duplicates()
-        truth_wS = truth_wS.set_index(['run_id','array_event_id'])
+        ###telescope_sens = weight
+        ###telescope_sens = telescope_sens.to_frame()
+        ###telescope_sens['pred'] = predictions
+        ###telescope_sens2 = telescope_sens.copy(deep=True)
+        ###mask = (telescope_sens['weight'] == 'LST') & (telescope_sens['pred'] > 3.0) # not in requiered energy range
+        ###telescope_sens2[mask] = 0.1
+        ###mask = (telescope_sens['weight'] == 'LST') & (telescope_sens['pred']>0.15) & (telescope_sens['pred']<3) #not in full sensitivity
+        ###telescope_sens2[mask] = 1
+        ###mask = (telescope_sens['weight'] == 'LST') & (telescope_sens['pred']<0.15) # not in requiered energy range
+        ###telescope_sens2[mask] = 2
+        ###mask = (telescope_sens['weight'] == 'MST') & (telescope_sens['pred'] > 50.0) # not in requiered energy range
+        ###telescope_sens2[mask] = 0.1
+        ###mask = (telescope_sens['weight'] == 'MST') & (telescope_sens['pred'] < 0.08) # not in requiered energy range
+        ###telescope_sens2[mask] = 0.1
+        ###mask = (telescope_sens['weight'] == 'MST') & (telescope_sens['pred']>5.0) & (telescope_sens['pred']<50.0) #not in full sensitivity
+        ###telescope_sens2[mask] = 1
+        ###mask = (telescope_sens['weight'] == 'MST') & (telescope_sens['pred']>0.08) & (telescope_sens['pred']<0.15) #not in full sensitivity
+        ###telescope_sens2[mask] = 1
+        ###mask = (telescope_sens['weight'] == 'MST') & (telescope_sens['pred']<5) & (telescope_sens['pred']>0.15) # not in requiered energy range
+        ###telescope_sens2[mask] = 2
+        ###mask = (telescope_sens['weight'] == 'SST') & (telescope_sens['pred'] > 300.0)
+        ###telescope_sens2[mask] = 0.1
+        ###mask = (telescope_sens['weight'] == 'SST') & (telescope_sens['pred'] < 1.0)
+        ###telescope_sens2[mask] = 0.1
+        ###mask = (telescope_sens['weight'] == 'SST') & (telescope_sens['pred']>1.0) & (telescope_sens['pred']<5.0) #not in full sensitivity
+        ###telescope_sens2[mask] = 1
+        ###mask = (telescope_sens['weight'] == 'SST') & (telescope_sens['pred']<300.0) & (telescope_sens['pred']>5.0) # not in requiered energy range
+        ###telescope_sens2[mask] = 2
+        ###telescope_sens2 = telescope_sens2.drop('pred',axis=1)
+        ###pred = pd.DataFrame({'predicted_energy':predictions,'mc_energy':y_test})
+        ###pred['weight']=telescope_sens2['weight']
+        ###pred['weighted_data'] = pred['predicted_energy']*pred['weight']
+        ###x = pred.groupby(level=['run_id','array_event_id'],sort=False)
+        ###prediction_wS = x['weighted_data'].sum()/x['weight'].sum()
+        ###prediction_wS = prediction_wS.to_frame('predicted_energy')
+        ###y_test1 = y_test.reset_index()
+        ###truth_wS = y_test1.drop_duplicates()
+        ###truth_wS = truth_wS.set_index(['run_id','array_event_id'])
 
-        z=np.array([prediction_wS['predicted_energy'].values,truth_wS['mc_energy'].values])
+        prediction_wS, std_wS = func.weighted_mean_over_ID(X_test['intensity'], predictions=predictions,truth=y_test)
+        truth_wS = y_test.drop_duplicates()
+        #std_wS = std_wS.reset_index()
+        #plt.plot(std_wS.index,std_wS['predicted_energy'].values,'.')
+        #plt.ylabel("sigma")
+        #plt.xlabel('event')
+        #plt.savefig("plots/std.jpg")
+        #plt.close()
+
+        weighted_pred = pd.merge(prediction_wS,truth_wS,on=['array_event_id','run_id'])
+
+
+        z=np.array([weighted_pred['weighted_prediction'].values,weighted_pred['mc_energy'].values])
         np.savetxt("data/encaps_pred_wS_data.txt",z.T)
 
+        #print(weighted_pred.iloc[-1])
+        #X_test['prediction'] = predictions
+        #X_test2 = X_test.set_index(['run_id','array_event_id'])
+        ##print(X_test2.loc[(weighted_pred.iloc[-1]['run_id'],weighted_pred.iloc[-1]['array_event_id'])])
+        ##print(X_test2.loc[(1004,),])
+        #x2 = X_test2.loc[(1004,),'prediction']
+        #x1 = weighted_pred.set_index(['run_id','array_event_id'])
+        #x1 = x1.loc[(1004,),]
+        #x1 = x1[0:1]
+        #x1 = x1.reset_index()
+        #arrayi = x1['array_event_id']
+        #x2 = x2.loc[arrayi.values,]
+        #x2 = x2.reset_index()
+        #plt.plot(x1['array_event_id'],x1['mc_energy'].values,'.',label="mc_energy")
+        #plt.plot(x1['array_event_id'],x1['weighted_prediction'],'rx',label="weighted pred")
+        #plt.plot(x2['array_event_id'],x2['prediction'],'g.',label="preds")
+#
+        #plt.legend()
+        #plt.savefig("plots/w_mean.jpg")
+        #plt.close()
 
-
-
-        print('RF with weighted mean(sensitivity):\n\t Coefficient for determination: %.2f \n' % r2_score(prediction_wS.values,truth_wS.values),
-        '\texplained_variance score: %.2f \n' % explained_variance_score(prediction_wS.values,truth_wS.values),
-        '\tmean squared error: %.2f \n' % mean_squared_error(prediction_wS.values,truth_wS.values))
+        print('RF with weighted mean(intensity):\n\t Coefficient for determination: %.2f \n' % r2_score(weighted_pred['weighted_prediction'].values,weighted_pred['mc_energy'].values),
+        '\texplained_variance score: %.2f \n' % explained_variance_score(weighted_pred['weighted_prediction'].values,weighted_pred['mc_energy'].values),
+        '\tmean squared error: %.2f \n' % mean_squared_error(weighted_pred['weighted_prediction'].values,weighted_pred['mc_energy'].values))
 
 
 
     if(args.step == 3):
         # use the prediction_w_mean for another RF
         encaps_info = list(['num_triggered_telescopes','num_triggered_lst','num_triggered_mst','num_triggered_sst','total_intensity'])
-        data_encaps = X_test[encaps_info].reset_index()
-        data_encaps = data_encaps.drop_duplicates()
-        data_encaps = data_encaps.set_index(['run_id','array_event_id'])
+        data_encaps = X_test[encaps_info].reset_index().drop_duplicates().set_index(['run_id','array_event_id'])
+        print(data_encaps.shape,prediction_wS.shape)
         data_encaps['weighted_pred'] = prediction_wS
 
         ######## neue Attribute berechnen #########
@@ -208,7 +250,7 @@ def encaps_RF():
         #fit and pred
         RFr2 = RandomForestRegressor(max_depth=10, n_jobs=-1,n_estimators=10)
         print("We use these attributes for the second RF: \n ",list(data_encaps))
-        X_train, X_test, y_train, y_test = train_test_split(data_encaps,truth_encaps,test_size=0.33)
+        X_train, X_test, y_train, y_test = train_test_split(data_encaps,truth_encaps,test_size=0.5)
         RFr2.fit(X_train,y_train)
         prediction_encaps = RFr2.predict(X_test)
         z=np.array([prediction_encaps,y_test.values])

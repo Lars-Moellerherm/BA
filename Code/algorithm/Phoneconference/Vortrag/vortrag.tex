@@ -58,7 +58,7 @@
   \begin{frame}
     \frametitle{Steps done for a better Reconstruction}
     \begin{itemize}
-      \item data: Monte Carlo data (PROD3(B)) \- pointlike gamma (203710 events).
+      \item data: Monte Carlo data (PROD3(B)) \- pointlike and diffuse gamma (203710 events).
 
       \item Used attributes for the RF:
       \begin{itemize}
@@ -90,7 +90,7 @@
           \begin{figure}
             \centering
             \includegraphics[width=\textwidth]{Plots/RF_MSV.pdf}
-            \caption{Energy reconstriction by a Random Forest Regressor by the use of the MSV.}
+            \caption{Energy reconstruction by a Random Forest Regressor by the use of the MSV.}
           \end{figure}
         \end{column}
         \begin{column}{0.5\textwidth}
@@ -152,7 +152,7 @@
 \section{Outlook}
   \begin{frame}{Outlook}
     \begin{itemize}
-      \item trying to build a second Random Forest which just trains on every event and not on every telesecope
+      \item building a second Random Forest, which trains on every event and not on every telesecope
       \item Using attributes like averaged prediction, num triggered telescopes, averaged prediction of LST, \dots
     \end{itemize}
   \end{frame}
