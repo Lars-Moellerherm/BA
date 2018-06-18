@@ -1,6 +1,7 @@
 # Folder view configuration files
 .DS_Store
 Desktop.ini
+data
 
 # Thumbnail cache files
 ._*
@@ -23,7 +24,7 @@ node_modules
 
 #build-Folder
 build
-data
+Code/data
 
 *.hdf5
 *.aux
@@ -37,3 +38,4 @@ data
 *.fls
 *.nav
 *.snm
+*.txt

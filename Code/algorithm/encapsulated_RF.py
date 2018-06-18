@@ -24,7 +24,7 @@ parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpForm
                                         attribute.
                                         - deafult: 3
 
-                                        Decide between mean scaled values and not with --msv
+                                        Decide between mean scaled values and not with --sv
                                             -default: True
 
                                         Decide if you want to consider the diffused gammas with --diffuse
@@ -33,12 +33,12 @@ parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpForm
                                         Decide how big your data should be with --size
                                             -you get --size events from gammas and diffuse gammas
                                              if you set --diffuse on True
-                                            -default is 10000000
+                                            -default is all data
                                     '''))
-parser.add_argument('--step', type=int, default=2)
+parser.add_argument('--step', type=int, default=3)
 parser.add_argument('--sv', type=bool, default=True, help="Wanna have the Scaled Value?")
-parser.add_argument('--diffuse', type=bool, default=False, help="Wanna have the diffuse gammas?")
-parser.add_argument('--size', type=int, default=10000000, help="How much data you want to enquire?")
+parser.add_argument('--diffuse', type=bool, default=True, help="Wanna have the diffuse gammas?")
+parser.add_argument('--size', type=int, default=-1, help="How much data you want to enquire?")
 
 
 def encaps_RF():
@@ -70,35 +70,64 @@ def encaps_RF():
         #data['weight'] = droped_data['telescope_type_name']
         truth = droped_data['mc_energy']
 
+        x1 = truth.values
+        y1 = data['num_triggered_sst'].values
+        plt.plot(x1,y1,'.')
+        plt.ylabel("num_triggered_sst")
+        plt.xlabel("mc_energy in TeV")
+        plt.xscale('log')
+        plt.savefig("plots/sst_mc.jpg")
+
+        plt.close()
         #fit and predict
-        RFr = RandomForestRegressor(max_depth=10, n_jobs=-1,n_estimators=10)
-        data = data
-        truth = truth
+        RFr = RandomForestRegressor(max_depth=15, n_jobs=-1,n_estimators=20, oob_score=True)
         X_train_i, X_test_i, y_train_i, y_test_i = train_test_split(data.index,truth.index,test_size=0.5)
         X_train = data.loc[X_train_i]
         X_test = data.loc[X_test_i]
         y_train = truth.loc[y_train_i]
         y_test = truth.loc[y_test_i]
-        X_train = X_train.reset_index()
-        y_train = y_train.reset_index()
-        X_test = X_test.reset_index()
-        y_test = y_test.reset_index()
         #X_train = X_train.drop('weight',axis=1)
         #weight = X_test['weight']
         #X_test = X_test.drop('weight',axis=1)
 
-        X1 = X_train.drop(['array_event_id','run_id'],axis=1)
-        X2 = X_test.drop(['array_event_id','run_id'],axis=1)
-        print("We use these attributes for the first RF: \n ",list(X1))
-        RFr.fit(X1.values, y_train['mc_energy'].values)
-        predictions = RFr.predict(X2.values)
+        X1 = X_train.values
+        X2 = X_test.values
+        y1 = y_train.values
+        print("We use these attributes for the first RF: \n ",list(X_train))
+        RFr.fit(X1, y_train)
+        print("The oob_score is: ",RFr.oob_score_)
 
-        z=np.array([predictions,y_test['mc_energy'].values])
+                ############# feature importance ################
+        feature = RFr.feature_importances_
+        std = np.std([tree.feature_importances_ for tree in RFr.estimators_],
+                     axis=0)
+        indices = np.argsort(feature)[::-1]
+        names = list(data)
+        # Print the feature ranking
+        print("Feature ranking:")
+
+        for f in range(X1.shape[1]):
+            print("%d. feature %s (%f)" % (f + 1, names[indices[f]], feature[indices[f]]))
+
+
+        data1=np.array([tree.feature_importances_ for tree in RFr.estimators_])
+        data1=data1[:,indices]
+        position_ticks = np.arange(0,X1.shape[1])+1
+        plt.boxplot(data1,notch=False)
+        plt.xticks(position_ticks,[names[i] for i in indices],rotation=90)
+        plt.tight_layout()
+        plt.savefig("plots/feautureimportance_boxplot_firstForest.pdf")
+        plt.close()
+
+            ################# prediction###############
+        predictions = RFr.predict(X2)
+
+        z=np.array([predictions,y_test.values])
         np.savetxt("data/encaps_pred_data.txt",z.T)
 
-        print('RandomForestRegressor:\n\t Coefficient for determination: %.2f \n' % r2_score(predictions,y_test['mc_energy'].values),
-                '\texplained_variance score: %.2f \n' % explained_variance_score(predictions,y_test['mc_energy'].values),
-                '\tmean squared error: %.2f \n' % mean_squared_error(predictions,y_test['mc_energy'].values),
+        print('RandomForestRegressor:\n\t Coefficient for determination: %.2f \n' % r2_score(predictions,y_test.values),
+                '\texplained_variance score: %.2f \n' % explained_variance_score(predictions,y_test.values),
+                '\tmean squared error: %.2f \n' % mean_squared_error(predictions,y_test.values),
                 "Finished with the first prediction ... \n")
 
     if(args.step > 1):
@@ -141,9 +170,14 @@ def encaps_RF():
         ###y_test1 = y_test.reset_index()
         ###truth_wS = y_test1.drop_duplicates()
         ###truth_wS = truth_wS.set_index(['run_id','array_event_id'])
+        data_w = X_test.copy(deep=True)
+        data_w['mc_energy'] = y_test
+        data_w['predictions'] = predictions
+        data_w = func.weighted_mean_over_ID(data_w['intensity'],data_w)
+        data_w = data_w.reset_index()
+        prediction_wI = data_w[['weighted_prediction','array_event_id','run_id','mc_energy']]
+        prediction_wI = prediction_wI.drop_duplicates()
 
-        prediction_wS, std_wS = func.weighted_mean_over_ID(X_test['intensity'], predictions=predictions,truth=y_test)
-        truth_wS = y_test.drop_duplicates()
         #std_wS = std_wS.reset_index()
         #plt.plot(std_wS.index,std_wS['predicted_energy'].values,'.')
         #plt.ylabel("sigma")
@@ -151,51 +185,33 @@ def encaps_RF():
         #plt.savefig("plots/std.jpg")
         #plt.close()
 
-        weighted_pred = pd.merge(prediction_wS,truth_wS,on=['array_event_id','run_id'])
 
 
-        z=np.array([weighted_pred['weighted_prediction'].values,weighted_pred['mc_energy'].values])
+        z=np.array([prediction_wI['weighted_prediction'].values,prediction_wI['mc_energy'].values])
         np.savetxt("data/encaps_pred_wS_data.txt",z.T)
 
-        #print(weighted_pred.iloc[-1])
-        #X_test['prediction'] = predictions
-        #X_test2 = X_test.set_index(['run_id','array_event_id'])
-        ##print(X_test2.loc[(weighted_pred.iloc[-1]['run_id'],weighted_pred.iloc[-1]['array_event_id'])])
-        ##print(X_test2.loc[(1004,),])
-        #x2 = X_test2.loc[(1004,),'prediction']
-        #x1 = weighted_pred.set_index(['run_id','array_event_id'])
-        #x1 = x1.loc[(1004,),]
-        #x1 = x1[0:1]
-        #x1 = x1.reset_index()
-        #arrayi = x1['array_event_id']
-        #x2 = x2.loc[arrayi.values,]
-        #x2 = x2.reset_index()
-        #plt.plot(x1['array_event_id'],x1['mc_energy'].values,'.',label="mc_energy")
-        #plt.plot(x1['array_event_id'],x1['weighted_prediction'],'rx',label="weighted pred")
-        #plt.plot(x2['array_event_id'],x2['prediction'],'g.',label="preds")
-#
-        #plt.legend()
-        #plt.savefig("plots/w_mean.jpg")
-        #plt.close()
-
-        print('RF with weighted mean(intensity):\n\t Coefficient for determination: %.2f \n' % r2_score(weighted_pred['weighted_prediction'].values,weighted_pred['mc_energy'].values),
-        '\texplained_variance score: %.2f \n' % explained_variance_score(weighted_pred['weighted_prediction'].values,weighted_pred['mc_energy'].values),
-        '\tmean squared error: %.2f \n' % mean_squared_error(weighted_pred['weighted_prediction'].values,weighted_pred['mc_energy'].values))
+        print('RF with weighted mean(intensity):\n\t Coefficient for determination: %.2f \n' % r2_score(prediction_wI['weighted_prediction'].values,prediction_wI['mc_energy'].values),
+        '\texplained_variance score: %.2f \n' % explained_variance_score(prediction_wI['weighted_prediction'].values,prediction_wI['mc_energy'].values),
+        '\tmean squared error: %.2f \n' % mean_squared_error(prediction_wI['weighted_prediction'].values,prediction_wI['mc_energy'].values))
 
 
 
     if(args.step == 3):
         # use the prediction_w_mean for another RF
         encaps_info = list(['num_triggered_telescopes','num_triggered_lst','num_triggered_mst','num_triggered_sst','total_intensity'])
-        data_encaps = X_test[encaps_info].reset_index().drop_duplicates().set_index(['run_id','array_event_id'])
-        print(data_encaps.shape,prediction_wS.shape)
-        data_encaps['weighted_pred'] = prediction_wS
+        data_encaps = X_test[encaps_info].reset_index().drop_duplicates()
+        data_encaps = pd.merge(data_encaps,prediction_wI, on=['run_id','array_event_id'])
 
         ######## neue Attribute berechnen #########
 
             ######### Mittelwert der Energien nur für die LST's ###########
-        pred = pred.drop(['mc_energy','weight','weighted_data'],axis=1)
-        pred_lst = pred[telescope_sens['weight']=='LST']
+        pred = data_w[['predictions','array_event_id','run_id','telescope_type_id']]
+        telescope_type = pred['telescope_type_id']
+        pred = pred.drop('telescope_type_id',axis=1)
+        telescope_type[telescope_type==1] = 'LST'
+        telescope_type[telescope_type==2] = 'MST'
+        telescope_type[telescope_type==3] = 'SST'
+        pred_lst = pred[telescope_type=='LST']
         prediction_lst_max = pred_lst.groupby(level=list(['run_id','array_event_id'])).max()
         prediction_lst_min = pred_lst.groupby(level=list(['run_id','array_event_id'])).min()
         prediction_lst = pred_lst.groupby(level=list(['run_id','array_event_id'])).mean()
@@ -205,7 +221,7 @@ def encaps_RF():
         prediction_lst.columns = ['mean_lst_pred']
         prediction_lst_std.columns = ['std_lst_pred']
 
-        pred_mst = pred[telescope_sens['weight']=='MST']
+        pred_mst = pred[telescope_type=='MST']
         prediction_mst_max = pred_mst.groupby(level=list(['run_id','array_event_id'])).max()
         prediction_mst_min = pred_mst.groupby(level=list(['run_id','array_event_id'])).min()
         prediction_mst = pred_mst.groupby(level=list(['run_id','array_event_id'])).mean()
@@ -215,7 +231,7 @@ def encaps_RF():
         prediction_mst_max.columns = ['max_mst_pred']
         prediction_mst_min.columns = ['min_mst_pred']
 
-        pred_sst = pred[telescope_sens['weight']=='SST']
+        pred_sst = pred[telescope_type=='SST']
         prediction_sst_max = pred_sst.groupby(level=list(['run_id','array_event_id'])).max()
         prediction_sst_min = pred_sst.groupby(level=list(['run_id','array_event_id'])).min()
         prediction_sst = pred_sst.groupby(level=list(['run_id','array_event_id'])).mean()
@@ -238,6 +254,7 @@ def encaps_RF():
         sw_std=sw_std.rename('std_scaled_width')
         data_encaps = pd.concat([data_encaps,msl,msw,sl_std,sw_std],axis=1)
 
+        import IPython; IPython.embed()
             ##### if there is no lst or sst or mst who has seen this event, I set the mean and std on 0
         data_encaps = data_encaps.fillna(0)
         data_encaps['mc_energy'] = truth_wS

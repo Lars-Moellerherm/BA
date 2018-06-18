@@ -6,25 +6,30 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 from sklearn.metrics import r2_score
 
-def weighted_mean_over_ID(weight, predictions, truth):
-    pred = pd.DataFrame({'predicted_energy':predictions,'weight': weight,'array_event_id':truth['array_event_id'],'run_id':truth['run_id']})
+def weighted_mean_over_ID(weight, data):
+    weight2 = weight.copy(deep=True)
+    predictions = data['predictions'].copy(deep=True)
+    truth = data['mc_energy'].copy(deep=True)
+    pred = pd.DataFrame({'predicted_energy':predictions, 'mc_energy':
+                        truth, 'weight': weight2})
     pred['weighted_data'] = pred['predicted_energy']*pred['weight']
-    x = pred.groupby(by=['run_id','array_event_id'],sort=False)
-    stand = x.std()
+    x = pred.groupby(level=list(['array_event_id','run_id']))
     prediction_w_mean = x['weighted_data'].sum()/x['weight'].sum()
     prediction_w_mean = prediction_w_mean.to_frame('weighted_prediction')
     prediction_w_mean = prediction_w_mean.reset_index()
-    return prediction_w_mean, stand
+    data = data.reset_index()
+    data2 = pd.merge(data,prediction_w_mean, on=list(['array_event_id','run_id']))
+    data2 = data2.set_index(list(['run_id','array_event_id']))
+    return data2
 
 
 def calc_scaled_width_and_length(data):
     SW = (data.width - np.mean(data.width))/sc.stats.sem(data.width)
     SL = (data.length - np.mean(data.length))/sc.stats.sem(data.length)
     SV = pd.DataFrame({'scaled_length':SL, 'scaled_width':SW})
-    MSV = SV.groupby(level=list(['array_event_id','run_id'])).mean()
-    MSV = MSV.reset_index()
+    SV = SV.reset_index()
     data = data.reset_index()
-    data2 = pd.merge(data,MSV,on=['array_event_id','run_id'])
+    data2 = pd.merge(data,SV,on=['array_event_id','run_id'])
     data2 = data2.set_index(['run_id','array_event_id'])
 
     return data2
@@ -162,7 +167,7 @@ def reading_data(diffuse,data_size1):
     gamma_runs_df = pd.DataFrame(data=dict(gammas['runs']))
     gamma_telescope_df = pd.DataFrame(data=dict(gammas['telescope_events']))
     max_size = gamma_telescope_df.shape[0]
-    if(data_size1 >= max_size):
+    if(data_size1 < 0):
         data_size = max_size-1
     else:
         data_size = data_size1
@@ -178,7 +183,6 @@ def reading_data(diffuse,data_size1):
     gamma_merge = gamma_merge.dropna(axis=0)
     data = gamma_merge
 
-
     if(diffuse):
         gammas_diffuse = h5.File("../data/3_gen/gammas_diffuse.hdf5","r")
 
@@ -187,7 +191,7 @@ def reading_data(diffuse,data_size1):
         gamma_diffuse_telescope_df = pd.DataFrame(data=dict(gammas_diffuse['telescope_events']))
 
         max_size_diffuse = gamma_diffuse_telescope_df.shape[0]
-        if(data_size1-1 >= max_size_diffuse):
+        if(data_size1 < 0):
             data_size = max_size_diffuse-1
         else:
             data_size = data_size1

@@ -14,8 +14,8 @@ bin_edge2 = np.logspace(np.log10(0.01),np.log10(max_energy),20)
 
 #reading data
 predictions, truth = np.genfromtxt("../good_data/encaps_pred_data.txt", unpack=True)
-prediction_w_mean, truth_w_mean = np.genfromtxt("../good_data/encaps_pred_w_mean_data.txt", unpack=True)
-predictions_encaps, truth_encaps = np.genfromtxt("../good_data/encaps_encaps_pred_data.txt", unpack=True)
+prediction_w_mean, truth_w_mean = np.genfromtxt("../good_data/encaps_pred_wS_data.txt", unpack=True)
+#predictions_encaps, truth_encaps = np.genfromtxt("../good_data/encaps_encaps_pred_data.txt", unpack=True)
 print('finished with reading data of encapsulated_RF.py ... \n')
 
 
@@ -30,9 +30,9 @@ plt.savefig("RF_MSV_wI_mean.pdf")
 plt.close()
 
     #plots for encapsulated RF
-r2_3 = func.plot_hist2d(predictions_encaps,truth_encaps,min_energy,max_energy,bin_edge)
-plt.savefig('RF_MSV_encaps.pdf')
-plt.close()
+#r2_3 = func.plot_hist2d(predictions_encaps,truth_encaps,min_energy,max_energy,bin_edge)
+#plt.savefig('RF_MSV_encaps.pdf')
+#plt.close()
 
 
 ########################R2 score per bin ###########################
@@ -132,16 +132,16 @@ def percentilesigma(y):
 
 rel_error = (predictions-truth)/truth
 rel_error_w_mean = (prediction_w_mean-truth_w_mean)/truth_w_mean
-rel_error_encaps = (predictions_encaps-truth_encaps)/truth_encaps
+#rel_error_encaps = (predictions_encaps-truth_encaps)/truth_encaps
 perc, bins_p, binnumber_p = stats.binned_statistic(truth,rel_error,statistic=percentilesigma,bins=bin_edge2)
 perc_w_mean, bins_p_w_mean, binnumber_p_w_mean = stats.binned_statistic(truth_w_mean,rel_error_w_mean,statistic=percentilesigma,bins=bin_edge2)
-perc_encaps, bins_p_encaps, binnumber_p_encaps = stats.binned_statistic(truth_encaps,rel_error_encaps,statistic=percentilesigma,bins=bin_edge2)
+#perc_encaps, bins_p_encaps, binnumber_p_encaps = stats.binned_statistic(truth_encaps,rel_error_encaps,statistic=percentilesigma,bins=bin_edge2)
 
 
 bin_p = (bins_p[:-1]+bins_p[1:])/2
 plt.plot(bin_p,perc,'rx',label='RF with MSV')
 plt.plot(bin_p,perc_w_mean,'bx',label='with weighted mean(intensity)')
-plt.plot(bin_p,perc_encaps,'gx',label='encapsulated RF')
+#plt.plot(bin_p,perc_encaps,'gx',label='encapsulated RF')
 plt.legend(loc='best')
 plt.xscale('log')
 plt.xlabel("Energy / TeV")
@@ -152,12 +152,12 @@ plt.close()
 
 mean, bins_m, binnumber_m = stats.binned_statistic(truth,rel_error,statistic='mean',bins=bin_edge2)
 mean_w_mean, bins_m_w_mean, binnumber_m_w_mean = stats.binned_statistic(truth_w_mean,rel_error_w_mean,statistic='mean',bins=bin_edge2)
-mean_encaps, bins_m_encaps, binnumber_m_encaps = stats.binned_statistic(truth_encaps,rel_error_encaps,statistic='mean',bins=bin_edge2)
+#mean_encaps, bins_m_encaps, binnumber_m_encaps = stats.binned_statistic(truth_encaps,rel_error_encaps,statistic='mean',bins=bin_edge2)
 
 bin_m = (bins_m[:-1]+bins_m[1:])/2
 plt.plot(bin_m,mean,'r.',label='RF with MSV')
 plt.plot(bin_m,mean_w_mean,'b.',label='with weighted mean(intensity)')
-plt.plot(bin_m,mean_encaps,'g.',label='encapsulated RF')
+#plt.plot(bin_m,mean_encaps,'g.',label='encapsulated RF')
 plt.legend(loc='best')
 plt.xscale('log')
 plt.xlabel("Energy / TeV")
