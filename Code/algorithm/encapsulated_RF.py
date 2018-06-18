@@ -36,8 +36,8 @@ parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpForm
                                             -default is all data
                                     '''))
 parser.add_argument('--step', type=int, default=3)
-parser.add_argument('--sv', type=bool, default=True, help="Wanna have the Scaled Value?")
-parser.add_argument('--diffuse', type=bool, default=True, help="Wanna have the diffuse gammas?")
+parser.add_argument('--sv', type=bool, default=False, help="Wanna have the Scaled Value?")
+parser.add_argument('--diffuse', type=bool, default=False, help="Wanna have the diffuse gammas?")
 parser.add_argument('--size', type=int, default=-1, help="How much data you want to enquire?")
 
 
@@ -70,6 +70,8 @@ def encaps_RF():
         #data['weight'] = droped_data['telescope_type_name']
         truth = droped_data['mc_energy']
 
+
+            #### plotte Truth gegen num_triggered_sst #######
         x1 = truth.values
         y1 = data['num_triggered_sst'].values
         plt.plot(x1,y1,'.')
@@ -77,11 +79,12 @@ def encaps_RF():
         plt.xlabel("mc_energy in TeV")
         plt.xscale('log')
         plt.savefig("plots/sst_mc.jpg")
-
         plt.close()
+
+
         #fit and predict
-        RFr = RandomForestRegressor(max_depth=15, n_jobs=-1,n_estimators=20, oob_score=True)
-        X_train_i, X_test_i, y_train_i, y_test_i = train_test_split(data.index,truth.index,test_size=0.5)
+        RFr = RandomForestRegressor(max_depth=10, n_jobs=-1,n_estimators=100, oob_score=True)
+        X_train_i, X_test_i, y_train_i, y_test_i = train_test_split(data.index,truth.index,test_size=0.66)
         X_train = data.loc[X_train_i]
         X_test = data.loc[X_test_i]
         y_train = truth.loc[y_train_i]
@@ -94,7 +97,8 @@ def encaps_RF():
         X2 = X_test.values
         y1 = y_train.values
         print("We use these attributes for the first RF: \n ",list(X_train))
-        RFr.fit(X1, y_train)
+        RFr.fit(X1, y1)
+                ############### overfitting ####################
         print("The oob_score is: ",RFr.oob_score_)
 
                 ############# feature importance ################
@@ -200,75 +204,109 @@ def encaps_RF():
         # use the prediction_w_mean for another RF
         encaps_info = list(['num_triggered_telescopes','num_triggered_lst','num_triggered_mst','num_triggered_sst','total_intensity'])
         data_encaps = X_test[encaps_info].reset_index().drop_duplicates()
+        print(prediction_wI.shape)
         data_encaps = pd.merge(data_encaps,prediction_wI, on=['run_id','array_event_id'])
+        print(data_encaps.shape)
 
         ######## neue Attribute berechnen #########
 
             ######### Mittelwert der Energien nur für die LST's ###########
         pred = data_w[['predictions','array_event_id','run_id','telescope_type_id']]
-        telescope_type = pred['telescope_type_id']
+        telescope_type = pred['telescope_type_id'].copy(deep=True)
         pred = pred.drop('telescope_type_id',axis=1)
         telescope_type[telescope_type==1] = 'LST'
         telescope_type[telescope_type==2] = 'MST'
         telescope_type[telescope_type==3] = 'SST'
         pred_lst = pred[telescope_type=='LST']
-        prediction_lst_max = pred_lst.groupby(level=list(['run_id','array_event_id'])).max()
-        prediction_lst_min = pred_lst.groupby(level=list(['run_id','array_event_id'])).min()
-        prediction_lst = pred_lst.groupby(level=list(['run_id','array_event_id'])).mean()
-        prediction_lst_std =  pred_lst.groupby(level=list(['run_id','array_event_id'])).std()
-        prediction_lst_max.columns = ['max_lst_pred']
-        prediction_lst_min.columns = ['min_lst_pred']
-        prediction_lst.columns = ['mean_lst_pred']
-        prediction_lst_std.columns = ['std_lst_pred']
+        prediction_lst_max = pred_lst.groupby(by=list(['run_id','array_event_id'])).max().reset_index()
+        prediction_lst_min = pred_lst.groupby(by=list(['run_id','array_event_id'])).min().reset_index()
+        prediction_lst = pred_lst.groupby(by=list(['run_id','array_event_id'])).mean().reset_index()
+        prediction_lst_std =  pred_lst.groupby(by=list(['run_id','array_event_id'])).std().reset_index()
+        prediction_lst_max = prediction_lst_max.rename(columns = {'predictions':'max_lst_pred'})
+        prediction_lst_min = prediction_lst_max.rename(columns = {'predictions':'min_lst_pred'})
+        prediction_lst = prediction_lst.rename(columns = {'prediction':'mean_lst_pred'})
+        prediction_lst_std = prediction_lst_std.rename(columns = {'predictions':'std_lst_pred'})
 
         pred_mst = pred[telescope_type=='MST']
-        prediction_mst_max = pred_mst.groupby(level=list(['run_id','array_event_id'])).max()
-        prediction_mst_min = pred_mst.groupby(level=list(['run_id','array_event_id'])).min()
-        prediction_mst = pred_mst.groupby(level=list(['run_id','array_event_id'])).mean()
-        prediction_mst_std =  pred_mst.groupby(level=list(['run_id','array_event_id'])).std()
-        prediction_mst.columns = ['mean_mst_pred']
-        prediction_mst_std.columns = ['std_mst_pred']
-        prediction_mst_max.columns = ['max_mst_pred']
-        prediction_mst_min.columns = ['min_mst_pred']
+        prediction_mst_max = pred_mst.groupby(by=list(['run_id','array_event_id'])).max().reset_index()
+        prediction_mst_min = pred_mst.groupby(by=list(['run_id','array_event_id'])).min().reset_index()
+        prediction_mst = pred_mst.groupby(by=list(['run_id','array_event_id'])).mean().reset_index()
+        prediction_mst_std =  pred_mst.groupby(by=list(['run_id','array_event_id'])).std().reset_index()
+        prediction_mst = prediction_mst.rename(columns={'predictions':'mean_mst_pred'})
+        prediction_mst_std = prediction_mst_std.rename(columns={'predictions':'std_mst_pred'})
+        prediction_mst_max = prediction_mst_max.rename(columns = {'predictions':'max_mst_pred'})
+        prediction_mst_min = prediction_mst_min.rename(columns = {'predictions':'min_mst_pred'})
 
         pred_sst = pred[telescope_type=='SST']
-        prediction_sst_max = pred_sst.groupby(level=list(['run_id','array_event_id'])).max()
-        prediction_sst_min = pred_sst.groupby(level=list(['run_id','array_event_id'])).min()
-        prediction_sst = pred_sst.groupby(level=list(['run_id','array_event_id'])).mean()
-        prediction_sst_std =  pred_sst.groupby(level=list(['run_id','array_event_id'])).std()
-        prediction_sst.columns = ['mean_sst_pred']
-        prediction_sst_std.columns = ['std_sst_pred']
-        prediction_sst_max.columns = ['max_sst_pred']
-        prediction_sst_min.columns = ['min_sst_pred']
-        data_encaps = pd.concat([data_encaps,prediction_lst,prediction_lst_std,prediction_mst,prediction_mst_std,
-                                prediction_sst,prediction_sst_std,prediction_lst_min,prediction_lst_max,
-                                prediction_mst_min,prediction_mst_max,prediction_sst_min,prediction_sst_max],axis=1)
+        prediction_sst_max = pred_sst.groupby(by=list(['run_id','array_event_id'])).max().reset_index()
+        prediction_sst_min = pred_sst.groupby(by=list(['run_id','array_event_id'])).min().reset_index()
+        prediction_sst = pred_sst.groupby(by=list(['run_id','array_event_id'])).mean().reset_index()
+        prediction_sst_std =  pred_sst.groupby(by=list(['run_id','array_event_id'])).std().reset_index()
+        prediction_sst = prediction_sst.rename(columns = {'predictions':'mean_sst_pred'})
+        prediction_sst_std = prediction_sst_std.rename(columns = {'predictions':'std_sst_pred'})
+        prediction_sst_max = prediction_sst_max.rename(columns = {'predictions':'max_sst_pred'})
+        prediction_sst_min = prediction_sst_min.rename(columns = {'predictions':'min_sst_pred'})
+        data_encaps =data_encaps.merge(prediction_lst,on=['array_event_id','run_id']).merge(prediction_lst_std,on=['array_event_id','run_id']).merge(prediction_mst,on=['array_event_id','run_id']).merge(prediction_mst_std,
+            on=['array_event_id','run_id']).merge(prediction_sst,on=['array_event_id','run_id']).merge(prediction_sst_std,
+            on=['array_event_id','run_id']).merge(prediction_lst_min,on=['array_event_id','run_id']).merge(prediction_lst_max,
+            on=['array_event_id','run_id']).merge(prediction_mst_min,on=['array_event_id','run_id']).merge(prediction_mst_max,
+            on=['array_event_id','run_id']).merge(prediction_sst_min,on=['array_event_id','run_id']).merge(prediction_sst_max,
+            on=['array_event_id','run_id'])
 
-        msl = X_test['scaled_length'].groupby(level=list(['run_id','array_event_id'])).mean()
-        msw = X_test['scaled_width'].groupby(level=list(['run_id','array_event_id'])).mean()
-        msl=msl.rename('mean_scaled_length')
-        msw=msw.rename('mean_scaled_width')
-        sl_std = X_test['scaled_length'].groupby(level=list(['run_id','array_event_id'])).std()
-        sw_std = X_test['scaled_width'].groupby(level=list(['run_id','array_event_id'])).std()
-        sl_std=sl_std.rename('std_scaled_length')
-        sw_std=sw_std.rename('std_scaled_width')
-        data_encaps = pd.concat([data_encaps,msl,msw,sl_std,sw_std],axis=1)
+        if(args.sv):
+            msl = X_test['scaled_length'].groupby(by=list(['run_id','array_event_id'])).mean().reset_index()
+            msw = X_test['scaled_width'].groupby(by=list(['run_id','array_event_id'])).mean().reset_index()
+            msl=msl.rename('mean_scaled_length')
+            msw=msw.rename('mean_scaled_width')
+            sl_std = X_test['scaled_length'].groupby(by=list(['run_id','array_event_id'])).std().reset_index()
+            sw_std = X_test['scaled_width'].groupby(by=list(['run_id','array_event_id'])).std().reset_index()
+            sl_std=sl_std.rename('std_scaled_length')
+            sw_std=sw_std.rename('std_scaled_width')
+            data_encaps = data_encaps.merge(msl,on=['array_event_id','run_id']).merge(msw,on=['array_event_id','run_id']).merge(sl_std,
+                on=['array_event_id','run_id']).merge(sw_std,on=['array_event_id','run_id'])
 
-        import IPython; IPython.embed()
+
+
             ##### if there is no lst or sst or mst who has seen this event, I set the mean and std on 0
         data_encaps = data_encaps.fillna(0)
-        data_encaps['mc_energy'] = truth_wS
 
 
         data_encaps = shuffle(data_encaps)
         truth_encaps = data_encaps['mc_energy'].copy(deep=True)
-        data_encaps = data_encaps.drop('mc_energy', axis=1)
-
+        data_encaps = data_encaps.drop(['mc_energy','array_event_id','run_id'], axis=1)
         #fit and pred
-        RFr2 = RandomForestRegressor(max_depth=10, n_jobs=-1,n_estimators=10)
+        RFr2 = RandomForestRegressor(max_depth=10, n_jobs=-1,n_estimators=100,oob_score=True)
         print("We use these attributes for the second RF: \n ",list(data_encaps))
         X_train, X_test, y_train, y_test = train_test_split(data_encaps,truth_encaps,test_size=0.5)
         RFr2.fit(X_train,y_train)
+
+                ############### overfitting ####################
+        print("The oob_score is: ",RFr2.oob_score_)
+
+                ############# feature importance ################
+        feature = RFr2.feature_importances_
+        std = np.std([tree.feature_importances_ for tree in RFr2.estimators_],
+                     axis=0)
+        indices = np.argsort(feature)[::-1]
+        names = list(data_encaps)
+        # Print the feature ranking
+        print("Feature ranking:")
+
+        for f in range(X_train.shape[1]):
+            print("%d. feature %s (%f)" % (f + 1, names[indices[f]], feature[indices[f]]))
+
+
+        data2=np.array([tree.feature_importances_ for tree in RFr2.estimators_])
+        data2=data2[:,indices]
+        position_ticks = np.arange(0,X_train.shape[1])+1
+        plt.boxplot(data2,notch=False)
+        plt.xticks(position_ticks,[names[i] for i in indices],rotation=90)
+        plt.tight_layout()
+        plt.savefig("plots/feautureimportance_boxplot_secondForest.pdf")
+        plt.close()
+
+
+                ####### Predictions ################
         prediction_encaps = RFr2.predict(X_test)
         z=np.array([prediction_encaps,y_test.values])
 
@@ -278,44 +316,6 @@ def encaps_RF():
         '\texplained_variance score: %.2f \n' % explained_variance_score(prediction_encaps,y_test.values),
         '\tmean squared error: %.2f \n' % mean_squared_error(prediction_encaps,y_test.values),
         "Finished with the encapsulated prediction \n")
-
-
-
-        ############ tree interpretation of the second forest ###########################
-
-
-        RF = RandomForestRegressor(max_depth=10,n_jobs=-1,n_estimators=30)
-        trainX,testX,trainY,testY = train_test_split(X,y)
-        RF.fit(trainX,trainY)
-        feature = RF.feature_importances_
-        std = np.std([tree.feature_importances_ for tree in RF.estimators_],
-                     axis=0)
-        indices = np.argsort(feature)[::-1]
-        names = list(data_encaps)
-        # Print the feature ranking
-        print("Feature ranking:")
-
-        for f in range(X.shape[1]):
-            print("%d. feature %s (%f)" % (f + 1, names[indices[f]], feature[indices[f]]))
-
-        plt.figure()
-        plt.title("Feature importances")
-        plt.bar(range(X.shape[1]), feature[indices],
-               color="b", yerr=std[indices], align="center",)
-        plt.xticks(range(X.shape[1]),[names[i] for i in indices],rotation=90)
-        plt.xlim([-1, X.shape[1]])
-        plt.tight_layout()
-        plt.savefig("plots/feautureimportance_secondForest.jpg")
-        plt.close()
-
-        data=np.array([tree.feature_importances_ for tree in RF.estimators_])
-        data=data[:,indices]
-        position_ticks = np.arange(0,X.shape[1])+1
-        plt.boxplot(data,notch=False)
-        plt.xticks(position_ticks,[names[i] for i in indices],rotation=90)
-        plt.tight_layout()
-        plt.savefig("plots/feautureimportance_boxplot_secondForest.pdf")
-        plt.close()
 
 
 
