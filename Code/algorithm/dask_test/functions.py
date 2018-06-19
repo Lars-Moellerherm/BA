@@ -8,24 +8,33 @@ from sklearn.metrics import r2_score
 import dask.dataframe as dd
 
 
-def weighted_mean_over_ID(weight, prediction):
-    pred = pd.merge(prediction,weight,on=['array_event_id','run_id'])
-    pred['weighted_data'] = pred['prediction']*pred['weight']
-    x = pred.groupby(by=['array_event_id','run_id'])
+def weighted_mean_over_ID(weight, data):
+    weight2 = weight.copy(deep=True)
+    predictions = data['predictions'].copy(deep=True)
+    truth = data['mc_energy'].copy(deep=True)
+    pred = pd.DataFrame({'predicted_energy':predictions, 'mc_energy':
+                        truth, 'weight': weight2})
+    pred['weighted_data'] = pred['predicted_energy']*pred['weight']
+    x = pred.groupby(level=list(['array_event_id','run_id']))
     prediction_w_mean = x['weighted_data'].sum()/x['weight'].sum()
     prediction_w_mean = prediction_w_mean.to_frame('weighted_prediction')
     prediction_w_mean = prediction_w_mean.reset_index()
-    return prediction_w_mean
+    data = data.reset_index()
+    data2 = pd.merge(data,prediction_w_mean, on=list(['array_event_id','run_id']))
+    data2 = data2.set_index(list(['run_id','array_event_id']))
+    return data2
 
 
 def calc_scaled_width_and_length(data):
     SW = (data.width - np.mean(data.width))/sc.stats.sem(data.width)
     SL = (data.length - np.mean(data.length))/sc.stats.sem(data.length)
-    SV = pd.DataFrame({'scaled_length':SL, 'scaled_width':SW, 'array_event_id':data['array_event_id'], 'run_id':data['run_id']})
-    data = data.set_index(['run_id','array_event_id'])
-    SV = SV.set_index(['run_id','array_event_id'])
-    data = pd.concat([data,SV],axis=1).reset_index()
-    return data
+    SV = pd.DataFrame({'scaled_length':SL, 'scaled_width':SW})
+    SV = SV.reset_index()
+    data = data.reset_index()
+    data2 = pd.merge(data,SV,on=['array_event_id','run_id'])
+    data2 = data2.set_index(['run_id','array_event_id'])
+
+    return data2
 
 def plot_hist2d(predictions,truth,min_energy,max_energy,bin_edges):
     min_e = np.log10(min_energy)
@@ -154,25 +163,27 @@ def plot_R2_per_bin(prediction, truth, bins):
 
 def reading_data(diffuse,data_size1):
     # Import data in h5py
-    gammas = h5.File("../data/3_gen/gammas.hdf5","r")
+    gammas = h5.File("../../data/3_gen/gammas.hdf5","r")
     # Converting to pandas
     gamma_array_df = pd.DataFrame(data=dict(gammas['array_events']))
     gamma_runs_df = pd.DataFrame(data=dict(gammas['runs']))
     gamma_telescope_df = pd.DataFrame(data=dict(gammas['telescope_events']))
-    max_size = gamma_telescope_df.shape[0]
+
+    gamma_array_dd = dd.from_pandas(gamma_array_df,chunksize=1000000)
+    gamma_telescope_dd = dd.from_pandas(gamma_telescope_df,chunksize=1000000)
+
+
+    #merging of array and telescope data and shuffle of proton and gamma
+    gamma_merge = dd.merge(gamma_telescope_dd,gamma_array_dd)
+    #there are some nan in width the needed to be deleted
+    gamma_merge = gamma_merge.dropna()
+    max_size = gamma_merge.shape[0]
     if(data_size1 < 0):
         data_size = max_size-1
     else:
         data_size = data_size1
-
-
-    #merging of array and telescope data and shuffle of proton and gamma
-    gamma_merge = pd.merge(gamma_telescope_df,gamma_array_df,on=list(["array_event_id",'run_id']))
-    #there are some nan in width the needed to be deleted
-    gamma_merge = gamma_merge.dropna(axis=0)
-    data = gamma_merge.iloc[:data_size]
-
-
+    data = gamma_merge[:data_size]
+    import IPython; IPython.embed()
 
     if(diffuse):
         gammas_diffuse = h5.File("../data/3_gen/gammas_diffuse.hdf5","r")
@@ -187,15 +198,19 @@ def reading_data(diffuse,data_size1):
         else:
             data_size = data_size1
 
+        gamma_diffuse_array_df = gamma_diffuse_array_df.iloc[:data_size]
+        gamma_diffuse_runs_df = gamma_diffuse_runs_df.iloc[:data_size]
+        gamma_diffuse_telescope_df = gamma_diffuse_telescope_df.iloc[:data_size]
         gamma_diffuse_merge = pd.merge(gamma_diffuse_array_df,gamma_diffuse_telescope_df,on=list(['array_event_id','run_id']))
+        gamma_diffuse_merge = gamma_diffuse_merge.set_index(['run_id','array_event_id'])
         gamma_diffuse_merge = gamma_diffuse_merge.dropna(axis=0)
-        gamma_diffuse_merge = gamma_diffuse_merge.iloc[:data_size]
-        data = pd.concat([data,gamma_diffuse_merge])
+        gamma_diffuse_merge = gamma_diffuse_merge.reset_index()
+        gamma_merge = gamma_merge.reset_index()
+        data = pd.concat([gamma_merge,gamma_diffuse_merge])
+        data = data.set_index(['run_id','array_event_id'])
         data = data.dropna(axis=1)
-
         print("Using diffused data...")
 
-    print("Komplette Anzahl an untersuchter Events: ",data.shape[0])
     return data;
 
 
@@ -203,7 +218,7 @@ def drop_data(data):
 
     droped_information = list(data)
     used = ['length','width','num_triggered_telescopes','intensity','kurtosis','skewness','total_intensity',
-            'telescope_type_id','num_triggered_lst','num_triggered_mst','num_triggered_sst','array_event_id','run_id','mc_energy']
+            'telescope_type_id','num_triggered_lst','num_triggered_mst','num_triggered_sst']
     if( droped_information.count('scaled_length')==1):
         used.append('scaled_length')
         used.append('scaled_width')

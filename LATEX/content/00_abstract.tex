@@ -1,25 +1,25 @@
 \thispagestyle{plain}
 
 \section*{Kurzfassung}
-In dieser Arbeit wird die Energie Rekonstruktionsanalyse für hochenergetischen kosmischen Photonen,welche durch das Cherenkov
-Telescope Array beobachtet werden, optimiert. Bis zu diesem
-Zeitpunkt wird für jedes Teleskop eine eigenständige Energieschätzung durch Algorithmen des überwachten Maschniellen Lernens durchgeführt.
-Da beim CTA die Möglichkeit besteht, dass mehrere Teleskope ein Event sehen, wird durch einfaches Mitteln über diese eigenständigen
-Ergebnisse die Energieschätzung deutlich besser. Eine Gewichtung des Mittelwerts mit der gemessenen Cherenkov Photonen Anzahl für jedes
-Teleskops führt auf eine weitere Verbesserung und wenn die erste Schätzung als neues Attribut in einer weiteren Regressionsanalyse verwendet
-wird, kann die tatsächliche Energie noch genauer vorhergesagt werden. Aufgrund der geringen Sensitivität der Teleskope bei niedrigen
-Energien fehlt es dem Regressor an Statistik, um in diesem Bereich eine genaue Vorhersage treffen zu können. Um diese Statstik zu erhöhen, wird eine
-Transformation der Energieverteilung vorgenommen, was zwar zu einer höheren Genauigkeit bei geringen Energien führt, jedoch zu großen
-Ungenauigkeiten in den anderen Energiebereichen.
+In dieser Arbeit wird die Energie Rekonstruktionsanalyse für hochenergetischen kosmischen Photonen, welche durch das Cherenkov Telescope Array beobachtet
+werden, optimiert.
+Bis zu diesem Zeitpunkt wird für jedes Teleskop eine eigenständige Energieschätzung durch Algorithmen des überwachten Maschniellen Lernens durchgeführt.
+Da beim CTA die Möglichkeit besteht, dass mehrere Teleskope ein Event sehen, wird durch einfaches Mitteln über diese eigenständigen Ergebnisse die
+Energieschätzung deutlich besser.
+Eine Gewichtung des Mittelwerts mit der gemessenen Cherenkov Photonen Anzahl für jedes Teleskops führt auf eine weitere Verbesserung und wenn die erste
+Schätzung als neues Attribut in einer weiteren Regressionsanalyse verwendet wird, kann die tatsächliche Energie noch genauer vorhergesagt werden.
+Aufgrund der geringen Sensitivität der Teleskope bei niedrigen Energien fehlt es dem Regressor an Statistik, um in diesem Bereich eine genaue Vorhersage
+treffen zu können.
+Um diese Statstik zu erhöhen, wird eine Transformation der Energieverteilung vorgenommen, was zwar zu einer höheren Genauigkeit bei geringen Energien führt,
+jedoch zu großen Ungenauigkeiten in den anderen Energiebereichen.
 
 \section*{Abstract}
 \begin{english}
 This thesis is optimizing the energy reconstruction for heigh energy cosmic photons, which are detected by the Cherenkov Telescope Array.
-For now there is a prediction by supervised
-machine learning regressors for every single telescope. By the fact, that CTA is an array and more then one telescope can measure the
-same event, the analyse can be optimized by averaging over these telescopes. Another improvement can be achieved by using the Chrenkov photon
-number from every telescope as an weight for the average. If these first predictions are used for a second regressor, the predictions
-are getting more accurate. The telescopes are less sensitive for low energetic cosmic rays and so there are less observed events and the
-estimations are getting vague. By using the right transformation for the energydistribution, the algorithm can better predict low energy
-events but getting worse for the higher energies.
+For now there is a prediction by supervised machine learning regressors for every single telescope.
+By the fact, that CTA is an array and more then one telescope can measure the same event, the analyse can be optimized by averaging over these telescopes.
+Another improvement can be achieved by using the Chrenkov photon number from every telescope as an weight for the average.
+If these first predictions are used for a second regressor, the predictions are getting more accurate.
+The telescopes are less sensitive for low energetic cosmic rays and so there are less observed events and the estimations are getting vague.
+By using the right transformation for the energydistribution, the algorithm can better predict low energy events but getting worse for the higher energies.
 \end{english}

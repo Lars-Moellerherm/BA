@@ -2,35 +2,38 @@
 
 Auf die Erdathmosphäre trifft eine große Menge von hochenergetischer kosmischer Strahlung und wechselwirken mit den Luftmolekülen.
 Bei dieser Strahlung wird unterschieden zwischen der Gammastrahlung, der geladenen Teilchenstrahlung und der Neutrinostrahlung.
-Da die geladenen Teilchen durch die Magnetfelder auf ihrem Weg durch das Universum ständig die Richtung wechseln, ist ihr
-Ursprungsort nicht detektierbar.
-Die Gammastrahlung und die Neutrinostrahlung ist jedoch ungeladen und erreicht die Erde somit auf
-direktem Weg, wenn Gravitationslinsen Effekte außer Acht gelassen werden, wobei die dünne Atmosphäre nicht ausreicht, um eine nennenswerte
-Wechselwirkung der Neutrinos mit den Luftmolekülen zu beobachten. Daher wird versucht mithilfe der Gammastrahlung etwas über die unverstandenen
-Prozesse im Universum zu erfahren. Die Energie der Strahlung liegt deutlich über der
-bisher erreichten Schwerpunktsenergie des LHC von $\approx\SI{13}{\tera\eV}$\cite{LHC} und ist somit von besonderem Interesse für
-die Entdeckung neuer Physik, die über das Standardmodell hinaus geht. Ein Beispiel hierfür ist die Suche nach Axionen, die in Blazaren
-und Gamma Ray Bursts enstehen oder die Suche nach Zerfällen der Dunklen Materie.
+Da die geladenen Teilchen durch die Magnetfelder auf ihrem Weg durch das Universum ständig die Richtung wechseln, ist ihr Ursprungsort nicht
+detektierbar.
+Die Gammastrahlung und die Neutrinostrahlung ist jedoch ungeladen und erreicht die Erde somit auf direktem Weg, wenn Gravitationslinsen Effekte
+außer Acht gelassen werden, wobei die dünne Atmosphäre nicht ausreicht, um eine nennenswerte Wechselwirkung der Neutrinos mit den Luftmolekülen zu
+beobachten.
+Daher wird versucht mithilfe der Gammastrahlung etwas über die unverstandenen Prozesse im Universum zu erfahren.
+Die Energie der Strahlung liegt deutlich über der bisher erreichten Schwerpunktsenergie des LHC von $\approx\SI{13}{\tera\eV}$\cite{LHC} und ist somit
+von besonderem Interesse für die Entdeckung neuer Physik, die über das Standardmodell hinaus geht.
+Ein Beispiel hierfür ist die Suche nach Axionen, die in Blazaren und Gamma Ray Bursts enstehen oder die Suche nach Zerfällen der Dunklen Materie.
 
-Da CTA jährlich $\SI{3.7}{\peta\byte}$\cite{Rohdaten} an Rohdaten
-verarbeiten muss, ist es von großem Interesse eine Computergesteuerte Datenanalyse zu entwickeln und das Feld des Maschniellen Lernens liefert
-die richtigen Werkzeuge für diese Art der Datenanalyse. Aufgrund der Monte-Carlo Simulation, die das Luftschauer und die Reaktion des
-Teleskopes simuliert, kann ein Trainingsdatensatz erzeugt werden, auf dem Methoden des überwachten Maschinellen Lernens trainiert werden können.
+Da CTA jährlich $\SI{3.7}{\peta\byte}$\cite{Rohdaten} an Rohdaten verarbeiten muss, ist es von großem Interesse eine Computergesteuerte Datenanalyse zu
+entwickeln und das Feld des Maschniellen Lernens liefert die richtigen Werkzeuge für diese Art der Datenanalyse.
+Aufgrund der Monte-Carlo Simulation, die das Luftschauer und die Reaktion des Teleskopes simuliert, kann ein Trainingsdatensatz erzeugt werden, auf dem
+Methoden des überwachten Maschinellen Lernens trainiert werden können.
 Und diese trainierten Algorithmen können auf die Rohdaten angewendet werden um das Event als Untergrund, also Teilchenstrahlung oder als
 Signal, also Gammaphoton einzuordnen oder um dessen Energie und Richtung zu rekonstruieren.
 
-Ein großes Ziel der CTA Organisation ist es extreme Objekte im Universum zu untersuchen und genauer zu verstehen. Dazu muss das
-Energiespektrum der Quelle gemessen werden und da CTA auf der Erdoberfläche steht, kann es die Energie der Gammastrahlung nur indirekt über
-das atmosphärische Schauer messen. Um nun die Ursprungsenergie des Photons zu erfahren muss die Energie rekonstruiert werden. Dies wird
-mithilfe von Randomforest Regressoren durchgeführt. CTA ist jedoch das erste Cherenkov Teleskop Experiment, welches eine größere
-Anzahl an Teleskopen beinhaltet, wodurch bei einer Vielzahl von Events mehrere Teleskope das gleiche Schauer sehen. Bis jetzt wird für
-jedes Teleskop eine eigenständige Energie Rekonstruktion durchgeführt, wobei die einzelnen Ergebnisse um den wahren Wert variiren. Der
-Mittelwert liegt jedoch deutlich näher an dem wahren Wert. Da alle Teleskope einen unterschiedlichen Blickwinkel und Abstand zum Schauer
-besitzen, hat jedes Teleskop unterschiedlich viel Information und liegt somit unterschiedlich nah am wahren Wert. Eine Gewichtung der
-einzelnen Ergebnisse, würde diesen Informationsunterschied berücksichtigen. Wenn nun eine erste Schätzung vorgenommen wurde, könnte ein
-zweiter Regressor eine feinere Vorhersage treffen, indem er sich auf Attribute konzentriert, die für eine solche Unterscheidung wichtig sind.
+Ein großes Ziel der CTA Organisation ist es extreme Objekte im Universum zu untersuchen und genauer zu verstehen.
+Dazu muss das Energiespektrum der Quelle gemessen werden und da CTA auf der Erdoberfläche steht, kann es die Energie der Gammastrahlung nur indirekt über
+das atmosphärische Schauer messen.
+Um nun die Ursprungsenergie des Photons zu erfahren muss die Energie rekonstruiert werden, dies wird mithilfe von Randomforest Regressoren durchgeführt.
+CTA ist jedoch das erste Cherenkov Teleskop Experiment, welches eine größere Anzahl an Teleskopen beinhaltet, wodurch bei einer Vielzahl von Events mehrere
+Teleskope das gleiche Schauer sehen.
+Bis jetzt wird für jedes Teleskop eine eigenständige Energie Rekonstruktion durchgeführt, wobei die einzelnen Ergebnisse um den wahren Wert variiren.
+Der Mittelwert liegt jedoch deutlich näher an dem wahren Wert.
+Da alle Teleskope einen unterschiedlichen Blickwinkel und Abstand zum Schauer besitzen, hat jedes Teleskop unterschiedlich viel Information und liegt somit
+unterschiedlich nah am wahren Wert.
+Eine Gewichtung der einzelnen Ergebnisse, würde diesen Informationsunterschied berücksichtigen.
+Wenn nun eine erste Schätzung vorgenommen wurde, könnte ein zweiter Regressor eine feinere Vorhersage treffen, indem er sich auf Attribute konzentriert, die
+für eine solche Unterscheidung wichtig sind.
 
 CTA ist sensitiv in einem Energiebereich von $\SI{20}{\giga\eV}$ bis $\SI{300}{\tera\eV}$\cite{CTAscience}, jedoch kann der Randomforest
-sehr niedrige Energien nicht schätzen, da es dort zu wenig Statistik gibt. Durch eine linerare Transformation der Energien, kann für eine
-höhere Statistik im niegrig Energiebereich gesorgt werden. Damit kann dann die Sensitivität der Teleskope im $\si{\giga\eV}$-bereich
-auch genutzt werden.
+sehr niedrige Energien nicht schätzen, da es dort zu wenig Statistik gibt.
+Durch eine linerare Transformation der Energien, kann für eine höhere Statistik im niegrig Energiebereich gesorgt werden.
+Damit kann dann die Sensitivität der Teleskope im $\si{\giga\eV}$-bereich auch genutzt werden.
