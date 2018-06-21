@@ -84,7 +84,7 @@ def encaps_RF():
 
 
         #fit and predict
-        RFr = RandomForestRegressor(max_depth=10, n_jobs=-1,n_estimators=100, oob_score=True)
+        RFr = RandomForestRegressor(max_depth=10, n_jobs=-1,n_estimators=100, oob_score=True, max_features='sqrt')
         train_i, test_i = train_test_split(data[['array_event_id','run_id']],test_size=0.66)
 
         X_train = data.loc[data[['array_event_id','run_id']].isin(train_i)[data[['array_event_id','run_id']].isin(train_i)==True].dropna().index]
@@ -184,38 +184,46 @@ def encaps_RF():
         pred = pred.reset_index()
         data_w2 = data_w[['prediction','array_event_id','run_id','intensity']].copy(deep=True)
         data_w2['weighted_data'] = data_w2['prediction']*data_w2['intensity']
-        x = data_w2.groupby(by=['run_id','array_event_id'])
-        prediction_w_mean = x['weighted_data'].sum()/x['intensity'].sum()
+        #x = data_w2.groupby(by=['run_id','array_event_id'])
+        #prediction_w_mean = x['weighted_data'].sum()/x['intensity'].sum()
         pred_mean = data_w2[['prediction','array_event_id','run_id']].groupby(by=['run_id','array_event_id']).mean()
-        pred_wI = prediction_w_mean.to_frame('weighted_prediction')
-        pred_mean.columns = ['meaned_prediction']
+        pred_median = data_w2[['prediction','array_event_id','run_id']].groupby(by=['run_id','array_event_id']).median()
+        #pred_wI = prediction_w_mean.to_frame('weighted_prediction')
+        pred_mean.columns = ['mean_prediction']
+        pred_median.columns = ['median_prediction']
 
         truth_wI = y_test.drop_duplicates().set_index(['run_id','array_event_id'])
-        pred_wI = pd.concat([pred_wI,truth_wI], axis=1)
-        pred_mean = pd.concat([pred_mean,truth_wI], axis=1).reset_index()
+        #pred_wI = pd.concat([pred_wI,truth_wI], axis=1)
+        pred_mean = pd.concat([pred_mean,truth_wI], axis=1)
+        pred_median = pd.concat([pred_median,truth_wI], axis=1)
 
 
+        #z=np.array([pred_wI['weighted_prediction'].values,pred_wI['mc_energy'].values])
+        #np.savetxt("data/encaps_pred_wS_data.txt",z.T)
 
-        z=np.array([pred_wI['weighted_prediction'].values,pred_wI['mc_energy'].values])
-        np.savetxt("data/encaps_pred_wS_data.txt",z.T)
-
-        z=np.array([pred_mean['meaned_prediction'].values,pred_mean['mc_energy'].values])
+        z=np.array([pred_mean['mean_prediction'].values,pred_mean['mc_energy'].values])
         np.savetxt("data/encaps_pred_mean_data.txt",z.T)
+        z=np.array([pred_median['median_prediction'].values,pred_median['mc_energy'].values])
+        np.savetxt("data/encaps_pred_median_data.txt",z.T)
 
-        print('RF with weighted mean(intensity):\n\t Coefficient for determination: %.2f \n' % r2_score(pred_wI['weighted_prediction'].values,pred_wI['mc_energy'].values),
-        '\texplained_variance score: %.2f \n' % explained_variance_score(pred_wI['weighted_prediction'].values,pred_wI['mc_energy'].values),
-        '\tmean squared error: %.2f \n' % mean_squared_error(pred_wI['weighted_prediction'].values,pred_wI['mc_energy'].values))
+        #print('RF with weighted mean(intensity):\n\t Coefficient for determination: %.2f \n' % r2_score(pred_wI['weighted_prediction'].values,pred_wI['mc_energy'].values),
+        #'\texplained_variance score: %.2f \n' % explained_variance_score(pred_wI['weighted_prediction'].values,pred_wI['mc_energy'].values),
+        #'\tmean squared error: %.2f \n' % mean_squared_error(pred_wI['weighted_prediction'].values,pred_wI['mc_energy'].values))
 
-        print('RF with mean:\n\t Coefficient for determination: %.2f \n' % r2_score(pred_mean['meaned_prediction'].values,pred_mean['mc_energy'].values),
-        '\texplained_variance score: %.2f \n' % explained_variance_score(pred_mean['meaned_prediction'].values,pred_mean['mc_energy'].values),
-        '\tmean squared error: %.2f \n' % mean_squared_error(pred_mean['meaned_prediction'].values,pred_mean['mc_energy'].values))
+        print('RF with mean:\n\t Coefficient for determination: %.2f \n' % r2_score(pred_mean['mean_prediction'].values,pred_mean['mc_energy'].values),
+        '\texplained_variance score: %.2f \n' % explained_variance_score(pred_mean['mean_prediction'].values,pred_mean['mc_energy'].values),
+        '\tmean squared error: %.2f \n' % mean_squared_error(pred_mean['mean_prediction'].values,pred_mean['mc_energy'].values))
+
+        print('RF with median:\n\t Coefficient for determination: %.2f \n' % r2_score(pred_median['median_prediction'].values,pred_median['mc_energy'].values),
+        '\texplained_variance score: %.2f \n' % explained_variance_score(pred_median['median_prediction'].values,pred_median['mc_energy'].values),
+        '\tmean squared error: %.2f \n' % mean_squared_error(pred_median['median_prediction'].values,pred_median['mc_energy'].values))
 
 
     if(args.step == 3):
-        # use the prediction_w_mean for another RF
+        # use the prediction_median for another RF
         encaps_info = ['num_triggered_telescopes','num_triggered_lst','num_triggered_mst','num_triggered_sst','total_intensity','array_event_id','run_id']
         data_encaps = X_test[encaps_info].drop_duplicates().set_index(['run_id','array_event_id'])
-        data_encaps = pd.concat([data_encaps,pred_wI], axis=1)
+        data_encaps = pd.concat([data_encaps,pred_mean], axis=1)
 
         ######## neue Attribute berechnen #########
 
@@ -232,7 +240,7 @@ def encaps_RF():
         prediction_lst = pred_lst.groupby(by=list(['run_id','array_event_id'])).mean()
         prediction_lst_std =  pred_lst.groupby(by=list(['run_id','array_event_id'])).std()
         prediction_lst_max = prediction_lst_max.rename(columns = {'prediction':'max_lst_pred'})
-        prediction_lst_min = prediction_lst_max.rename(columns = {'prediction':'min_lst_pred'})
+        prediction_lst_min = prediction_lst_min.rename(columns = {'prediction':'min_lst_pred'})
         prediction_lst = prediction_lst.rename(columns = {'prediction':'mean_lst_pred'})
         prediction_lst_std = prediction_lst_std.rename(columns = {'prediction':'std_lst_pred'})
 
@@ -283,7 +291,7 @@ def encaps_RF():
         truth_encaps = data_encaps[['mc_energy']].copy(deep=True)
         data_encaps = data_encaps.drop(['mc_energy','array_event_id','run_id'], axis=1)
         #fit and pred
-        RFr2 = RandomForestRegressor(max_depth=10, n_jobs=-1,n_estimators=100,oob_score=True)
+        RFr2 = RandomForestRegressor(max_depth=10, n_jobs=-1,n_estimators=100,oob_score=True, max_features='sqrt')
         print("We use these attributes for the second RF: \n ",list(data_encaps))
         X2_train, X2_test, y2_train, y2_test = train_test_split(data_encaps,truth_encaps,test_size=0.5)
         RFr2.fit(X2_train.values,y2_train.values)
@@ -321,7 +329,7 @@ def encaps_RF():
         z=np.array([prediction_encaps,y2_test['mc_energy'].values])
         np.savetxt("data/encaps_encaps_pred_data.txt",z.T)
 
-        print('encapsulated RF:\n\t Coefficient of determination: %.2f\n' % r2_score(prediction_encaps,y2_test.values),
+        print('encapsulated with median_prediction RF:\n\t Coefficient of determination: %.2f\n' % r2_score(prediction_encaps,y2_test.values),
         '\texplained_variance score: %.2f \n' % explained_variance_score(prediction_encaps,y2_test.values),
         '\tmean squared error: %.2f \n' % mean_squared_error(prediction_encaps,y2_test.values),
         "Finished with the encapsulated prediction \n")

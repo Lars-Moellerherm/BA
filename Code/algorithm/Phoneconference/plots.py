@@ -5,6 +5,7 @@ import pandas as pd
 from sklearn.metrics import r2_score
 from scipy import stats
 
+
 min_energy = 0.003
 max_energy = 340
 bin_edge = np.logspace(np.log10(min_energy),np.log10(max_energy),300)
@@ -14,8 +15,8 @@ bin_edge2 = np.logspace(np.log10(0.01),np.log10(max_energy),20)
 
 #reading data
 predictions, truth = np.genfromtxt("../good_data/encaps_pred_data.txt", unpack=True)
-prediction_w_mean, truth_w_mean = np.genfromtxt("../good_data/encaps_pred_wS_data.txt", unpack=True)
-prediction_mean, truth_mean = np.genfromtxt("../good_data/encaps_pred_mean_data.txt", unpack=True)
+prediction_w_mean, truth_w_mean = np.genfromtxt("../good_data/encaps_pred_mean_data.txt", unpack=True)
+prediction_mean, truth_mean = np.genfromtxt("../good_data/encaps_pred_median_data.txt", unpack=True)
 predictions_encaps, truth_encaps = np.genfromtxt("../good_data/encaps_encaps_pred_data.txt", unpack=True)
 print('finished with reading data of encapsulated_RF.py ... \n')
 
@@ -27,12 +28,12 @@ plt.close()
 
     #weighted mean (intensity)
 r2_2 = func.plot_hist2d(prediction_w_mean,truth_w_mean,min_energy,max_energy,bin_edge)
-plt.savefig("RF_wI_mean.pdf")
+plt.savefig("RF_mean.pdf")
 plt.close()
 
     # just the mean
 r2_4 = func.plot_hist2d(prediction_mean,truth_mean,min_energy,max_energy,bin_edge)
-plt.savefig("RF_mean.pdf")
+plt.savefig("RF_median.pdf")
 plt.close()
 
     #plots for encapsulated RF
@@ -148,8 +149,8 @@ perc_encaps, bins_p_encaps, binnumber_p_encaps = stats.binned_statistic(truth_en
 
 bin_p = (bins_p[:-1]+bins_p[1:])/2
 plt.plot(bin_p,perc,'rx',label='RF with MSV')
-plt.plot(bin_p,perc_w_mean,'bx',label='with weighted mean(intensity)')
-plt.plot(bin_p,perc_mean,'kx',label='with mean')
+plt.plot(bin_p,perc_w_mean,'bx',label='with mean')
+plt.plot(bin_p,perc_mean,'kx',label='with median')
 plt.plot(bin_p,perc_encaps,'gx',label='encapsulated RF')
 plt.legend(loc='best')
 plt.xscale('log')
@@ -166,8 +167,8 @@ mean_encaps, bins_m_encaps, binnumber_m_encaps = stats.binned_statistic(truth_en
 
 bin_m = (bins_m[:-1]+bins_m[1:])/2
 plt.plot(bin_m,mean,'r.',label='RF with MSV')
-plt.plot(bin_m,mean_w_mean,'b.',label='with weighted mean(intensity)')
-plt.plot(bin_m,mean_mean,'k.',label="with mean")
+plt.plot(bin_m,mean_w_mean,'b.',label='with mean')
+plt.plot(bin_m,mean_mean,'k.',label="with median")
 plt.plot(bin_m,mean_encaps,'g.',label='encapsulated RF')
 plt.legend(loc='best')
 plt.xscale('log')
