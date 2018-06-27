@@ -71,18 +71,6 @@ def encaps_RF():
         truth = data[['mc_energy','array_event_id','run_id']]
         data = data.drop('mc_energy',axis=1)
 
-
-            #### plotte Truth gegen num_triggered_sst #######
-        #x1 = truth.values
-        #y1 = data['num_triggered_sst'].values
-        #plt.plot(x1,y1,'.')
-        #plt.ylabel("num_triggered_sst")
-        #plt.xlabel("mc_energy in TeV")
-        #plt.xscale('log')
-        #plt.savefig("plots/sst_mc.jpg")
-        #plt.close()
-
-
         #fit and predict
         RFr = RandomForestRegressor(max_depth=10, n_jobs=-1,n_estimators=100, oob_score=True, max_features='sqrt')
         train_i, test_i = train_test_split(data[['array_event_id','run_id']],test_size=0.66)
@@ -135,80 +123,27 @@ def encaps_RF():
                 "Finished with the first prediction ... \n")
 
     if(args.step > 1):
-        # weighted mean over sensitivity
-        ###telescope_sens = weight
-        ###telescope_sens = telescope_sens.to_frame()
-        ###telescope_sens['pred'] = predictions
-        ###telescope_sens2 = telescope_sens.copy(deep=True)
-        ###mask = (telescope_sens['weight'] == 'LST') & (telescope_sens['pred'] > 3.0) # not in requiered energy range
-        ###telescope_sens2[mask] = 0.1
-        ###mask = (telescope_sens['weight'] == 'LST') & (telescope_sens['pred']>0.15) & (telescope_sens['pred']<3) #not in full sensitivity
-        ###telescope_sens2[mask] = 1
-        ###mask = (telescope_sens['weight'] == 'LST') & (telescope_sens['pred']<0.15) # not in requiered energy range
-        ###telescope_sens2[mask] = 2
-        ###mask = (telescope_sens['weight'] == 'MST') & (telescope_sens['pred'] > 50.0) # not in requiered energy range
-        ###telescope_sens2[mask] = 0.1
-        ###mask = (telescope_sens['weight'] == 'MST') & (telescope_sens['pred'] < 0.08) # not in requiered energy range
-        ###telescope_sens2[mask] = 0.1
-        ###mask = (telescope_sens['weight'] == 'MST') & (telescope_sens['pred']>5.0) & (telescope_sens['pred']<50.0) #not in full sensitivity
-        ###telescope_sens2[mask] = 1
-        ###mask = (telescope_sens['weight'] == 'MST') & (telescope_sens['pred']>0.08) & (telescope_sens['pred']<0.15) #not in full sensitivity
-        ###telescope_sens2[mask] = 1
-        ###mask = (telescope_sens['weight'] == 'MST') & (telescope_sens['pred']<5) & (telescope_sens['pred']>0.15) # not in requiered energy range
-        ###telescope_sens2[mask] = 2
-        ###mask = (telescope_sens['weight'] == 'SST') & (telescope_sens['pred'] > 300.0)
-        ###telescope_sens2[mask] = 0.1
-        ###mask = (telescope_sens['weight'] == 'SST') & (telescope_sens['pred'] < 1.0)
-        ###telescope_sens2[mask] = 0.1
-        ###mask = (telescope_sens['weight'] == 'SST') & (telescope_sens['pred']>1.0) & (telescope_sens['pred']<5.0) #not in full sensitivity
-        ###telescope_sens2[mask] = 1
-        ###mask = (telescope_sens['weight'] == 'SST') & (telescope_sens['pred']<300.0) & (telescope_sens['pred']>5.0) # not in requiered energy range
-        ###telescope_sens2[mask] = 2
-        ###telescope_sens2 = telescope_sens2.drop('pred',axis=1)
-        ###pred = pd.DataFrame({'predicted_energy':predictions,'mc_energy':y_test})
-        ###pred['weight']=telescope_sens2['weight']
-        ###pred['weighted_data'] = pred['predicted_energy']*pred['weight']
-        ###x = pred.groupby(level=['run_id','array_event_id'],sort=False)
-        ###prediction_wS = x['weighted_data'].sum()/x['weight'].sum()
-        ###prediction_wS = prediction_wS.to_frame('predicted_energy')
-        ###y_test1 = y_test.reset_index()
-        ###truth_wS = y_test1.drop_duplicates()
-        ###truth_wS = truth_wS.set_index(['run_id','array_event_id'])
+
+        ######### gewichteter und nicht gewichteter Mittelwert ######################
+        X_test_w = X_test.set_index(['run_id','array_event_id'])
+        pred_w = pred.set_index(['run_id','array_event_id'])
+        data_w = pd.concat([X_test_w,pred_w],axis=1).reset_index()
+        truth_grouped = y_test.drop_duplicates().set_index(['run_id','array_event_id'])
 
 
-                            ######### gewichteter und nicht gewichteter Mittelwert ######################
-        X_test = X_test.set_index(['run_id','array_event_id'])
-        pred = pred.set_index(['run_id','array_event_id'])
-        data_w = pd.concat([X_test,pred],axis=1).reset_index()
-        X_test = X_test.reset_index()
-        pred = pred.reset_index()
-        data_w2 = data_w[['prediction','array_event_id','run_id','intensity']].copy(deep=True)
-        data_w2['weighted_data'] = data_w2['prediction']*data_w2['intensity']
-        #x = data_w2.groupby(by=['run_id','array_event_id'])
-        #prediction_w_mean = x['weighted_data'].sum()/x['intensity'].sum()
-        pred_mean = data_w2[['prediction','array_event_id','run_id']].groupby(by=['run_id','array_event_id']).mean()
-        pred_median = data_w2[['prediction','array_event_id','run_id']].groupby(by=['run_id','array_event_id']).median()
-        #pred_wI = prediction_w_mean.to_frame('weighted_prediction')
+                ################ Mean and Median ##################
+        x_grouped = data_w[['prediction','array_event_id','run_id']].groupby(by=['run_id','array_event_id'])
+        pred_mean = x_grouped.mean()
+        pred_median = x_grouped.median()
         pred_mean.columns = ['mean_prediction']
         pred_median.columns = ['median_prediction']
-
-        truth_wI = y_test.drop_duplicates().set_index(['run_id','array_event_id'])
-        #pred_wI = pd.concat([pred_wI,truth_wI], axis=1)
-        pred_mean = pd.concat([pred_mean,truth_wI], axis=1)
-        pred_median = pd.concat([pred_median,truth_wI], axis=1)
-
-
-        #z=np.array([pred_wI['weighted_prediction'].values,pred_wI['mc_energy'].values])
-        #np.savetxt("data/encaps_pred_wS_data.txt",z.T)
+        pred_mean = pd.concat([pred_mean,truth_grouped], axis=1)
+        pred_median = pd.concat([pred_median,truth_grouped], axis=1)
 
         z=np.array([pred_mean['mean_prediction'].values,pred_mean['mc_energy'].values])
         np.savetxt("data/encaps_pred_mean_data.txt",z.T)
         z=np.array([pred_median['median_prediction'].values,pred_median['mc_energy'].values])
         np.savetxt("data/encaps_pred_median_data.txt",z.T)
-
-        #print('RF with weighted mean(intensity):\n\t Coefficient for determination: %.2f \n' % r2_score(pred_wI['weighted_prediction'].values,pred_wI['mc_energy'].values),
-        #'\texplained_variance score: %.2f \n' % explained_variance_score(pred_wI['weighted_prediction'].values,pred_wI['mc_energy'].values),
-        #'\tmean squared error: %.2f \n' % mean_squared_error(pred_wI['weighted_prediction'].values,pred_wI['mc_energy'].values))
 
         print('RF with mean:\n\t Coefficient for determination: %.2f \n' % r2_score(pred_mean['mean_prediction'].values,pred_mean['mc_energy'].values),
         '\texplained_variance score: %.2f \n' % explained_variance_score(pred_mean['mean_prediction'].values,pred_mean['mc_energy'].values),
@@ -217,6 +152,93 @@ def encaps_RF():
         print('RF with median:\n\t Coefficient for determination: %.2f \n' % r2_score(pred_median['median_prediction'].values,pred_median['mc_energy'].values),
         '\texplained_variance score: %.2f \n' % explained_variance_score(pred_median['median_prediction'].values,pred_median['mc_energy'].values),
         '\tmean squared error: %.2f \n' % mean_squared_error(pred_median['median_prediction'].values,pred_median['mc_energy'].values))
+
+
+                ############## Weight Intensity ####################
+
+        data_w2 = data_w[['prediction','array_event_id','run_id','intensity']].copy(deep=True)
+        data_w2['weighted_data'] = data_w2['prediction']*data_w2['intensity']
+        x = data_w2.groupby(by=['run_id','array_event_id'])
+        pred_wI = x['weighted_data'].sum()/x['intensity'].sum()
+        pred_wI = pred_wI.to_frame('weighted_prediction')
+        pred_wI = pd.concat([pred_wI,truth_grouped], axis=1)
+
+        z=np.array([pred_wI['weighted_prediction'].values,pred_wI['mc_energy'].values])
+        np.savetxt("data/encaps_pred_wI_data.txt",z.T)
+
+        print('RF with weighted mean(intensity):\n\t Coefficient for determination: %.2f \n' % r2_score(pred_wI['weighted_prediction'].values,pred_wI['mc_energy'].values),
+        '\texplained_variance score: %.2f \n' % explained_variance_score(pred_wI['weighted_prediction'].values,pred_wI['mc_energy'].values),
+        '\tmean squared error: %.2f \n' % mean_squared_error(pred_wI['weighted_prediction'].values,pred_wI['mc_energy'].values))
+
+
+        # weighted mean over sensitivity
+        data_wS = data_w[['telescope_type_id','array_event_id','run_id','prediction']].set_index(['run_id','array_event_id'])
+        telescope_sens = data_wS.copy(deep=True)
+        mask = (data_wS['telescope_type_id'] == 1) & (data_wS['prediction'] > 3.0) # not in requiered energy range
+        telescope_sens[mask] = 0.1
+        mask = (data_wS['telescope_type_id'] == 1) & (data_wS['prediction']>0.15) & (data_wS['prediction']<3) #not in full sensitivity
+        telescope_sens[mask] = 1
+        mask = (data_wS['telescope_type_id'] == 1) & (data_wS['prediction']<0.15) # not in requiered energy range
+        telescope_sens[mask] = 2
+        mask = (data_wS['telescope_type_id'] == 2) & (data_wS['prediction'] > 50.0) # not in requiered energy range
+        telescope_sens[mask] = 0.1
+        mask = (data_wS['telescope_type_id'] == 2) & (data_wS['prediction'] < 0.08) # not in requiered energy range
+        telescope_sens[mask] = 0.1
+        mask = (data_wS['telescope_type_id'] == 2) & (data_wS['prediction']>5.0) & (data_wS['prediction']<50.0) #not in full sensitivity
+        telescope_sens[mask] = 1
+        mask = (data_wS['telescope_type_id'] == 2) & (data_wS['prediction']>0.08) & (data_wS['prediction']<0.15) #not in full sensitivity
+        telescope_sens[mask] = 1
+        mask = (data_wS['telescope_type_id'] == 2) & (data_wS['prediction']<5) & (data_wS['prediction']>0.15) # not in requiered energy range
+        telescope_sens[mask] = 2
+        mask = (data_wS['telescope_type_id'] == 3) & (data_wS['prediction'] > 300.0)
+        telescope_sens[mask] = 0.1
+        mask = (data_wS['telescope_type_id'] == 3) & (data_wS['prediction'] < 1.0)
+        telescope_sens[mask] = 0.1
+        mask = (data_wS['telescope_type_id'] == 3) & (data_wS['prediction']>1.0) & (data_wS['prediction']<5.0) #not in full sensitivity
+        telescope_sens[mask] = 1
+        mask = (data_wS['telescope_type_id'] == 3) & (data_wS['prediction']<300.0) & (data_wS['prediction']>5.0) # not in requiered energy range
+        telescope_sens[mask] = 2
+        telescope_sens = telescope_sens.drop('prediction',axis=1)
+        data_wS = pd.concat([telescope_sens['telescope_type_id'],data_wS['prediction']],axis=1).reset_index()
+        data_wS['weighted_data'] = data_wS['prediction']*data_wS['telescope_type_id']
+        x = data_wS.groupby(by=['run_id','array_event_id'])
+        prediction_wS = x['weighted_data'].sum()/x['telescope_type_id'].sum()
+        prediction_wS = prediction_wS.to_frame('wS_prediction')
+        pred_wS = pd.concat([prediction_wS,truth_grouped],axis=1)
+
+        z=np.array([pred_wS['wS_prediction'].values,pred_wS['mc_energy'].values])
+        np.savetxt("data/encaps_pred_wS_data.txt",z.T)
+
+        print('RF with weighted mean(sensitivity):\n\t Coefficient for determination: %.2f \n' % r2_score(pred_wS['wS_prediction'].values,pred_wS['mc_energy'].values),
+        '\texplained_variance score: %.2f \n' % explained_variance_score(pred_wS['wS_prediction'].values,pred_wS['mc_energy'].values),
+        '\tmean squared error: %.2f \n' % mean_squared_error(pred_wS['wS_prediction'].values,pred_wS['mc_energy'].values))
+
+
+            ######### weight telescope size
+
+        telescope = data_w[['array_event_id','run_id','telescope_type_id']].set_index(['run_id','array_event_id'])
+        mask= telescope == 1
+        telescope[mask]=23#size of the mirror
+        mask = telescope == 2
+        telescope[mask]=12
+        mask = telescope == 3
+        telescope[mask]=4
+        data_wSi = data_w[['prediction','array_event_id','run_id']].set_index(['run_id','array_event_id'])
+        data_wSi = pd.concat([telescope['telescope_type_id'],data_wSi],axis=1).reset_index()
+        data_wSi['weighted_data'] = data_wSi['prediction']*data_wSi['telescope_type_id']
+        x = data_wSi.groupby(by=['run_id','array_event_id'])
+        prediction_wSi = x['weighted_data'].sum()/x['telescope_type_id'].sum()
+        prediction_wSi = prediction_wSi.to_frame('wSi_prediction')
+        pred_wSi = pd.concat([prediction_wSi,truth_grouped],axis=1)
+
+        import IPython; IPython.embed()
+
+        z=np.array([pred_wSi['wSi_prediction'].values,pred_wSi['mc_energy'].values])
+        np.savetxt("data/encaps_pred_wSi_data.txt",z.T)
+
+        print('RF with weighted mean(telescope size):\n\t Coefficient for determination: %.2f \n' % r2_score(pred_wSi['wSi_prediction'].values,pred_wSi['mc_energy'].values),
+        '\texplained_variance score: %.2f \n' % explained_variance_score(pred_wSi['wSi_prediction'].values,pred_wSi['mc_energy'].values),
+        '\tmean squared error: %.2f \n' % mean_squared_error(pred_wSi['wSi_prediction'].values,pred_wSi['mc_energy'].values))
 
 
     if(args.step == 3):
@@ -231,10 +253,7 @@ def encaps_RF():
         pred = data_w[['prediction','array_event_id','run_id','telescope_type_id']]
         telescope_type = pred['telescope_type_id'].copy(deep=True)
         pred = pred.drop('telescope_type_id',axis=1)
-        telescope_type[telescope_type==1] = 'LST'
-        telescope_type[telescope_type==2] = 'MST'
-        telescope_type[telescope_type==3] = 'SST'
-        pred_lst = pred[telescope_type=='LST']
+        pred_lst = pred[telescope_type==1]
         prediction_lst_max = pred_lst.groupby(by=list(['run_id','array_event_id'])).max()
         prediction_lst_min = pred_lst.groupby(by=list(['run_id','array_event_id'])).min()
         prediction_lst = pred_lst.groupby(by=list(['run_id','array_event_id'])).mean()
@@ -244,7 +263,7 @@ def encaps_RF():
         prediction_lst = prediction_lst.rename(columns = {'prediction':'mean_lst_pred'})
         prediction_lst_std = prediction_lst_std.rename(columns = {'prediction':'std_lst_pred'})
 
-        pred_mst = pred[telescope_type=='MST']
+        pred_mst = pred[telescope_type==2]
         prediction_mst_max = pred_mst.groupby(by=list(['run_id','array_event_id'])).max()
         prediction_mst_min = pred_mst.groupby(by=list(['run_id','array_event_id'])).min()
         prediction_mst = pred_mst.groupby(by=list(['run_id','array_event_id'])).mean()
@@ -254,7 +273,7 @@ def encaps_RF():
         prediction_mst_max = prediction_mst_max.rename(columns = {'prediction':'max_mst_pred'})
         prediction_mst_min = prediction_mst_min.rename(columns = {'prediction':'min_mst_pred'})
 
-        pred_sst = pred[telescope_type=='SST']
+        pred_sst = pred[telescope_type==3]
         prediction_sst_max = pred_sst.groupby(by=list(['run_id','array_event_id'])).max()
         prediction_sst_min = pred_sst.groupby(by=list(['run_id','array_event_id'])).min()
         prediction_sst = pred_sst.groupby(by=list(['run_id','array_event_id'])).mean()
@@ -263,12 +282,6 @@ def encaps_RF():
         prediction_sst_std = prediction_sst_std.rename(columns = {'prediction':'std_sst_pred'})
         prediction_sst_max = prediction_sst_max.rename(columns = {'prediction':'max_sst_pred'})
         prediction_sst_min = prediction_sst_min.rename(columns = {'prediction':'min_sst_pred'})
-        #data_encaps =data_encaps.merge(prediction_lst,on=['array_event_id','run_id']).merge(prediction_lst_std,on=['array_event_id','run_id']).merge(prediction_mst,on=['array_event_id','run_id']).merge(prediction_mst_std,
-        #    on=['array_event_id','run_id']).merge(prediction_sst,on=['array_event_id','run_id']).merge(prediction_sst_std,
-        #    on=['array_event_id','run_id']).merge(prediction_lst_min,on=['array_event_id','run_id']).merge(prediction_lst_max,
-        #    on=['array_event_id','run_id']).merge(prediction_mst_min,on=['array_event_id','run_id']).merge(prediction_mst_max,
-        #    on=['array_event_id','run_id']).merge(prediction_sst_min,on=['array_event_id','run_id']).merge(prediction_sst_max,
-        #    on=['array_event_id','run_id'])
 
         data_encaps = pd.concat([data_encaps,prediction_lst,prediction_lst_std,prediction_mst,prediction_mst_std,prediction_sst,prediction_sst_std,prediction_lst_min,
                                 prediction_lst_max,prediction_mst_min,prediction_mst_max,prediction_sst_min,prediction_sst_max],axis=1)
