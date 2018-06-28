@@ -164,6 +164,8 @@ def plot():
     predictions, truth = np.genfromtxt("good_data/trafo_pred_data.txt",unpack=True)
     prediction_mean, truth_mean = np.genfromtxt("good_data/trafo_pred_mean_data.txt",unpack=True)
     prediction_encaps, truth_encaps = np.genfromtxt("good_data/trafo_encaps_pred_data.txt",unpack=True)
+
+    bin_edge = np.logspace(np.log10(min_energy),np.log10(max_energy),300)
         #Energy Plots
     # first prediction
     r2_1 = func.plot_hist2d(predictions,truth,min_energy,max_energy,bin_edge)

@@ -44,8 +44,8 @@ def plot_hist2d(predictions,truth,min_energy,max_energy,bin_edges):
     plt.xlabel('truth value / TeV')
     plt.xscale('log')
     plt.yscale('log')
-    plt.xlim(max_e)
-    plt.ylim(max_e)
+    #plt.xlim(max_e)
+    #plt.ylim(max_e)
 
     return r2
 
