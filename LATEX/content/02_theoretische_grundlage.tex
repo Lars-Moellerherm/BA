@@ -78,46 +78,95 @@ Energien sichtbar sind, da die höher energetische Gammastrahlung mit der Hinter
 
 \section{Maschinelles Lernen}
 
-Da die Photonen, die durch unverstandene Prozesse entstehen, einen Geringen Teilchenfluss besitzen, steigt die Anzahl an beobachteten Ereignissen bei modernen
-Experimenten stark an.
-Um diese Ereignisse händisch zu analysieren, ist die Anzahl der qualifizierten Arbeiter zu gering, daher werden Algorithmen trainiert,
-die diese Aufgabe übernehmen. Diese Algorithmen müssen jedoch intelligente Entscheidungen eigenständig treffen können, womit von künstliche Intelligenz
+Da die Photonen, die durch unverstandene Prozesse entstehen, einen Geringen Teilchenfluss besitzen, muss die Anzahl an beobachteten Ereignissen bei modernen
+Experimenten stark ansteigen.
+Eine händische Analyse ist nicht mehr möglich, daher werden Algorithmen trainiert,
+die diese Aufgabe übernehmen. Diese Algorithmen müssen jedoch intelligente Entscheidungen eigenständig treffen können, wobei dann von künstliche Intelligenz
 gesprochen werden kann.
 Ein Teilgebiet der künstlichen Intelligenz ist das maschinelle Lernen(ML). Hierbei lernen Algorithmen aus Datensätzen, indem sie verschiedene Optimierungsverfahren
-der Mathematik benutzen, um eine Fehlerfunktion zu minimieren. Ein trainierter Algorithmus ist dann in der Lage Vorhersagen für neue Datenpunkte zu treffen.
+der Mathematik nutzen, um eine Fehlerfunktion zu minimieren. Ein trainierter Algorithmus ist in der Lage Vorhersagen für neue Datenpunkte zu treffen.
 
-Der Bereich des maschinellen Lernens wird in zwei Methoden gegliedert. Es gibt das überwachte Lernen, bei dem das Ergebnis und die Eingansdaten bekannt
-sind und es gibt das unüberwachte Lernen, bei dem der Algorithmus nur die Eingansdaten kennt und in diesen Daten Muster bildet.
-Zwei große Aufgabengebiete im Bereich des überwachten Lernens sind die Regression und die Klassifikation. Bei der Regression ist die Ausgabe eine
-kontinuierliche Variable und bei der Klassifikation ist der Ausgabeparameter in $N$ Klassen eingeteilt. Die Regression kann somit als Grenzfall
+Der Bereich des maschinellen Lernens wird in zwei Bereiche gegliedert. Es gibt das überwachte Lernen, bei dem das Ergebnis und die Eingangsdaten bekannt
+sind und es gibt das unüberwachte Lernen, bei dem der Algorithmus nur die Eingangsdaten kennt und in diesen Daten Muster sucht.
+Zwei große Aufgabengebiete im Bereich des überwachten Lernens sind die Regression und die Klassifikation. Bei der Regression ist der Ausgabewert eine
+kontinuierliche Variable und bei der Klassifikation ist das Ergebnis in $N$ Klassen eingeteilt. Die Regression kann somit als Grenzfall
 $N \to \infty$ der Klassifikation verstanden werden.
 
-Das Modell der Regressionsanalyse ist gegeben durch abhängige Variablen $y$ die über eine Funktion $f(X,\theta)$ von den Variablen $X$ abhängen.
-Das Ziel der Analyse ist die Parameter $\theta$ so zu optimieren, dass $\hat{y} = f(X,\theta) + L(\hat{y},y)$ mit einem möglichst geringem Fehler
+Das Modell der Regressionsanalyse ist gegeben durch die abhängige Variable $y$ die über eine Funktion $f(X,\theta)$ von der Variable $X$ abhängt.
+Das Ziel der Analyse ist es, den Parameter $\theta$ so zu optimieren, dass $\hat{y} = f(X,\theta) + L(\hat{y},y)$ mit einem minimierten Fehler
 $L(\hat{y},y)$ gilt.
-Wenn $\theta$ ein Vektor aus k Parametern ist und $(X,y)$ $N$ Tupel sind, müssen drei Fälle unterschieden werden.
+Wenn $\vec{\theta}$ ein Vektor aus k Parametern ist und $(X_i,y_i)$ $N$ Tupel sind, müssen drei Fälle unterschieden werden.
 Im ersten Fall ist $k>N$ und somit das System unterbestimmt.
-In diesem Fall gibt es nicht genug Datenpunkte um alle Parameter vorher zusagen und somit kommen die meisten Regressionsmethoden
+Für unterbestimmte Syteme gibt es nicht genug Datenpunkte, um alle Parameter vorherzusagen und somit führen viele Regressionsmethoden
 nicht zum Ziel.
 Bei $k = N$ existiert genug Information um ein lineares System exakt zu lösen.
-Im letzten Fall $k<N$ ist das System sogar überbestimmt und es gibt mehrere Lösungen, wobei die Lösung gewählt wird, die den Fehler minimiert.
-Damit die Regressionsanalyse funktioniert, muss der Datensatz das Problem vollständig representieren, außerdem darf der Fehler $L(\hat{y},y)$ keinen Trend
-haben und unkorreliert sein.
-Eine weitere Annahmen über das Problem muss sein, dass die Variablen $X$ unkorreliert und linear unabhängig sind.
-Ein Problem stellt eine unkonstante Varianz des Fehlers da, was jedoch durch eine gewichtete Methode korrigiert werden kann.
+Im letzten Fall $k<N$ ist das System überbestimmt und es gibt mehrere Lösungen, wobei die Lösung gewählt wird, die den Fehler minimiert.
+Damit die Regressionsanalyse funktioniert, muss der Trainingsdatensatz das Problem vollständig repräsentieren. Außerdem darf der Fehler $L(\hat{y},y)$ keinen Trend
+oder Korrelation besitzen.
+Eine weitere Annahmen über das Problem muss sein, dass die Variable $X$ unkorreliert und linear unabhängig ist.
+Wenn ein Problem eine unkonstante Varianz des Fehlers besitzt, muss dies durch eine gewichtete Methode korrigiert werden.
 
 \section{Random Forest Regressor}
 
 Eine Methode des überwachten Lernens, welche für die Regression verwendet werden kann, ist der Random Forest Algorithmus. Dieser Algorithmus baut
-einen Wald aus mehreren unkorrelierten Entscheidungsbäumen, die somit eigenständige Vorhersagen liefern über die gemittelt werden kann.
+einen Wald aus mehreren unkorrelierten Entscheidungsbäumen auf, die eigenständige Vorhersagen treffen, über die gemittelt werden kann.
 
-Ein Entscheidungsbaum ist so aufgebaut, dass zu Begin der gesamte Datensatz in den sogenannten 'Stamm' gegeben wird. Dort wird der Datensatz aufgeteilt
-und es entstehen Blätter mit einem Teil des Datensatzes. Der Datensatz wird so getrennt, dass ein gewähltes Kriterium optimiert wird. Dieses Kriterium
-kann die Gini Unreinheit oder der Informationsgewinn sein, bei der Regression wird jedoch häufig die Variance Reduktion verwendet.
+Ein Entscheidungsbaum ist so aufgebaut, dass zu Begin der gesamte Datensatz, der sogenannten 'Stamm', aufgeteilt wird.
+Dadurch entstehen "Blätter", dir nur noch aus einem Teil des Datensatzes bestehen.
+Der Datensatz wird so getrennt, dass ein gewähltes Kriterium optimiert wird. Dieses Kriterium
+kann die Gini Unreinheit oder der Informationsgewinn sein, bei der Regression wird jedoch häufig die Varianz Reduktion verwendet. Bei dieser Optimierung
+wird in jedem Schritt der mittlere quadratische Fehler
+\begin{equation}
+  H(X_m) = \frac{1}{N_m}\sum_{i\in N_m}(y_i-c_m)^2
+\end{equation}
+jedes Teildatensatzes $m$ minimiert, mit
+\begin{equation}
+  c_m = \frac{1}{N_m}\sum_{i\in N_m}y_i
+\end{equation}
+als Mittelwert der Vorhersagen $y_i$ für jeden Datenpunkt $i$.
+Dies wird rekursiv wiederholt und somit der Baum ausgebaut, bis ein Abbruchkriterium erfüllt ist. Dieses Abbruchkriterium kann eine vorher festgelegte maximale Tiefe
+des Baumes sein, eine minimale Größe des Datensatzes der getrennt werden soll oder eine minimale Größe des getrennten Datensatzes. Nach erreichen der Abbruchbedigung ist
+$c_m$ des letzten Blattes die endgültige Vorhersage.
 
-Dies wird rekursiv wiederholt, bis ein Abbruchkriterium erfüllt ist. Dieses Abbruchkriterium kann eine vorher festgelegte maximale Tiefe des Baumes sein,
-eine minimale Größe des Datensatzes der getrennt werden soll oder eine minimale Größe des getrennten Datensatzes.
-%Decissiontree
+Bei Entscheidungsbäumen gibt es eine Vielzahl von Umsetzungen, die aktuellsten Arten sind jedoch der C4.5 und der CART Algorithmus\cite[1]{CART}. Die Besonderheit am C5.0 Algorithmus,
+das er im Gegensatz zum CART Algorithmus den Datensatz nicht nur binär trennen kann, jedoch kann mit ihm keine Regression durchgeführt werden. Im \textsc{scikit-learn}
+Framework\cite{scikit-learn} von Python ist der CART-Algorithmus implementiert, der zur Regression genutzt werden kann und die Varianze Reduktion als Optimierungskriterium nutzt.
+
+Die Vorteile eines Entscheidungsbaums sind die Interpretierbarkeit, der logarithmische Zusammenhang zwischen Trainingsdauer und Datengröße und die einfache Datenpreparation die
+nur notwendig ist. Außerdem ist der Entscheidungsbaum nicht anfällig gegenüber unbedeutenen Attributen. Nachteile der Entscheidungsbäume ist die Gefahr des übertrainierens. Dies
+führt dazu, dass durch zu großes Ausbauen des Baumes der Trainingsdatensatz zu gut nachgebildet wird und dadurch die Vorhersagen für einen unabhängigen Testdatensatz unpräziser sind.
+Desweiteren kann es zu einem Trend in den Vorhersagen kommen, wenn die Statistik des Ergebnisses einen großen Trend aufweist.
+Außerdem sind die Entscheidungsbäume nicht stabil, da leichte Änderungen im Datensatz zu grob abweichenden Entscheidungsbäumen führen, damit ist die Varainz bei Vorhersagen
+unterschiedlicher Bäume sehr hoch.
+Da der Entscheidungsbaum zu den gierigen Algorithmen gehört, welche die Entscheidung aufgrund des derzeitig besten Gewinn treffen, findet dieses Verfahren sehr schnell ein
+Optimum, jedoch ist dieses Extremum nicht immer das globale Extremum und somit nicht die optimalste Lösung.
+Die letzten beiden Nachteile können durch die Erweiterung des Entscheidungsbaum zu einem Entscheidungswald behoben werden.
+
+Dieses Verfahren wird Random Forest(RF) genannt. Beim Random Forest werden eine Vielzahl von Entscheidungsbäume die, um Unkorreliertheit der Ergebnisse zu erreichen, mit
+zufällig ausgewählten Teildatensätzen und Attribute trainiert werden. Das Ergebnis des RF ergibt sich durch eine Mittelung über alle Entscheidungsbäume.
+Wenn die Anzahl der Entscheidungsbäume erhöht wird konvergiert generalisierte Fehler
+\begin{equation}
+  PE = P_{X,y}(mg(X,y)<0)
+\end{equation}
+gegen
+\begin{equation}
+  P_{X,y}(P_\theta(h(X,\theta)=y)-\max_{j\neq y}P_\theta(h(X,\theta)=j)<0)
+\end{equation}
+und somit kann es durch eine Vergrößerung des Waldes nicht zum Übertraining kommen[7]\cite{RandomForests_Breiman}. Bei diesem Theorem ist
+\begin{equation}
+  mg(X,y) = av_k I(h_k(X)=y) - \max_{j \neq y}av_k I(h_k(X)=j)
+\end{equation}
+die Gewinn Funktion, $h_k(X)$ die Vorhersage der einzelnen Entscheidungsbäume und $I(\cdot)$ die charakteristische Funktion, welche eine $1$ ergibt, wenn der
+Entscheidungsbaum das geforderte Ergebnis liefert und eine $0$ wenn nicht. Wenn die Gewinn Funktion also über null liegt, sagt der Entscheidungsbaum das richtige Ergebnis vorher.
+
+Um einen unkorrelierten Wald zu erhalten, muss die Auswahl der Teildatensätzen und der Attribute zufällig und unabhängig getroffen werden. Dazu kann unteranderem das Adaboost
+Verfahren oder das einfachere Bagging verwendet werden. Das in \textsc{scikit-learn} verwendete Bagging funktioniert, indem aus dem Datensatz $N$ Stichporben der Größe
+$M$ gezogen werden und für die $N$ Entscheidungsbäume verwendet werden. Die $N$ Ergebnisse werden am Ende gemittelt oder mit der Genauigkeit des jeweiligen Ergebnisses gewichtet
+gemittelt. Auch die Attribute werden in einem Umfang, der festgelegt werden kann, zufällig gezogen. Hierdurch wird der Trend der einzelnen Ergebnisse größer jedoch durch die
+Mittelung wird die Standardabweichung der Ergebnisse ungleich geringer und somit führt Bagging zu einem besseren Ergebnis.
+
+
+% Breiman RF Theorem 1.2
 %Randomforest
 %bagging
 \section{Energie Rekonstruktion}
