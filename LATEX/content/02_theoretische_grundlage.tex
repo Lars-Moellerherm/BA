@@ -1,6 +1,7 @@
 \chapter{Theoretische Grundlagen}
 
 \section{Gammaastronomie}
+\label{sec:Gammaastronomie}
 
 Im Universum gibt es zahlreiche Prozesse, bei denen hochenergetische Teilchen entstehen, oder auf diese Energien beschleunigt werden.
 Bei diesen Teilchen handelt es sich zum großen Teil um Protonen oder leichten  Atomkernen bis hin zu Eisen, aber auch Elektronen oder Myonen
@@ -52,15 +53,19 @@ Teilchenschauer ensteht.
 In diesem Schauer entstehen geladene Teilchen, die eine Geschwindigkeit besitzen, die über der Lichtgeschwindigkeit in Luft liegt.
 Geladene Teilchen polarisieren die Luftmoleküle für kurze Zeit, wodurch sie elektromagnetische Wellen aussenden.
 Wenn sich nun das geladene Teilchen schneller als die Lichtgeschwindigkeit des Mediums bewegt, können sich die Wellen nicht mehr destruktiv
-überlagern und es enstehen Cherenkov-Blitze, welches sich kegelförmig ausbreitet und von den Teleskopen am Boden beobachtet werden kann.
+überlagern und es enstehen Cherenkov-Blitze, welches sich kegelförmig ausbreitet und von den Cherenkov Teleskopen am Boden für $\SI{150}{\nano\s}$\cite{Cherenkov_Licht}
+beobachtet werden kann.
 Das Spektrum der Cherenkov-Strahlung ist kontinuierlich, die Intensität pro Frequenz ist jedoch proportional zur Frequenz im sichtbaren Bereich und
-daher wird das Cherenkov-Licht als bläulich wahrgenommen. Da jedoch sowohl hochenergetische Gammastrahlung als auch hochenergetische Teilchenstrahlung
+daher wird das Cherenkov-Licht als bläulich wahrgenommen.
+Die Kamera des Teleskopes löst aus, wenn eine bestimmte Anzahl an Licht des Schauers auf sie trifft. Und dann werden Bilder für eine Dauer von
+$(150-300)\si{\nano\s}$ aufgenommen.
+Da jedoch hochenergetische Gammastrahlung als auch hochenergetische Teilchenstrahlung
 Schauer in der Atmosphäre erzeugen, gibt es einen großen Untergrund, der seperiert werden muss.
 
 \section{Cherenkov Teleskope Array (CTA)}
 
 Das Cherenkov Teleskop Array ist ein Zukunftsprojekt einer internationalen Kollaboration von 210 Instituten aus 32 Ländern\cite{CTA_consortium}
-und der nächste Schritt in der hochenergie Gammastronomie.
+und der nächste Schritt in der hochenergie Gammaastronomie.
 Mit einer Gesamtanzahl von 108 Teleskopen hat das Array nach Simulationen zur Folge in seinem Hauptenergiebereich eine Sensitivität von $\SI{0.1}{\percent}$
 des Energieflusses des Krebsnebels, was ungefähr zehn mal sensitiver als das HESS-Experiment ist\cite{CTA_paper}.
 Da der Teilchenfluss $\Phi$ der kosmischen Strahlung in dem Sensitivitätsbereich von CTA dem Potenzgesetz $\Phi \propto E^{-2.7}$\cite[5]{Cosmic_rays} folgt,
@@ -77,6 +82,7 @@ Die hohe Sensitivität und die niedrige Energieuntergrenze ermöglichen die Entd
 Energien sichtbar sind, da die höher energetische Gammastrahlung mit der Hintergundstrahlung wechselwirkt und somit nicht beobachtbar ist.
 
 \section{Maschinelles Lernen}
+\label{sec:ML}
 
 Da die Photonen, die durch unverstandene Prozesse entstehen, einen Geringen Teilchenfluss besitzen, muss die Anzahl an beobachteten Ereignissen bei modernen
 Experimenten stark ansteigen.
@@ -160,21 +166,52 @@ die Gewinn Funktion, $h_k(X)$ die Vorhersage der einzelnen Entscheidungsbäume u
 Entscheidungsbaum das geforderte Ergebnis liefert und eine $0$ wenn nicht. Wenn die Gewinn Funktion also über null liegt, sagt der Entscheidungsbaum das richtige Ergebnis vorher.
 
 Um einen unkorrelierten Wald zu erhalten, muss die Auswahl der Teildatensätzen und der Attribute zufällig und unabhängig getroffen werden. Dazu kann unteranderem das Adaboost
-Verfahren oder das einfachere Bagging verwendet werden. Das in \textsc{scikit-learn} verwendete Bagging funktioniert, indem aus dem Datensatz $N$ Stichporben der Größe
+Verfahren oder das einfachere Bagging verwendet werden. Das in \textsc{scikit-learn} verwendete Bagging funktioniert, indem aus dem Datensatz $N$ Stichproben der Größe
 $M$ gezogen werden und für die $N$ Entscheidungsbäume verwendet werden. Die $N$ Ergebnisse werden am Ende gemittelt oder mit der Genauigkeit des jeweiligen Ergebnisses gewichtet
 gemittelt. Auch die Attribute werden in einem Umfang, der festgelegt werden kann, zufällig gezogen. Hierdurch wird der Trend der einzelnen Ergebnisse größer jedoch durch die
-Mittelung wird die Standardabweichung der Ergebnisse ungleich geringer und somit führt Bagging zu einem besseren Ergebnis.
+Mittelung wird die Standardabweichung der Ergebnisse ungleich geringer. Dies wird Verzerrung-Varainz-Dilemma genannt. Im Allgemeinen ist das Ziel eine möglichst
+geringe Standardabweichung zu erreichen, um nicht überanzupassen, jedoch einen nicht zu große Verzerrung zu erhalten.
 
+Durch Kreuzvalidierung kann das Modell auf Übertraining untersucht werden. Hierbei wird der Datensatz aufgeteilt, um
+den Algorithmus mit dem einen Datensatz trainieren zu können und mit dem anderen unabhängigen Teil testen zu können. Die in \textsc{scikit-learn} implementierte
+Methode ist die einfache Kreuzvalidierung, bei der der Datensatz in $k$ Teildatensätze geteilt wird und jeder dieser Datensätze als einmal als Validierungsdatensatz
+verwendet wird und $k-1$ Datensätze als Trainigsdatensatz dienen.
 
-% Breiman RF Theorem 1.2
-%Randomforest
-%bagging
 \section{Energie Rekonstruktion}
+
+Um die in \autoref{sec:Gammaastronomie} erwähnten Bilder auszuwerten, muss zunächst die Kamera kalibriert werden, da die Funktionsweise der elektronischen
+Komponenten stark von äußeren Bedingungen beeinflusst werden.
+Der nächste Schritt ist das Extrahieren der wichtigen Information aus dem Kamerabild in Form der Hillas-Parameter.
+Dabei wird angenommen, dass die Kamera das Schauer als Ellipse sieht, wobei diese Ellipse eine Länge $L$ und Breite $w$ besitzt.
+Weitere Parameter sind die $x$ und $y$ Koordinate des Ellipsenmittelpunkts, sowie die Polarkoordinaten $r$ und $\phi$ oder der Rotationswinkel $\psi$
+der Ellipse.
+Ein weiterer wichtiger Parameter ist die totale Intensität des Bildes und da das CTA aus mehreren unterschiedlichen Teleskopen besteht, ist die Anzahl
+der Teleskope, die das gleiche Schauer gesehen haben, und welche Art von Teleskope dieses Schauer gesehen haben von großer Bedeutung für die Anschließende
+Signal Seperation und Energie Schätzung.
+
+Mit Hilfe dieser Parameter kann der Untergrund, der aus geladener kosmischer Teilchenstrahlung besteht, von dem Signal, welches aus den Photon induzierten
+Schauern besteht, getrennt werden.
+Diese Aufgabe wird mit einer klassifizierungs Methode des maschinellen Lernens gelöst und größtenteils mit hilfe eines
+Random Forest Klassifiers.
+Durch das Verhältnis von Signal zu Untergrund von $\frac{1}{1000}$\cite{Cherenkov_Licht} wird eine große Menge Trainingsdaten
+benötigt, um eine gute Trennung zu erreichen.
+
+Nach einer erfolgreichen Seperation können diese Parameter genutzt werden, um die Energie des Photons zu schätzen.
+Dies kann durch Regressionsmethoden gelöst werde und auch bei dieser Aufgabe ist der Random Forest der stabliste Algorithmus\cite{Cherenkov_Licht}.
+
+Die in \autoref{sec:ML} aufgeführten Annahmen für eine erfolgreiche Regressionsanalyse, sind bei diesem Problem bestmöglich erfüllt. Die Trainingsdaten
+werden durch Monte Carlo Simulationen erstellt, die die Wechselwirkung der primär und sekundär Teilchen mit der Atmosphäre und die Reaktion des Teleskopes
+auf das Schauerlicht simuliert.
+Dadurch repräsentiert der Trainingsdatensatz das Problem bestmögliche, jedoch ist der Fehler möglicherweise nicht zufällig mit einem Mittelwert von $0$, da
+mögliche systematische Fehler in der Simulation zu einer Verzerrung führen.
+Darüber hinaus werden die Parameter mit einer größtmöglichen Präzession gemessen, jedoch sind aufgrund der Berechnung der Hillas Parameter, welche in [102]\cite{HESS}
+genauer beschrieben ist, nicht linear unabhängig.
+Auch die Varianz des Fehlers ist aufgrund der unterschiedlichen Sensitivitäten der Telescope nicht homogen
+über den ganzen Energiebereich, was jedoch durch eine Gewichtung ausgeglichen werden könnte.
+ 
 %Hillas Parameter
 %Datenstruktur und Level
 %erfüllt es die Annahmen für eine Regression
-
-\section{Mean Scaled Value}
 
 
 \section{Performance}
