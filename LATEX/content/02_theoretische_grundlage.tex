@@ -220,9 +220,21 @@ genauer beschrieben wird, diese nicht linear unabhängig.
 Auch die Varianz des Fehlers geht aufgrund der unterschiedlichen Sensitivitäten der Telescope nicht homogen
 über den ganzen Energiebereich, was jedoch durch eine Gewichtung ausgeglichen werden könnte.
 
-%Hillas Parameter
-%Datenstruktur und Level
-%erfüllt es die Annahmen für eine Regression
-
-
 \section{Performance}
+
+Um zu erkennen ob das weiterentwickelte Modell eine genauere Vorhersage liefert als das bisherige, muss die
+Performance des Modells beurteilt werden können.
+Ein mögliches Maß, um die Anpassungsgüte von Regressionsmodellen beurteilen zu können, stellt der Determinationskoeffizient dar, welcher
+durch
+\begin{equation}
+  R^2 = 1 - \frac{\sum_i (y_i-\hat{y}_i)^2}{\sum_i (y_i - \overline{y})^2}
+\end{equation}
+definiert wird. Wobei $\hat{y_i}$ die Schätzwerte, $\overline{y}$ den Mittelwert und $y_i$ die Messwerte darstellen.
+Der Determinationskoeffizient nimmt den Wert $1$ an, wenn das Modell die Messpunkte genau beschreibt, wenn jedoch
+$R^2 \leq 0$ kann das Modell als unbrauchbar eingestuft werden, da die Attribute $X$ keine Information zur
+Lösung des Problems einbringen.
+Dieser Koeffizient besitzt Grenzen der Interpretierbarkeit, da er nur eine Aussage über das gesamte Modell macht und
+nicht über die Genauigkeit in einzelnen Wertebereichen. Außerdem ist er sehr empfindlich gegenüber Trends in den
+Ergebnissen, die zu sehr geringen $R^2$-Werten führen, jedoch nicht bedeuten, dass das Modell die Abhängigkeiten des
+Problems nicht gut beschreibt. Desweiteren muss die gleiche Anzahl an Datenpunkten vorliegen, um Modelle
+miteinander zu vergleichen.
