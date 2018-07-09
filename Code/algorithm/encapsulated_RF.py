@@ -54,13 +54,7 @@ def encaps_RF():
 
 
     print("Finished with reading Data ... \n")
-    if(args.sv):
 
-        #calculate the mean scaled
-        data = func.calc_scaled_width_and_length(data)
-
-
-        print("Finished with calculating Mean Scaled Values ... \n")
 
     if(args.step > 0 & args.step < 4):
         data = shuffle(data)
@@ -79,6 +73,14 @@ def encaps_RF():
         X_test = data.loc[data[['array_event_id','run_id']].isin(test_i)[data[['array_event_id','run_id']].isin(test_i)==True].dropna().index]
         y_train = truth.loc[truth[['array_event_id','run_id']].isin(train_i)[truth[['array_event_id','run_id']].isin(train_i)==True].dropna().index]
         y_test = truth.loc[truth[['array_event_id','run_id']].isin(test_i)[truth[['array_event_id','run_id']].isin(test_i)==True].dropna().index]
+
+        if(args.sv):
+
+            #calculate the mean scaled
+            X_train = func.calc_scaled_width_and_length(X_train)
+
+
+            print("Finished with calculating Mean Scaled Values ... \n")
 
         X1 = X_train.drop(['array_event_id','run_id'],axis=1).values
         X2 = X_test.drop(['array_event_id','run_id'],axis=1).values
@@ -285,16 +287,6 @@ def encaps_RF():
 
         data_encaps = pd.concat([data_encaps,prediction_lst,prediction_lst_std,prediction_mst,prediction_mst_std,prediction_sst,prediction_sst_std,prediction_lst_min,
                                 prediction_lst_max,prediction_mst_min,prediction_mst_max,prediction_sst_min,prediction_sst_max],axis=1)
-        if(args.sv):
-            msl = X_test[['scaled_length','run_id','array_event_id']].groupby(by=['run_id','array_event_id']).mean()
-            msw = X_test[['scaled_width','run_id','array_event_id']].groupby(by=['run_id','array_event_id']).mean()
-            msl=msl.rename(columns={'scaled_length':'mean_scaled_length'})
-            msw=msw.rename(columns={'scaled_width':'mean_scaled_width'})
-            sl_std = X_test[['scaled_length','run_id','array_event_id']].groupby(by=['run_id','array_event_id']).std()
-            sw_std = X_test[['scaled_width','run_id','array_event_id']].groupby(by=['run_id','array_event_id']).std()
-            sl_std=sl_std.rename(columns={'scaled_length':'std_scaled_length'})
-            sw_std=sw_std.rename(columns={'scaled_width':'std_scaled_width'})
-            data_encaps = pd.concat([data_encaps,msl,msw,sl_std,sw_std],axis=1)
 
 
 
@@ -307,6 +299,21 @@ def encaps_RF():
         RFr2 = RandomForestRegressor(max_depth=10, n_jobs=-1,n_estimators=100,oob_score=True, max_features='sqrt')
         print("We use these attributes for the second RF: \n ",list(data_encaps))
         X2_train, X2_test, y2_train, y2_test = train_test_split(data_encaps,truth_encaps,test_size=0.5)
+
+        if(args.sv):
+
+            X2_train = func.calc_scaled_width_and_length(X2_train)
+            msl = X2_train[['scaled_length','run_id','array_event_id']].groupby(by=['run_id','array_event_id']).mean()
+            msw = X2_train[['scaled_width','run_id','array_event_id']].groupby(by=['run_id','array_event_id']).mean()
+            msl=msl.rename(columns={'scaled_length':'mean_scaled_length'})
+            msw=msw.rename(columns={'scaled_width':'mean_scaled_width'})
+            sl_std = X2_train[['scaled_length','run_id','array_event_id']].groupby(by=['run_id','array_event_id']).std()
+            sw_std = X2_train[['scaled_width','run_id','array_event_id']].groupby(by=['run_id','array_event_id']).std()
+            sl_std=sl_std.rename(columns={'scaled_length':'std_scaled_length'})
+            sw_std=sw_std.rename(columns={'scaled_width':'std_scaled_width'})
+            X2_train = pd.concat([X2_train,msl,msw,sl_std,sw_std],axis=1)
+
+
         RFr2.fit(X2_train.values,y2_train.values)
 
                 ############### overfitting ####################
@@ -318,6 +325,7 @@ def encaps_RF():
                      axis=0)
         indices = np.argsort(feature)[::-1]
         names = list(data_encaps)
+
         # Print the feature ranking
         print("Feature ranking:")
 
