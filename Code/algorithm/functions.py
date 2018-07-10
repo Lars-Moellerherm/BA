@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 from sklearn.metrics import r2_score
 import dask.dataframe as dd
-#from tqdm import tqdm
+from tqdm import tqdm
 
 
 def weighted_mean_over_ID(weight, prediction):
@@ -28,6 +28,21 @@ def calc_scaled_width_and_length(data):
     data = pd.concat([data,SV],axis=1).reset_index()
     return data
 
+def calc_mean_scaled_width_and_length(X):
+    X = calc_scaled_width_and_length(X)
+    msl = X[['scaled_length','run_id','array_event_id']].groupby(by=['run_id','array_event_id']).mean()
+    msw = X[['scaled_width','run_id','array_event_id']].groupby(by=['run_id','array_event_id']).mean()
+    msl=msl.rename(columns={'scaled_length':'mean_scaled_length'})
+    msw=msw.rename(columns={'scaled_width':'mean_scaled_width'})
+    sl_std = X[['scaled_length','run_id','array_event_id']].groupby(by=['run_id','array_event_id']).std()
+    sw_std = X[['scaled_width','run_id','array_event_id']].groupby(by=['run_id','array_event_id']).std()
+    sl_std=sl_std.rename(columns={'scaled_length':'std_scaled_length'})
+    sw_std=sw_std.rename(columns={'scaled_width':'std_scaled_width'})
+    X=X.drop(['scaled_length','scaled_width','width','length'],axis=1).drop_duplicates().set_index(['run_id','array_event_id'])
+    X = pd.concat([X,msl,msw,sl_std,sw_std],axis=1)
+    return X
+
+
 def plot_hist2d(predictions,truth,min_energy,max_energy,bin_edges):
     min_e = np.log10(min_energy)
     max_e = np.log10(max_energy)
@@ -37,11 +52,11 @@ def plot_hist2d(predictions,truth,min_energy,max_energy,bin_edges):
     plt.pcolormesh(bin1, bin2, d, cmap='viridis', norm=LogNorm())
     #plt.grid(True,which='both')
     plt.colorbar()
-    plt.plot([min_energy,max_energy],[min_energy,max_energy],color="grey", label= "correct prediction")
+    plt.plot([min_energy,max_energy],[min_energy,max_energy],color="grey", label= "richtige Schätzung")
     #plt.legend()
-    ax.text(0.2, 0.95,'R2_score: %.2f'% r2, ha='center', va='center', transform=ax.transAxes,size='medium',bbox=dict(boxstyle="round",facecolor='grey',alpha=0.1))
-    plt.ylabel('Predicted value / TeV')
-    plt.xlabel('truth value / TeV')
+    ax.text(0.2, 0.95,r'$R^2$: %.2f'% r2, ha='center', va='center', transform=ax.transAxes,size='medium',bbox=dict(boxstyle="round",facecolor='grey',alpha=0.1))
+    plt.ylabel('Schätzung / TeV')
+    plt.xlabel('Wahrheit / TeV')
     plt.xscale('log')
     plt.yscale('log')
     #plt.xlim(max_e)
@@ -314,3 +329,45 @@ def resolution(df,
                 marker=mark,
                 color=color,
             )
+
+
+def translate(names,kind):
+    name = np.asarray(names)
+    if(kind==1):
+        name[name=='num_triggered_sst']='Anz_ausgelöster_SST'
+        name[name=='num_triggered_mst']='Anz_ausgelöster_MST'
+        name[name=='num_triggered_lst']='Anz_ausgelöster_LST'
+        name[name=='total_intensity']='totale_Intensität'
+        name[name=='num_triggered_telescopes']='Anz_ausgelöster_Teleskope'
+        name[name=='telescope_type_id']='Teleskopart'
+        name[name=='intensity']='Intensität'
+        name[name=='scaled_length']='skalierte_Länge'
+        name[name=='scaled_width']='skalierte_Weite'
+        name[name=='length']='Länge'
+        name[name=='width']='Weite'
+        name[name=='skewness']='Schiefe'
+        name[name=='kurtosis']='Wölbung'
+    if(kind==2):
+        name[name=='min_mst_pred']='min_MST_Schätzung'
+        name[name=='max_mst_pred']='max_MST_Schätzung'
+        name[name=='mean_mst_pred']='Mittelwert_MST_Schätzung'
+        name[name=='total_intensity']='totale_Intensität'
+        name[name=='num_triggered_sst']='Anz_ausgelöster_SST'
+        name[name=='mean_sst_pred']='Mittelwert_SST_Schätzung'
+        name[name=='mean_prediction']='Mittelwert_Schätzung'
+        name[name=='min_sst_pred']='min_SST_Schätzung'
+        name[name=='std_sst_pred']='std_SST_Schätzung'
+        name[name=='max_sst_pred']='max_SST_Schätzung'
+        name[name=='num_triggered_telescopes']='Anz_ausgelöster_Teleskope'
+        name[name=='mean_lst_pred']='Mittelwert_LST_Schätzung'
+        name[name=='min_lst_pred']='min_LST_Schätzung'
+        name[name=='std_mst_pred']='std_MST_Schätzung'
+        name[name=='std_scaled_length']='std_skalierte_Länge'
+        name[name=='std_scaled_width']='std_skalierte_Weite'
+        name[name=='num_triggered_mst']='Anz_ausgelöster_MST'
+        name[name=='std_lst_pred']='std_LST_Schätzung'
+        name[name=='mean_scaled_length']='Mittelwert_skalierte_Länge'
+        name[name=='max_lst_pred']='max_LST_Schätzung'
+        name[name=='num_triggered_lst']='Anz_ausgelöster_LST'
+        name[name=='mean_scaled_width']='Mittelwert_skalierte_Weite'
+    return name
