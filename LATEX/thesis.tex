@@ -128,6 +128,14 @@
 %------------------------------------------------------------------------------
 
 \usepackage[pdfusetitle,unicode,linkbordercolor=tugreen]{hyperref}
+
+\AtBeginDocument{%
+\newcaptionname{ngerman}{\figureautorefname}{Abbildung}
+\newcaptionname{ngerman}{\tableautorefname}{Tabelle}
+\newcaptionname{ngerman}{\sectionautorefname}{Kapitel}
+\newcaptionname{ngerman}{\chapterautorefname}{Kapitel}%
+}
+
 \usepackage{bookmark}
 \usepackage[shortcuts]{extdash}
 

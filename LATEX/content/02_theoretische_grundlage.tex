@@ -79,6 +79,7 @@ Da sowohl hochenergetische Gammastrahlung als auch Teilchenstrahlung
 Schauer in der Atmosphäre erzeugen, gibt es einen großen Untergrund, der separiert werden muss.
 
 \section{Cherenkov Teleskope Array (CTA)}
+\label{sec:CTA}
 
 Das geplante Cherenkov Teleskop Array wird von einer internationalen Kollaboration von 210 Instituten aus 32 Ländern\cite{CTA_consortium} geführt
 und bildet den nächste Schritt in der hochenergie Gammaastronomie.
@@ -92,7 +93,7 @@ Fläche von $\SI{10e6}{\m\squared}$\cite{CTA_ob}.
 Durch 3 verschiedene Teleskopgrößen, kann CTA Photonen mit Energien von $\SI{30}{\giga\eV}$ bis $\SI{300}{\tera\eV}$ detektieren.
 Die Teleskop Arten bestehen aus dem LST (Large Sized Telescope) mit einer Spiegelgröße von $\SI{23}{\m}$, dem MST (Medium Sized Telescope)
 mit einer Größe von $\SI{11.5}{\m}$ oder $\SI{9.7}{\m}$ und dem SST (Small-Sized Telescope), welches eine Größe von $\SI{4.3}{\m}$ oder $\SI{4.0}{\m}$
-besitzt, .
+besitzt\cite{CTA_tec} .
 Um die ganze Bandbreite der Beschleunigungsprozesse im Universum untersuchen zu können, wird eine solche Energiebreite benötigt.
 Insbesondere kann das "knee" des Energiespektrums bei $\SI{3e15}{\eV}$ genauer untersucht werden.
 Die hohe Sensitivität und die niedrige Energieuntergrenze ermöglichen die Entdeckung neuer Quellen mit einer starken Rotverschiebung, die nur bei niedrigen
@@ -211,6 +212,14 @@ Der nächste Schritt stellt das Extrahieren der wichtigen Information aus dem Ka
 Dabei wird angenommen, dass die Kamera das Schauer als Ellipse sieht, wobei diese Ellipse eine Länge $L$ und Breite $w$ besitzt.
 Weitere Parameter sind die $x$ und $y$ Koordinate des Ellipsenmittelpunkts, sowie dessen Polarkoordinaten $r$ und $\phi$ oder der Rotationswinkel $\psi$
 der Ellipsenhauptachse, welcher relativ zur Verbindungslinie zwischen Ellipsenmittelpunkt und Kameramittelpunkt gemessen wird.
+Die geometrischen Hillasparameter sind in \autoref{abb:Hillas} dargestellt.
+\begin{figure}
+  \includegraphics[width=0.7\textwidth]{Plots/Hillas.JPG}
+  \centering
+  \caption{Schematische Darstellung der Hillasparameter, die das Kamerabild des Schauers charakterisieren. Diese Parameter
+            werden verwendet, um die Energie des primären Teilchens zu schätzen.}
+  \label{abb:Hillas}
+\end{figure}
 Ein weiterer wichtiger Parameter bildet die totale Intensität des Bildes und da das CTA aus mehreren unterschiedlichen Teleskopen besteht, bekommt die Anzahl
 der Teleskope, die das gleiche Schauer gesehen haben, und welche Art von Teleskope dieses Schauer gesehen hat, eine großer Bedeutung für die Anschließende
 Signal Seperation und Energie Schätzung.
@@ -272,11 +281,3 @@ Dabei stellt $Q84$ das $\SI{84.13}{\percent}$ Quantil und $Q15$ das $\SI{15.87}{
 bestimmt werden, die das $q$-te Quartil als den $q \cdot N$-ten Wert eines geordneten Datensatzes der Größe $N$ definiert.
 Der Mittelwert ist ein Maß für die Verzerrung und der IQA ist ein Maß für die Auflösung des Schätzers, wobei dies für unterschiedliche
 Energie-Container untersucht wird, da aufgrund der energieabhängigen Statistik auch diese Werte über das Energiespektrum hinweg variieren.
-
-
-
-
-
-
-
-h

@@ -24,12 +24,12 @@ und
 \end{equation}
 definiert sind, wobei der Mittelwert über alle Trainingsdatenwerte genommen wird. Diese Methode nennt sich Scaled Cuts Technik.\cite[104]{HESS}
 
-Der ganze Datensatz besteht aus ??????????????? Datenpunkten, die durch die \textsc{train\_test\_split}-Funktion der \textsc{sklearn}-Bibliotheke
+Der ganze Datensatz besteht aus $\num{3322938}$ Datenpunkten, die durch die \textsc{train\_test\_split}-Funktion der \textsc{sklearn}-Bibliotheke
 in einen Trainings und Testdatensatz aufgeteilt wird. Dabei wird mit $\SI{33}{\percent}$ der Daten trainiert und mit $\SI{66}{\percent}$
 getestet. Die Aufteilung geschieht jedoch mithilfe der Ereignisnummer, damit bei der Trennung keine Ereignisse getrennt werden.
 
 Bei dem Training werde ein Random Forest verwendet, der eine Maximal Tiefe von $10$ Ebenen besitzt, damit es nicht zum Übertraining
-kommt, da der Trainingsdatensatz nur ?????????? Datenpunkte besitzt.
+kommt, da der Trainingsdatensatz $\num{1129798}$ Datenpunkte besitzt.
 Jeder Baum trainiert mit $\sqrt{N}$ Attributen,wobei $N$ Attribute zur Verfügung stehen, da sonst die Bäume nicht mehr unkorreliert
 sind und somit die Ergebnisse der einzelnen Bäume nicht mehr verschieden sind.
 Außerdem besteht der Wald aus $100$ Bäumen, wobei dieser Parameter mit einer größeren Rechenleistung vergrößert werden kann, ohne
@@ -40,32 +40,114 @@ Da die gering gewählte Tiefe ein Übertraining bereits verhindern sollte und da
 der minimalen Blatt und Trenngröße auf ihrer Grundeinstellung von $1$ und $2$ gelassen.
 
 \begin{figure}
-  \includegraphics{Plots/RF.pdf}
+  \includegraphics[width=\textwidth]{Plots/RF.pdf}
+  \centering
   \caption{In diesem Graph ist die vorhergesagte Energie gegen die Wahrheit aufgetragen, dabei ist eine Streuung mit einer Verzerrung um die
           Diagonale zu erkennen.}
   \label{abb:Energie_RF}
 \end{figure}
 
-Dieser Entscheidungswald liefert eine Performance, wie sie in \autoref{abb:Energie_RF} zu sehen ist.
-Dabei ist eine deutliche Überschätzung der Wahrheiten zu beobachten. Außerdem sind feine horizontale Linien zu sehen, die auf eine Korreliertheit
-der Entscheidungsbäume hindeutet.
-Der $R^2$-Wert von $\num{0.51}$ deutet jedoch daraufhin, dass der Random Forest eine bessere Beschreibung des Modells liefert als der Mittelwert.
+Dieser trainierte Entscheidungswald wird mit $\num{2193140}$ Datenpunkten getestet und liefert eine Performance, wie sie in \autoref{abb:Energie_RF} zu sehen ist.
+Dabei ist eine Überschätzung der Wahrheiten zu beobachten, sowie feine horizontale Linien, die auf eine Korreliertheit der Entscheidungsbäume hindeutet.
+Der $R^2$-Wert von $\num{0.50}$ deutet auf eine bessere Beschreibung des Modells als der bloße Mittelwert hin.
 Die Korreliertheit und die Verzerrung kann durch eine geeignetere Wahl der Hyperparameter minimiert werden, jedoch ist dies nicht das Ziel dieser
 Arbeit.
 
 \begin{figure}
-  \includegraphics{Plots/feautureimportance_boxplot_trafo_firstForest.pdf}
-  \caption{Darstellung der Wichtigkeit der genutzen Attribute bei der ersten Vorhersage als Boxplot.}
+  \includegraphics[width=\textwidth]{Plots/feautureimportance_boxplot_firstForest.pdf}
+  \centering
+  \caption{Darstellung der Wichtigkeit der genutzen Attribute bei der ersten Vorhersage als Kastengrafik. Die Anzahl der ausgelösten SST und die totale Intensität
+          stellen die wichtigsten Attribute dar und die Weite trägt kaum zur Schätzung bei.}
   \label{abb:first_FI}
 \end{figure}
 
-In \autoref{abb:first_FI} ist die Wichtigkeit der Attribute dargestellt.
-% Analyse des Boxplots
+In \autoref{abb:first_FI} ist die Wichtigkeit der Attribute aufgeführt, wobei zur Darstellung eine Kastengrafik genutzt wird.
+Dabei stellt die grüne Linie den Median dar, die Enden des Kastens das $\num{0.25}$- und das $\num{0.75}$-Quartil, die Antennen das $\num{0.125}$- und das
+$\num{0.875}$-Quantil und die Punkte Ausreißer die außerhalb des $\num{0.75}$-IQA liegen.
+Eventspezifische Attribute wie die Anzahl der ausgelösten Teleskope und die totale Intensität besitzen die größte Wichtigkeit und teleskopspezifische Attribute
+wie die Hillasparameter scheinen keinen großen Informationsgewinn zu liefern.
+Eine Erklärung liefert die Tatsache, das ein wichtiger Parameter für die Energieschätzung die in dem Schauer deponierte Energie ist und die Hillasparameter im
+Gegensatz zu den eventspezifischen Parametern von dem Abstand des Teleskopes zum Schauer abhängen.
 
 \section{Optimierung durch Mittelwerte und geeignete Gewichte}
+
+Die Energieschätzung der einzelnen Teleskope bei einem Ereignis variiert, obwohl sie das gleiche Schauer beobachten.
+Dies liegt an dem unterschiedlichen Blickwinkel und Abstand der Teleskope, was dazu führt das jedes Teleskop unterschiedlich viel Information über das
+Schauer besitzt.
+Es wird angenommen, dass die variierenden Ergebnisse zufällig und nach den Zentralen Grenzwertsatz der Statistik normalverteilt um den
+wahren Wert liegen\cite[10]{zufall_Fehler}.
+Daher wird als Schätzer des wahren Wertes das arithmetische Mittel und der Median untersucht.
+\begin{figure}
+  \includegraphics[width=\textwidth]{Plots/RF_mean_bias.pdf}
+  \centering
+  \caption{Darstellung der Verzerrung für verschiedene Energiebereiche. Es sind die Mittelwerte der relativen Fehler für die erste Vorhersage, die Vorhersage
+          nach der Mittelwert Bildung und der Median der Vorhersagen aufgetragen.}
+  \label{abb:mean_median_bias}
+\end{figure}
+\begin{figure}
+  \includegraphics[width=\textwidth]{Plots/RF_mean_resolution.pdf}
+  \centering
+  \caption{Darstellung des IQA des relativen Fehlers für verschiedene Energiebereiche. Aufgetragen sind die erste Vorhersage, die Vorhersage
+          nach der Mittelwert Bildung und der Median der Vorhersagen.}
+  \label{abb:mean_median_IQA}
+\end{figure}
+Die zusammengefassten Schätzungen führen auf die Verzerrungen und IQA's, die in \autoref{abb:mean_median_bias} und \autoref{abb:mean_median_IQA} zusehen sind.
+Bei der Bildung des Median ist die erwartete Verbesserung zu beobachten.
+Das Schätzen mithilfe des Mittelwerts führt jedoch zu einer Verschlechterung des Ergebnisses.
+Bei dem Beobachten von Schauern kann es vorkommen, dass einzelne Teleskope im Gegensatz zu anderen besser positionierten Teleskopen nur einen geringen Teil
+des Schauers beobachten und somit wenig Information des Schauers besitzen und eine ganz falsche Vorhersage liefern.
+Dies sind meist nur vereinzelte Teleskope und die Mehrheit der Teleskope liegt richtig.
+Jedoch führt eine Mittelung dazu, dass diese eine Schätzung den Mittelwert verschlechtert.
+Das die Verzerrung nur in der Mitte des Energiebereiches größer ist, liegt daran, dass der genannte Effekt bei geringen Energien und somit kleinen Schauern
+nicht so groß ist, da dort die Kamerabilder grundsätzlich wenig Information beinhalten.
+Und bei großen Energien sind die Scheuer meistens groß genug, dass genug Teleskope ausreichend Information beinhalten.
+
+Dass Telekope mit schwachem Kamerabild das Zusammengefasste Ergebnis verschlechtern, kann nicht auftreten, wenn der Median berechnet wird.
+Dadurch führt der Median auf eine bessere Schätzung als die Mittelwert Bildung und normalverteilten Ergebnisse liefern zusammengefasst ein besseres Ergebnis,
+was in \autoref{abb:mean_median_bias} und \autoref{abb:mean_median_IQA} zu erkennen ist.
+
+Eine weitere Möglichkeit um das Problem zu beheben, dass nicht alle Telskope das Schauer gleich gut sehen, ist das Mitteln mit einem Gewicht, welches die
+Sichtbarkeit des Schauers beschreibt.
+Die beobachtete Intensität ist zum Beispiel ein Indiz auf den gesehenen Anteil des Schauers, wobei eine hohe
+beobachtete Intensität eine gute Sichtbarkeit bedeutet und somit die Intensität direkt als Gewicht verwendet wird.
+
+Zum Anderen besitzten die in \autoref{sec:CTA} beschriebenen Teleskope eine energieabhängige Sensitivität, wobei
+es einen Energiebereich gibt bei dem eine volle Sensitivität herrscht und ein Bereich indem eine Teilsensitivität
+herrscht.
+Das LST besitzt eine Teilsensitivität bei $\SI{20}{\giga\eV}-\SI{3}{\tera\eV}$ und eine volle Sensitivität bei
+$\SI{20}{\giga\eV}-\SI{150}{\giga\eV}$.
+Das MST ist teilsensitiv bei $\SI{80}{\giga\eV}-\SI{50}{\tera\eV}$ und vollsensitiv bei $\SI{150}{\giga\eV}-\SI{5}{\tera\eV}$
+und das LST hat seine Teilsensitivität bei Energien zwischen $\SI{1}{\tera\eV}-\SI{300}{\tera\eV}$ und seine
+Hauptsensitivität bei $\SI{5}{\tera\eV}-\SI{300}{\tera\eV}$.\cite{CTA_tec}
+Wenn die geschätzte Energie im vollsensitiven Bereich liegt, wird ein Gewicht von $2$ angelegt, wenn sie im
+teilsensitiven Bereich liegt ein Gewicht von $1$ und wenn die Energie in keinem Sensitivitätsbereich liegt
+wird ein Gewicht von $0.1$ angelegt.
+
+\begin{figure}
+  \includegraphics[width=\textwidth]{Plots/RF_weights_bias.pdf}
+  \centering
+  \caption{Darstellung der Verzerrung für die erste Vorhersage und für eine gewichtete Mittelung mit der Intensität
+            oder der Sensitivität als Gewicht.}
+  \label{abb:w_bias}
+\end{figure}
+\begin{figure}
+  \includegraphics[width=\textwidth]{Plots/RF_weights_resolution.pdf}
+  \centering
+  \caption{Auftragen des IQA des relativen Fehlers für verschiedene Energiebereiche, jeweils für die erste Vorhersage und
+            für die mit der Intensität oder der Sensitivität gewichtet gemittelten Vorhersage.}
+  \label{abb:w_IQA}
+\end{figure}
+Das Gewichten führt auf eine Energieschätzung, die in \autoref{abb:w_bias} und \autoref{abb:w_IQA} zu sehen ist.
+In beiden Abbildungen ist keine Verbesserung des Schätzers im Vergleich zu einer ungemittelten Vorhersage zu erkennen.
+
 
 %Einfacher Mittelwert über gleiches Event; Nutzung von unterschiedlichen Gewichten;
 
 \section{Verschachtelung von Regressionsverfahren}
 
+Schon die Wichtigkeit der eventspezifischen Attribute in \autoref{abb:first_FI} deutet darauf hin, dass durch zusammenfassen der Information eines Ereignisses
+größerer Informationsgewinn entsteht.
+
 %Einmal Verschachteln ; Mehrmals Verschafteln gegen die Laufzeit
+
+\section{Transformation der Energie}
