@@ -142,6 +142,85 @@ def encaps_RF():
         data_w = pd.concat([X_test_w,pred_w],axis=1).reset_index()
         truth_grouped = y_test.drop_duplicates().set_index(['run_id','array_event_id'])
 
+        ######################### Untersuchung der Vorhersagen für ein Event ####################
+        data_std = data_w.copy(deep=True)
+        pred_std = data_std[['prediction','run_id','array_event_id']].groupby(by=['run_id','array_event_id']).std().fillna(0)
+        pred_std.columns = ['std_Schätzung']
+        dat = data_w[['mc_energy','run_id','array_event_id']].drop_duplicates().set_index(['run_id','array_event_id'])
+        pred_std = pd.concat([pred_std,dat],axis=1)
+        min_energy = 0.003
+        max_energy = 340
+        bin_edge = np.logspace(np.log10(min_energy),np.log10(max_energy),20)
+        N , bin_edges, b = sc.stats.binned_statistic(pred_std['mc_energy'],pred_std['std_Schätzung'],bins=bin_edge,statistic='mean')
+        plt.hlines(N,bin_edges[:-1],bin_edges[1:],lw=2)
+        plt.xscale('log')
+        plt.xlabel("E / TeV")
+        plt.ylabel("mittelwert der standardabweichungen")
+        plt.savefig("plots/std_pred.pdf")
+        plt.close()
+
+        pred_std = pred_std.sort_values(by="std_Schätzung")
+        N = pred_std.shape[0]
+        N = int(N*0.5)
+        i = pred_std.iloc[N].name
+        data_test = data_w.set_index(['run_id','array_event_id'])
+        preds_max=data_test.loc[i]
+        ax = preds_max['prediction'].plot(kind="box")
+        plt.axhline(preds_max['mc_energy'].iloc[1],xmin=0.4,xmax=0.6,color="r",ls="dashed",label="Wahrheit")
+        plt.axhline(preds_max['prediction'].mean(),xmin=0.425,xmax=0.575,color="orange",label="Mittelwert")
+        ax.text(0.2, 0.95,'Anzahl Teleskope: %i ' % preds_max['num_triggered_telescopes'].iloc[0], ha='center', va='center', transform=ax.transAxes,size='medium',bbox=dict(boxstyle="round",facecolor='grey',alpha=0.1))
+        plt.legend()
+        plt.ylabel("Energie / TeV")
+        plt.yscale('log')
+        plt.savefig("plots/pred1.pdf")
+        plt.close()
+
+        N = N-1;
+        i = pred_std.iloc[N].name
+        data_test = data_w.set_index(['run_id','array_event_id'])
+        preds_max=data_test.loc[i]
+        ax = preds_max['prediction'].plot(kind="box")
+        plt.axhline(preds_max['mc_energy'].iloc[1],xmin=0.4,xmax=0.6,color="r",ls="dashed",label="Wahrheit")
+        plt.axhline(preds_max['prediction'].mean(),xmin=0.425,xmax=0.575,color="orange",label="Mittelwert")
+        ax.text(0.2, 0.95,'Anzahl Teleskope: %i ' % preds_max['num_triggered_telescopes'].iloc[0], ha='center', va='center', transform=ax.transAxes,size='medium',bbox=dict(boxstyle="round",facecolor='grey',alpha=0.1))
+        plt.legend()
+        plt.ylabel("Energie / TeV")
+        plt.yscale('log')
+        plt.savefig("plots/pred2.pdf")
+        plt.close()
+
+        N = N-1;
+        i = pred_std.iloc[N].name
+        data_test = data_w.set_index(['run_id','array_event_id'])
+        preds_max=data_test.loc[i]
+        ax = preds_max['prediction'].plot(kind="box")
+        plt.axhline(preds_max['mc_energy'].iloc[1],xmin=0.4,xmax=0.6,color="r",ls="dashed",label="Wahrheit")
+        plt.axhline(preds_max['prediction'].mean(),xmin=0.425,xmax=0.575,color="orange",label="Mittelwert")
+        ax.text(0.2, 0.95,'Anzahl Teleskope: %i ' % preds_max['num_triggered_telescopes'].iloc[0], ha='center', va='center', transform=ax.transAxes,size='medium',bbox=dict(boxstyle="round",facecolor='grey',alpha=0.1))
+        plt.legend()
+        plt.ylabel("Energie / TeV")
+        plt.yscale('log')
+        plt.savefig("plots/pred3.pdf")
+        plt.close()
+
+        N = N-1;
+        i = pred_std.iloc[N].name
+        data_test = data_w.set_index(['run_id','array_event_id'])
+        preds_max=data_test.loc[i]
+        ax = preds_max['prediction'].plot(kind="box")
+        plt.axhline(preds_max['mc_energy'].iloc[1],xmin=0.4,xmax=0.6,color="r",ls="dashed",label="Wahrheit")
+        plt.axhline(preds_max['prediction'].mean(),xmin=0.425,xmax=0.575,color="orange",label="Mittelwert")
+        ax.text(0.2, 0.95,'Anzahl Teleskope: %i ' % preds_max['num_triggered_telescopes'].iloc[0], ha='center', va='center', transform=ax.transAxes,size='medium',bbox=dict(boxstyle="round",facecolor='grey',alpha=0.1))
+        plt.legend()
+        plt.ylabel("Energie / TeV")
+        plt.yscale('log')
+        plt.savefig("plots/pred4.pdf")
+        plt.close()
+
+
+
+
+
 
                 ################ Mean and Median ##################
         x_grouped = data_w[['prediction','array_event_id','run_id']].groupby(by=['run_id','array_event_id'])

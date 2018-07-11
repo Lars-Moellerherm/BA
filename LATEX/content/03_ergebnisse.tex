@@ -138,16 +138,39 @@ wird ein Gewicht von $0.1$ angelegt.
   \label{abb:w_IQA}
 \end{figure}
 Das Gewichten führt auf eine Energieschätzung, die in \autoref{abb:w_bias} und \autoref{abb:w_IQA} zu sehen ist.
-In beiden Abbildungen ist keine Verbesserung des Schätzers im Vergleich zu einer ungemittelten Vorhersage zu erkennen.
-
+In beiden Abbildungen ist keine Verbesserung des Schätzers im Vergleich zu einer ungemittelten Vorhersage zu erkennen, was darauf schließen lässt,
+dass entweder die meisten Fehlschätzungen nicht durch die schlechte Sicht auf das Schauer entstehen, sondern andere Gründe haben oder die
+Gewichte sind nicht gut genug für den Ausgleich geeignet.
 
 %Einfacher Mittelwert über gleiches Event; Nutzung von unterschiedlichen Gewichten;
 
 \section{Verschachtelung von Regressionsverfahren}
 
-Schon die Wichtigkeit der eventspezifischen Attribute in \autoref{abb:first_FI} deutet darauf hin, dass durch zusammenfassen der Information eines Ereignisses
-größerer Informationsgewinn entsteht.
+Schon die Wichtigkeit der eventspezifischen Attribute in \autoref{abb:first_FI} deutet darauf hin, dass in der zusammengefassten Attribute eines Ereignisses
+mehr Information steckt, als in den teleskopspezifischen Attributen.
+Daher wird nach der ersten Schätzung ein zweiter Random Forest trainiert, der nun Schätzungen für jedes Event abgibt und dem eventspezifische Attribute
+übergeben werden.
+Zu den Attributen gehören die Anzahl der ausgelösten Telskope, sowie SST, MST und LST, die totale Intensität, die gemittelte Schätzung des ersten Waldes,
+die Mittelwerte und Standardabweichungen der skalierten Größen und die Mittelwerte, Standardabweichungen, Maximal- und Minimalwerte der Schätzungen von den
+SST, MST oder LST.
 
+\begin{figure}
+  \includegraphics[width=\textwidth]{Plots/RF_nested_bias.pdf}
+  \centering
+  \caption{Abbildung der Verzerrung nach einer Verschachtelung von zwei Random Forests. Es ist eine deutliche Verbesserung gegenüber der ersten Schätzungen
+            zu erkennen.}
+  \label{abb:nest_bias}
+\end{figure}
+\begin{figure}
+  \includegraphics[width=\textwidth]{Plots/RF_nested_resolution.pdf}
+  \centering
+  \caption{Abbildung des IQA für den zweiten Random Forest. Die Verschachtelung führt auf eine starke Verringerung des IQA bei niedrigen Energien.}
+  \label{abb:nest_IQA}
+\end{figure}
+Der Random Forest wird mit $\num{498081}$ Ereignissen trainiert und mit genauso vielen getestet. Die Performance des zweiten Schätzers ist in \autoref{abb:nest_bias}
+und \autoref{abb:nest_IQA} zu sehen.
+Die Verschachtelung der Entscheidungswälder führt auf eine verbesserte Performance sowohl bei der Verzerrung als auch bei dem IQA, wodurch ein Übertraining
+durch den zweiten Wald ausgeschlossen werden kann.
 %Einmal Verschachteln ; Mehrmals Verschafteln gegen die Laufzeit
 
 \section{Transformation der Energie}
