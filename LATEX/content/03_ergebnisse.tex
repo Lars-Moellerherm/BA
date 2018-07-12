@@ -38,73 +38,75 @@ Die anderen Hyperparameter sind nicht manuell verändert und somit nutzt der Alg
 Varianz Reduktion.
 Da die gering gewählte Tiefe ein Übertraining bereits verhindern sollte und das Problem viel Statistik besitzt, werden die Hyperparameter
 der minimalen Blatt und Trenngröße auf ihrer Grundeinstellung von $1$ und $2$ gelassen.
-
 \begin{figure}
-  \includegraphics[width=\textwidth]{Plots/RF.pdf}
+  \includegraphics[width=0.7\textwidth]{Plots/RF.pdf}
   \centering
   \caption{In diesem Graph ist die vorhergesagte Energie gegen die Wahrheit aufgetragen, dabei ist eine Streuung mit einer Verzerrung um die
           Diagonale zu erkennen.}
   \label{abb:Energie_RF}
 \end{figure}
-
 Dieser trainierte Entscheidungswald wird mit $\num{2193140}$ Datenpunkten getestet und liefert eine Performance, wie sie in \autoref{abb:Energie_RF} zu sehen ist.
 Dabei ist eine Überschätzung der Wahrheiten zu beobachten, sowie feine horizontale Linien, die auf eine Korreliertheit der Entscheidungsbäume hindeutet.
 Der $R^2$-Wert von $\num{0.50}$ deutet auf eine bessere Beschreibung des Modells als der bloße Mittelwert hin.
 Die Korreliertheit und die Verzerrung kann durch eine geeignetere Wahl der Hyperparameter minimiert werden, jedoch ist dies nicht das Ziel dieser
 Arbeit.
-
 \begin{figure}
-  \includegraphics[width=\textwidth]{Plots/feautureimportance_boxplot_firstForest.pdf}
+  \includegraphics[width=0.7\textwidth]{Plots/feautureimportance_boxplot_firstForest.pdf}
   \centering
   \caption{Darstellung der Wichtigkeit der genutzen Attribute bei der ersten Vorhersage als Kastengrafik. Die Anzahl der ausgelösten SST und die totale Intensität
           stellen die wichtigsten Attribute dar und die Weite trägt kaum zur Schätzung bei.}
   \label{abb:first_FI}
 \end{figure}
-
 In \autoref{abb:first_FI} ist die Wichtigkeit der Attribute aufgeführt, wobei zur Darstellung eine Kastengrafik genutzt wird.
 Dabei stellt die grüne Linie den Median dar, die Enden des Kastens das $\num{0.25}$- und das $\num{0.75}$-Quartil, die Antennen das $\num{0.125}$- und das
 $\num{0.875}$-Quantil und die Punkte Ausreißer die außerhalb des $\num{0.75}$-IQA liegen.
+Die Wichtigkeit ist durch die Verringerung des mittleren quadratischen Fehlers aus \autoref{sec:RF} mithilfe dieses
+Attributes definiert.
 Eventspezifische Attribute wie die Anzahl der ausgelösten Teleskope und die totale Intensität besitzen die größte Wichtigkeit und teleskopspezifische Attribute
 wie die Hillasparameter scheinen keinen großen Informationsgewinn zu liefern.
 Eine Erklärung liefert die Tatsache, das ein wichtiger Parameter für die Energieschätzung die in dem Schauer deponierte Energie ist und die Hillasparameter im
 Gegensatz zu den eventspezifischen Parametern von dem Abstand des Teleskopes zum Schauer abhängen.
+Die Kategorisierung der Attribute birgt eine Gefahr bei Variablen mit einer unterschiedlichen Anzahl Kategorien, da Attribute mit einer größeren Anzahl
+bevorzugt werden\cite{feature_importance}.
+In diesem Fall ist es möglich, dass die Anzahl der ausgelösten Teleskope unterschätz wird.
 
 \section{Optimierung durch Mittelwerte und geeignete Gewichte}
 
 Die Energieschätzung der einzelnen Teleskope bei einem Ereignis variiert, obwohl sie das gleiche Schauer beobachten.
 Dies liegt an dem unterschiedlichen Blickwinkel und Abstand der Teleskope, was dazu führt das jedes Teleskop unterschiedlich viel Information über das
 Schauer besitzt.
-Es wird angenommen, dass die variierenden Ergebnisse zufällig und nach den Zentralen Grenzwertsatz der Statistik normalverteilt um den
-wahren Wert liegen\cite[10]{zufall_Fehler}.
-Daher wird als Schätzer des wahren Wertes das arithmetische Mittel und der Median untersucht.
+Wenn die variierenden Ergebnisse zufällig und nach den Zentralen Grenzwertsatz der Statistik normalverteilt um den
+wahren Wert liegen\cite[10]{zufall_Fehler}, verbessert eine Mittelwertbildung das Ergebnis.
+Daher wird als Schätzer das arithmetische Mittel und der Median untersucht.
 \begin{figure}
-  \includegraphics[width=\textwidth]{Plots/RF_mean_bias.pdf}
+  \includegraphics[width=0.7\textwidth]{Plots/RF_mean_bias.pdf}
   \centering
   \caption{Darstellung der Verzerrung für verschiedene Energiebereiche. Es sind die Mittelwerte der relativen Fehler für die erste Vorhersage, die Vorhersage
-          nach der Mittelwert Bildung und der Median der Vorhersagen aufgetragen.}
+          nach der Mittelwertbildung und der Median der Vorhersagen aufgetragen.}
   \label{abb:mean_median_bias}
 \end{figure}
 \begin{figure}
-  \includegraphics[width=\textwidth]{Plots/RF_mean_resolution.pdf}
+  \includegraphics[width=0.7\textwidth]{Plots/RF_mean_resolution.pdf}
   \centering
   \caption{Darstellung des IQA des relativen Fehlers für verschiedene Energiebereiche. Aufgetragen sind die erste Vorhersage, die Vorhersage
           nach der Mittelwert Bildung und der Median der Vorhersagen.}
   \label{abb:mean_median_IQA}
 \end{figure}
-Die zusammengefassten Schätzungen führen auf die Verzerrungen und IQA's, die in \autoref{abb:mean_median_bias} und \autoref{abb:mean_median_IQA} zusehen sind.
-Bei der Bildung des Median ist die erwartete Verbesserung zu beobachten.
-Das Schätzen mithilfe des Mittelwerts führt jedoch zu einer Verschlechterung des Ergebnisses.
-Bei dem Beobachten von Schauern kann es vorkommen, dass einzelne Teleskope im Gegensatz zu anderen besser positionierten Teleskopen nur einen geringen Teil
-des Schauers beobachten und somit wenig Information des Schauers besitzen und eine ganz falsche Vorhersage liefern.
-Dies sind meist nur vereinzelte Teleskope und die Mehrheit der Teleskope liegt richtig.
-Jedoch führt eine Mittelung dazu, dass diese eine Schätzung den Mittelwert verschlechtert.
-Das die Verzerrung nur in der Mitte des Energiebereiches größer ist, liegt daran, dass der genannte Effekt bei geringen Energien und somit kleinen Schauern
-nicht so groß ist, da dort die Kamerabilder grundsätzlich wenig Information beinhalten.
-Und bei großen Energien sind die Scheuer meistens groß genug, dass genug Teleskope ausreichend Information beinhalten.
 
-Dass Telekope mit schwachem Kamerabild das Zusammengefasste Ergebnis verschlechtern, kann nicht auftreten, wenn der Median berechnet wird.
-Dadurch führt der Median auf eine bessere Schätzung als die Mittelwert Bildung und normalverteilten Ergebnisse liefern zusammengefasst ein besseres Ergebnis,
-was in \autoref{abb:mean_median_bias} und \autoref{abb:mean_median_IQA} zu erkennen ist.
+Die zusammengefassten Schätzungen führen auf die Verzerrungen und IQA's, die in \autoref{abb:mean_median_bias} und \autoref{abb:mean_median_IQA} zusehen sind.
+Bei geringen Energien führt das arithmetische Mittel auf keinen geringere Verzerrung und auch der Median bringt nur eine leichte Verbesserung.
+Dies liegt daran, dass eine Verzerrung die Annahme verletzt, dass die Ergebnisse um den wahren Wert liegen, sondern sie liegen um einen verschobenen
+Wert.
+Das arithmetische Mittel kann daher die Verzerrung nicht verringern.
+Nur bei Ereignissen mit einer geringen Verzerrung sorgt das Mitteln für eine bessere Performance, was zum einen bei dem IQA für große Energien zu beobachten
+ist und bei dem gemittelten quadratischen Fehler, der von $\num{103.31}$ für die erste Schätzung auf $\num{66.69}$ nach einer Mittelwertbildung fällt.
+
+Das der Median die Verzerrung verringert liegt daran, dass es bei dem Beobachten von Schauern vorkommen kann, dass einzelne Teleskope im Gegensatz zu anderen
+besser positionierten Teleskopen nur einen geringen Teil des Schauers beobachten und somit wenig Information des Schauers besitzen und eine falsche Vorhersage
+liefern.
+Dies sind meist nur vereinzelte Teleskope und der Median der Teleskope liegt richtig.
+Dies zeichnet sich auch durch einen gemittelten quadratischen Fehler von $\num{68.11}$ aus, welcher besser als der Fehler der ersten Schätzung ist und
+vergleichbar mit dem Fehler der Mittelwertbildung.
 
 Eine weitere Möglichkeit um das Problem zu beheben, dass nicht alle Telskope das Schauer gleich gut sehen, ist das Mitteln mit einem Gewicht, welches die
 Sichtbarkeit des Schauers beschreibt.
@@ -122,25 +124,34 @@ Hauptsensitivität bei $\SI{5}{\tera\eV}-\SI{300}{\tera\eV}$.\cite{CTA_tec}
 Wenn die geschätzte Energie im vollsensitiven Bereich liegt, wird ein Gewicht von $2$ angelegt, wenn sie im
 teilsensitiven Bereich liegt ein Gewicht von $1$ und wenn die Energie in keinem Sensitivitätsbereich liegt
 wird ein Gewicht von $0.1$ angelegt.
-
 \begin{figure}
-  \includegraphics[width=\textwidth]{Plots/RF_weights_bias.pdf}
+  \includegraphics[width=0.7\textwidth]{Plots/RF_weights_bias.pdf}
   \centering
-  \caption{Darstellung der Verzerrung für die erste Vorhersage und für eine gewichtete Mittelung mit der Intensität
+  \caption{Darstellung der Verzerrung für die arithmetische Mittelung, den Median und für eine gewichtete Mittelung mit der Intensität
             oder der Sensitivität als Gewicht.}
   \label{abb:w_bias}
 \end{figure}
 \begin{figure}
-  \includegraphics[width=\textwidth]{Plots/RF_weights_resolution.pdf}
+  \includegraphics[width=0.7\textwidth]{Plots/RF_weights_resolution.pdf}
   \centering
-  \caption{Auftragen des IQA des relativen Fehlers für verschiedene Energiebereiche, jeweils für die erste Vorhersage und
+  \caption{Auftragen des IQA des relativen Fehlers für verschiedene Energiebereiche, jeweils für den arithmetischen Mittelwert, den Median und
             für die mit der Intensität oder der Sensitivität gewichtet gemittelten Vorhersage.}
   \label{abb:w_IQA}
 \end{figure}
+
 Das Gewichten führt auf eine Energieschätzung, die in \autoref{abb:w_bias} und \autoref{abb:w_IQA} zu sehen ist.
-In beiden Abbildungen ist keine Verbesserung des Schätzers im Vergleich zu einer ungemittelten Vorhersage zu erkennen, was darauf schließen lässt,
-dass entweder die meisten Fehlschätzungen nicht durch die schlechte Sicht auf das Schauer entstehen, sondern andere Gründe haben oder die
-Gewichte sind nicht gut genug für den Ausgleich geeignet.
+Beide Gewichte führen nicht auf das gewünschte Ergebnis und die Intensität verschlechtert die Performance sogar.
+Die Sensitivität scheint zwar ein Indikator für die Sichtbarkeit zu sein, jedoch scheint die Höhe der Gewichtung nicht ausreichend zu sein, um
+die Fehlschätzungen zu korrigieren.
+Die Intensität scheint zu stark energieabhängig zu sein um ein geeignetes Gewicht zu sein.
+Jedoch verbessert sich der gemittelte quadratische Fehler auf $\num{60.64}$ im vergleich zu der Gewichtung mit der Sensitivität, wo er bei
+$\num{66.05}$ bleibt.
+
+Das Ziel bei der Energieschätzung besteht darin die Energieauflösung der Teleskope zu verbessern, was jedoch nur durch eine Verringerung der
+Verzerrung und des IQA gelingt und nicht durch die Verbesserung von Ergebnissen, die schon nahe an der Wahrheit liegen.
+Daher ist eine gewichtete oder ungewichtete Mittelung über die Ergebnisse nicht zielführend.
+Der Median sorgt für eine Verbesserung in niedrigen Energiebereichen, jedoch führt er zu einer Verschlechterung bei Energien von $(\num{0.1}-\num{1.0})\,\si{\tera\eV}$.
+In diesem Bereich besitzt das CTA jedoch die größte Statistik, womit der Performancegewinn infrage gestellt wird.
 
 %Einfacher Mittelwert über gleiches Event; Nutzung von unterschiedlichen Gewichten;
 
@@ -150,27 +161,44 @@ Schon die Wichtigkeit der eventspezifischen Attribute in \autoref{abb:first_FI} 
 mehr Information steckt, als in den teleskopspezifischen Attributen.
 Daher wird nach der ersten Schätzung ein zweiter Random Forest trainiert, der nun Schätzungen für jedes Event abgibt und dem eventspezifische Attribute
 übergeben werden.
-Zu den Attributen gehören die Anzahl der ausgelösten Telskope, sowie SST, MST und LST, die totale Intensität, die gemittelte Schätzung des ersten Waldes,
-die Mittelwerte und Standardabweichungen der skalierten Größen und die Mittelwerte, Standardabweichungen, Maximal- und Minimalwerte der Schätzungen von den
-SST, MST oder LST.
-
+Zu den Attributen gehören die Anzahl der ausgelösten Telskope, sowie SST, MST und LST, die totale Intensität, die arithmetisch gemittelte Schätzung des
+ersten Waldes, die Mittelwerte und Standardabweichungen der skalierten Größen und die Mittelwerte, Standardabweichungen, Maximal- und Minimalwerte der
+Schätzungen von den SST, MST oder LST.
 \begin{figure}
-  \includegraphics[width=\textwidth]{Plots/RF_nested_bias.pdf}
+  \includegraphics[width=0.7\textwidth]{Plots/RF_nested_bias.pdf}
   \centering
   \caption{Abbildung der Verzerrung nach einer Verschachtelung von zwei Random Forests. Es ist eine deutliche Verbesserung gegenüber der ersten Schätzungen
             zu erkennen.}
   \label{abb:nest_bias}
 \end{figure}
 \begin{figure}
-  \includegraphics[width=\textwidth]{Plots/RF_nested_resolution.pdf}
+  \includegraphics[width=0.7\textwidth]{Plots/RF_nested_resolution.pdf}
   \centering
   \caption{Abbildung des IQA für den zweiten Random Forest. Die Verschachtelung führt auf eine starke Verringerung des IQA bei niedrigen Energien.}
   \label{abb:nest_IQA}
 \end{figure}
-Der Random Forest wird mit $\num{498081}$ Ereignissen trainiert und mit genauso vielen getestet. Die Performance des zweiten Schätzers ist in \autoref{abb:nest_bias}
-und \autoref{abb:nest_IQA} zu sehen.
-Die Verschachtelung der Entscheidungswälder führt auf eine verbesserte Performance sowohl bei der Verzerrung als auch bei dem IQA, wodurch ein Übertraining
+
+Der Random Forest wird mit $\num{498081}$ Ereignissen trainiert und mit genauso vielen getestet.
+Die Performance des zweiten Schätzers ist in \autoref{abb:nest_bias} und \autoref{abb:nest_IQA} zu sehen und der gemittelte quadrierte Fehler fällt
+auf $\num{37.74}$.
+Die Verschachtelung der Entscheidungswälder führt auf eine verbesserte Performance, sowohl bei der Verzerrung als auch bei dem IQA, wodurch ein Übertraining
 durch den zweiten Wald ausgeschlossen werden kann.
+
+Die genutzten Attribute haben eine starke Korrelation aufgrund der Gewinnung der Attribute aus der gleichen Information.
+Dies ist durch die Anzahl an Ausreißer in \autoref{abb:second_FI} zu erkennen.
+\begin{figure}
+  \includegraphics[width=0.7\textwidth]{Plots/feautureimportance_boxplot_secondForest.pdf}
+  \centering
+  \caption{Abbildung der Wichtigkeit der Attribute im zweiten Random Forest. Die Informationen der SST und die
+          Schätzung des ersten Random Forest sind bedeutende Attribute und die hohe Fluktuation deutet auf eine
+          Korreliertheit der Attribute hin.}
+  \label{abb:second_FI}
+\end{figure}
+Eine genauere Untersuchung des Aufbaus der Entscheidungsbäume ergibt, dass die erste Seperation der Datensätze mithilfe der gemittelten Schätzung geschieht,
+um sich in den Unterbäumen auf die für diesen Energiebereich interessanten Attribute zu konzentrieren.
+Die Anzahl der ausgelösten SST stellt zum Beispiel einen guten Parameter für hohe Energien dar, da solche Photonen große Schauer erzeugen, die
+zu großen Cherenkov-Kegeln führen.
+
 %Einmal Verschachteln ; Mehrmals Verschafteln gegen die Laufzeit
 
 \section{Transformation der Energie}

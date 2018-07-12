@@ -11,6 +11,7 @@ from sklearn.metrics import r2_score, explained_variance_score, mean_squared_err
 from sklearn.utils import shuffle
 from sklearn.tree import DecisionTreeClassifier
 import argparse
+from treeinterpreter import treeinterpreter as ti
 
 parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter,
                                 description=argparse._textwrap.dedent('''\
@@ -460,9 +461,17 @@ def encaps_RF():
         "Finished with the encapsulated prediction \n")
 
 
+        ############## Treeinterpreter #################
+        test_dat = X2_test.values[:30,:]
+        prediction, bias , contrebutions = ti.predict(RFr2, test_dat)
 
-
-
+        for i in range(len(test_dat)):
+            print("Instance: ", i)
+            print("Bias: ", bias[i])
+            print("Feuture contribution: ")
+            for c, feauture in sorted(zip(contrebutions[i],names), key = lambda x: -abs(x[0])):
+                print (feauture, round(c,2))
+            print("-"*20)
 
 
 
