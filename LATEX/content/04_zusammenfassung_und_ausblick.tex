@@ -1,11 +1,47 @@
 \chapter{Zusammenfassung und Ausblick}
+Die Energieauflösung des CTA Experiments ist noch nicht bei der Auflösung des MAGIC Experiments von $\num{0.2}$ für
+$\SI{5000}{\giga\eV}$\cite{MAGIC_performance} in allen Energiebereichen angelangt, jedoch erzielen die Methoden dieser
+Arbeit eine deutliche Verbesserung, obwohl keine Schnitte in den Daten vorgenommen wurden.
+
+% Max Paper vorzitieren, um einen aktuellen Auflösungswert von MAGIC zu bekommen
 
 \section{Fazit der Arbeit}
 
-%deutliche verbesserung bei Verschachtelung und mean scaled values;
+Durch das Bilden des arithmetischen Mittels über aller Teleskope ergibt sich kein Performancegewinn, da die Schätzungen
+eine Verzerrung besitzen, die durch eine Mittelwertbildung nicht verbessert werden kann.
+Die Bildung des Median hingegen ermöglicht eine kleine Verbesserung, da einzelne Schätzungen, die möglicherweise
+eine falsche Schätzung aufgrund der geringen Sicht des Teleskopes auf das Schauer abgeben, herausgefiltert werden.
+Eine geeignete Gewichtung bei der Mittelwertbildung, die diesen Effekt beim arithmetischen Mittel erreichen könnte, wurde
+nicht gefunden, da die Fehlschätzungen über einen Bereich von fünf Größenordnungen gehen können.
+Eine Schätzung mithilfe eines zweiten Random Forests, der eventspezifische Informationen und eine
+Schätzung des ersten Algorithmus bekommt, liefert einen enormen Performancegewinn, da durch die erste Schätzung eine
+Trennung vorgenommen werden kann, die eine anschließende energiespezifischere Analyse ermöglicht.
+Das Problem des großen Zielbereichs wird mithilfe einer logarithmischen Transformation gelöst, wodurch ein weitere
+Verbesserung der Auflösung und der Verzerrung verzeichnet wird.
+Eine verschachtelte Analyse mit einem transformierten Zielbereich, die jedoch einen nicht parallelisierbaren Zeitaufwand bedeutet,
+führt die Energieschätzung des CTA-Experiments mit einer ungefähren Auflösung von $0.4$ in weiten Teilen des
+Energiebereichs nahe an die Performance des MAGIC Projekts heran.
 
 \section{Perspektiven}
 
-% versuch neue mean scaled Values zu definieren; bessere Transformation finden;
-% dist_to_core mit dazu nehmen --> Hillasparameter werden wichtiger; erster Baum wird aufholen;
-% dist to core als gewicht würde auch das problem beheben
+Eine deutliche Verbesserung wird die Hinzunahme des Abstandes von Teleskope und Schauer und die Schätzung des ersten
+Wecheselwirkungspunktes des primär Teilchens mit der Atmosphäre als zusätzliche Attribute bewirken, da diese wichtige
+charakteristische Merkmale für die Energieschätzung sind. Außerdem dürften die Hillas Parameter wichtiger werden, da durch
+die Distanz zum Schauer die Hillasparameter ein Indiz auf die größe des Schauers geben können.
+Dadurch wird die Performance der einfachen Schätzung näher an die des verschachtelten Waldes herankommen.
+Diese Attribute stehen zum Zeitpunkt der Arbeit jedoch nicht funktionsfähig zur Verfügung.
+
+Zusätzlich wäre es von Interesse den Abstand als Gewicht zu testen, da dieser ein direktes Indiz auf die Sichtbarkeit
+liefert.
+Vielleicht liefern andere Gewichte, Kombinationen von Gewichten oder skalierte Gewichte einen Performancegewinn.
+
+Von Interesse wäre es andere Transformationen zu testen, die den Zielbereich weiter verkleinern und für eine gleichverteilte
+Statistik in allen Energiebereichen sorgen.
+Vielleicht können auch unterschiedliche Transformationen angewendet werden, jenachdem welcher Energiebereich für die
+Beobachtung von Interesse ist und somit die beste Performance für jede Analyse individuell herausgeholt werden kann.
+
+Ein großer Grund für den Erfolg des verschachtelten Modells und der Transformationsmethode ist die Tatsache, dass für das
+Ausbauen der Entscheidungbäume ein Kriterium genutzt wir, welches den absoluten Fehler minimiert, wobei das Anforderungsprofil des
+CTA eine Minimierung des relativen Fehlers verlangt.
+Das Entwickeln von anderen Kriterien oder das Nutzen von anderen Regressionsmethoden, die die Minimierung des relativen Fehlers
+anstreben, würden die Analyse anforderungsorientiert verbessern.

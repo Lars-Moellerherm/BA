@@ -1,5 +1,10 @@
 \chapter{Theoretische Grundlagen}
 
+Um die Performance der Energieschätzung zu verbessern, muss verstanden werde welche Anforderungen an die Analyse gestellt
+werden, um zu neuen Erkenntnissen in der Astroteilchenphysik zu gelangen.
+Außerdem muss der Algorithmus des Random Forest genau verstanden werden, um Möglichkeiten des Performancegewinns zu erarbeiten,
+wobei am Ende eine sinnvolle Evaluierung der Performance vorgenommen werden muss.
+
 \section{Gammaastronomie}
 \label{sec:Gammaastronomie}
 
@@ -28,18 +33,18 @@ Fermi-Beschleunigung erster und zweiter Ordnung eine große Rolle.
 Für den Teilchenfluss der Kosmischen Strahlung direkt nach der Fermibeschleunigung in Schockfronten gilt
 $\Phi(E)\approx E^{-2}$.
 Wenn die Strahlung mit dem extragalaktische Plasma wechselwirkt, wird das Spektrum um $E^{-\frac{1}{3}}$ steiler und
-da es auch das Plasma der Milchstraße durchqueren muss, damit es im Sonnensystem gemessen zu werden kann, wird
-der Teilchenfluss der Kosmischen Strahlung durch $E^{-2.7}$\cite[5]{Cosmic_rays} beschrieben.
+da es auch das Plasma der Milchstraße durchqueren muss, um im Sonnensystem gemessen werden zu können, wird
+der Teilchenfluss der Kosmischen Strahlung durch $\Phi(E) \approx E^{-2.7}$\cite[5]{Cosmic_rays} beschrieben.
 
 Jedoch erklären diese Prozesse nicht den gemessenen Energiefluss von ultra hochenergetischen Teilchen, denn bei Energien von $\SI{3e15}{\eV}$ tritt ein erstes
-"knee" im Spektrum auf, welches nicht durch die Fermibeschleunigung erklärt wird.
+\enquote{knee} im Spektrum auf, welches nicht durch die Fermibeschleunigung erklärt wird.
 Die Phänomene die Materie bis auf diese Energien beschleunigen, sind noch nicht vollständig erforscht.
-Ein möglicher Prozess wäre die Beschleunigung durch elektrische Potentialunterschieden oder der Zerfall von Dunkler Materie speziell könnte
+Ein möglicher Prozess wäre die Beschleunigung durch elektrische Potentialunterschiede oder der Zerfall von Dunkler Materie könnte
 hochenergetische Teilchen erzeugen.
 
 Diese hochenergetische Teilchenstrahlung erzeugt durch Wechselwirkungen oder Zerfälle Gammastrahlung.
-Wichtige Prozesse bei der Erzeugung hochenergetischer Photonen sind die Wechselwirkungen von Photonen und Elektronen.
-Die Prozesse, bei denen Gammastrahlung entsteht, sind die inverse Compton-Streuung, wobei das geladene Teilchen Energie auf das Photon
+Wichtige Prozesse bei der Erzeugung hochenergetischer Photonen sind die Wechselwirkungen von Photonen und Elektronen, wie
+die inverse Compton-Streuung, wobei das geladene Teilchen Energie auf das Photon
 überträgt, die Annihilation, welche den Umkehrprozess der Paarerzeugung darstellt und aus einem Elekron Positron Paar
 ein Photon erzeugt, und die Bremsstrahlung, wobei ein Photon bei der Impulsänderung gelandener Teilchen abgestrahlt wird.
 
@@ -56,19 +61,19 @@ ein Photon erzeugt, und die Bremsstrahlung, wobei ein Photon bei der Impulsände
 und somit deren Ursprungsrichtung bekannt ist. Jedoch wechselwirken die Photonen mit interstellarem Staub, der zwischen der Erde und der
 Quelle ist, wodurch ein Teil der Gammastrahlung nicht zur Erde gelangt.
 
-Diese hochenergetischen Photonen oder auch Gammastrahlung genannt, können entweder direkt mithilfe von Satelliten im Weltraum oder indirekt über das in
-der Atmosphäre entstehende Schauer mithilfe von Cherenkov Teleskopen auf der Erdoberfläche beobachtet werden.
+Diese hochenergetischen Photonen, können entweder mithilfe von Satelliten im Weltraum oder mithilfe von Cherenkov Teleskopen auf
+der Erdoberfläche beobachtet werden.
 Aufgrund der hohen Energien der Gammstrahlung können die Satelliten nur mithilfe von Szinillationszählern diese messe und nicht durch Spiegelteleskope,
 da diese hohen Frequenzen nicht gespiegelt werden, sondern durch die Spiegeloberfläche transmittieren.
 Diese energiereiche Strahlung sorgt jedoch dafür, dass in der Erdatmosphäre durch die Wechselwirkung mit den Luftmolekülen ein hochrelativistisches
-Teilchenschauer ensteht, welches aus überlichtschnellen geladenen Teilchen bestehen.
+Teilchenschauer ensteht, welches aus überlichtschnellen geladenen Teilchen besteht.
 Da sich bei Geschwindigkeiten über der Lichtgeschwindigkeit des Mediums die durch die Polarisierung entstandenen elektromagnetischen Wellen
 nicht mehr destruktiv überlagern, entstehen Cherenkov-Blitze mit einer Dauer von $\SI{150}{\nano\s}$\cite{Cherenkov_Licht}, welche sich kegelförmig
-mit einem spezifischen Winkel von
+mit einem Winkel von
 \begin{equation}
  cos(\theta) = \frac{1}{n\beta}
 \end{equation}
-ausbreitet und von den Cherenkov
+ausbreiten und von den Cherenkov
 Teleskopen am Boden beobachtet werden können.
 Der Winkel $\theta$ hängt von dem Brechungsindex $n$ der Luft ab, welcher von der Feuchtigkeit und Dichte der Luft abhängt und somit höhenabhängig ist.
 Das kontinuierliche Spektrum der Cherenkov-Strahlung besitzt eine zur Frequenz proportionale Intensität im sichtbaren Bereich und
@@ -88,16 +93,18 @@ des Energieflusses des Krebsnebels, wodurch es ungefähr zehn mal sensitiver wie
 Da der Teilchenfluss $\Phi$ der kosmischen Strahlung dem Potenzgesetz $\Phi \propto E^{-2.7}$\cite[5]{Cosmic_rays} folgt,
 treffen bei einer Energie $E$ von $\SI{1}{\tera\eV}$ noch $\SI{1}{\per\m\squared\per\s}$ Teilchen auf die Erdatmosphäre.
 Um dennoch genug Statistik zu besitzen, muss eine möglichst große Himmelfläche observiert werden.
-CTA beobachtet durch die große Anzahl an Teleskopen, bei einer Beobachtungszeit von $\SI{0.5}{\hour}$, Photonen mit einer Energie von $\SI{1}{\tera\eV}$ auf einer
-Fläche von $\SI{10e6}{\m\squared}$\cite{CTA_ob}.
-Durch 3 verschiedene Teleskopgrößen, kann CTA Photonen mit Energien von $\SI{30}{\giga\eV}$ bis $\SI{300}{\tera\eV}$ detektieren.
-Die Teleskop Arten bestehen aus dem LST (Large Sized Telescope) mit einer Spiegelgröße von $\SI{23}{\m}$, dem MST (Medium Sized Telescope)
-mit einer Größe von $\SI{11.5}{\m}$ oder $\SI{9.7}{\m}$ und dem SST (Small-Sized Telescope), welches eine Größe von $\SI{4.3}{\m}$ oder $\SI{4.0}{\m}$
+Das CTA beobachtet durch die große Anzahl an Teleskopen bei einer Beobachtungszeit von $\SI{0.5}{\hour}$ Photonen mit einer Energie von $\SI{1}{\tera\eV}$ auf einer
+effektiven Fläche von $\SI{e6}{\m\squared}$\cite{CTA_ob}.
+Durch 3 verschiedene Teleskopgrößen, kann das CTA Photonen mit Energien von $\SI{30}{\giga\eV}$ bis $\SI{300}{\tera\eV}$ detektieren,
+was es ermöglicht die verschiedenen Beschleunigungsprozesse im Universum zu untersuchen.
+Insbesondere kann das \enquote{knee} bei $\SI{3e15}{\eV}$ genauer untersucht werden.
+Zu den Arten gehören das LST (Large Sized Telescope) mit einer Spiegelgröße von $\SI{23}{\m}$, das MST (Medium Sized Telescope)
+mit einer Größe von $\SI{11.5}{\m}$ oder $\SI{9.7}{\m}$ und das SST (Small-Sized Telescope), welches eine Größe von $\SI{4.3}{\m}$ oder $\SI{4.0}{\m}$
 besitzt\cite{CTA_tec} .
-Um die ganze Bandbreite der Beschleunigungsprozesse im Universum untersuchen zu können, wird eine solche Energiebreite benötigt.
-Insbesondere kann das "knee" des Energiespektrums bei $\SI{3e15}{\eV}$ genauer untersucht werden.
 Die hohe Sensitivität und die niedrige Energieuntergrenze ermöglichen die Entdeckung neuer Quellen mit einer starken Rotverschiebung, die nur bei niedrigen
-Energien sichtbar sind, da die höher energetische Gammastrahlung mit der Hintergundstrahlung wechselgewirkt hat und somit nicht beobachtet werden kann.
+Energien sichtbar sind, da die höher energetische Gammastrahlung mit der Hintergundstrahlung wechselgewirkt und somit nicht beobachtet werden kann.
+Die große Anzahl an Teleskopen führt zusätlich auf eine bessere Winkelauflösung, was entscheidend bei der Multimessenger Beobachtung von Quellen ist, welche
+durch die ersten Neutrinoquellen Identifizierung im Jahr $2018$ immer vielseitiger und erfolgreicher wird.
 
 \section{Maschinelles Lernen}
 \label{sec:ML}
@@ -109,25 +116,24 @@ Diese Algorithmen müssen jedoch intelligente Entscheidungen eigenständig treff
 genannt wird.
 Das maschinelle Lernen wird als Teilgebiet der künstlichen Intelligenz verstanden. Hierbei lernen Algorithmen aus Datensätzen,
 indem sie verschiedene Optimierungsverfahren der Mathematik nutzen, um eine Fehlerfunktion zu minimieren.
-Und ein trainierter Algorithmus trifft Vorhersagen für neue Datenpunkte.
+Wobei ein trainierter Algorithmus im Anschluss Vorhersagen über neue Datenpunkte treffen kann.
 
 Der Bereich des maschinellen Lernens wird in das überwachte Lernen, bei dem das Ergebnis und die Eingangsdaten bekannt
-sind und das unüberwachte Lernen, bei dem der Algorithmus nur die Eingangsdaten kennt und in diesen Daten Muster sucht, gegliedert.
+sind und das unüberwachte Lernen, bei dem der Algorithmus Muster in den Eingangsdaten sucht, gegliedert.
 Zwei große Aufgabengebiete im Bereich des überwachten Lernens sind die Regression und die Klassifikation. Die Regression bildet
-auf die reelen Zahlen ab und die Klassifikation auf $N$ Klassen.
-Die Regression kann somit als Grenzfall $N \to \infty$ der Klassifikation verstanden werden.
+auf die reelen Zahlen ab und die Klassifikation auf $N$ Klassen, womit die Regression als Grenzfall $N \to \infty$ der Klassifikation
+verstanden werden kann.
 
 Das Modell der Regressionsanalyse benutzt die abhängige Variable $y$ die über eine Funktion $f(X,\theta)$ von der Variable $X$ abhängt, um
 den Parameter $\theta$ so zu optimieren, dass für $\hat{y} = f(X,\theta) + L(\hat{y},y)$ der Fehler
 $L(\hat{y},y)$ minimiert wird.
 Wenn $\vec{\theta}$ aus k Parametern besteht und $(X_i,y_i)$ $N$ Tupel sind, müssen drei Fälle unterschieden werden.
-Im ersten Fall gilt $k>N$, was zu einem unterbestimmten System führt.
-Für unterbestimmte Syteme gibt es nicht genug Datenpunkte, um alle Parameter vorherzusagen und viele Regressionsmethoden
-führen zu keinem Ergebnis.
+Im ersten Fall gilt $k>N$, was zu einem unterbestimmten System führt, indem es nicht genug Datenpunkte gibt, um alle Parameter
+vorherzusagen, wodurch viele Regressionsmethoden zu keinem Ergebnis führen.
 Bei $k = N$ existiert genug Information um ein lineares System exakt zu lösen.
-Im letzten Fall gilt $k<N$, was das System überbestimmt werden lässt, wodurch es mehrere Lösungen gibt und
-es wird die Lösung gewählt, die den Fehler minimiert.
-Damit die Regressionsanalyse funktioniert, muss der Trainingsdatensatz das Problem vollständig repräsentieren. Außerdem darf der Fehler $L(\hat{y},y)$ keinen Trend
+Im letzten Fall gilt $k<N$, was das System überbestimmt werden lässt, was zu mehrere Lösungen führt und
+es wird die Lösung gewählt, die $L(\hat{y},y)$ minimiert.
+Damit die Regressionsanalyse funktioniert, muss der Trainingsdatensatz das Problem vollständig repräsentieren. Außerdem darf $L(\hat{y},y)$ keinen Trend
 und keine Korrelation besitzen.
 Eine weitere Annahmen über das Problem muss sein, dass das Problem eine unkorreliert und linear unabhängig Variable $X$ besitzt.
 Wenn ein Problem eine unkonstante Varianz des Fehlers besitzt, muss dies durch eine gewichtete Methode korrigiert werden.
@@ -136,7 +142,7 @@ Wenn ein Problem eine unkonstante Varianz des Fehlers besitzt, muss dies durch e
 \label{sec:RF}
 
 Eine Methode des überwachten Lernens, welche für die Regression verwendet werden kann, stellt der Random Forest Algorithmus dar. Dieser Algorithmus baut
-einen Wald aus mehreren unkorrelierten Entscheidungsbäumen auf, die eigenständige Vorhersagen treffen, über die gemittelt wird.
+einen Wald aus mehreren unkorrelierten Entscheidungsbäumen auf, die eigenständige Vorhersagen treffen, über die abschließend gemittelt wird.
 
 Ein Entscheidungsbaum wird aufgebaut, indem der Datensatz in Teildatensätze aufgeteilt wird, wobei ein gewähltes Kriterium optimiert wird.
 Dieses Kriterium
@@ -156,25 +162,25 @@ des Baumes sein, eine minimale Größe des Datensatzes, der getrennt werden soll
 $c_m$ des letzten Schrittes die endgültige Vorhersage.
 
 Bei Entscheidungsbäumen gibt es eine Vielzahl von Umsetzungen.
-Die aktuellsten Arten sind jedoch der C5.0 und der CART Algorithmus\cite[1]{CART}.
+Die aktuellsten Arten sind der C5.0 und der CART Algorithmus\cite[1]{CART}.
 Die Besonderheit am C5.0 Algorithmus bildet, im Gegensatz zum CART Algorithmus, die nicht notwendige binäre Trennung des Datensatzes,
 jedoch kann mit ihm keine Regression durchgeführt werden.
-Im \textsc{scikit-learn}-Framework\cite{scikit-learn} wird eine CART Implementierung des Entscheidungsbaums benutzt, welche zur
-Regression genutzt werden kann und die Varianze Reduktion als Optimierungskriterium nutzt.
+Im \textsc{scikit-learn}-Framework\cite{scikit-learn} wird eine CART Implementierung des Entscheidungsbaumes benutzt, welche zur
+Regression fähig ist und die Varianze Reduktion als Optimierungskriterium nutzt.
 
-Die Vorteile eines Entscheidungsbaums sind die Interpretierbarkeit, der logarithmische Zusammenhang zwischen Trainingsdauer und Datengröße und die einfache Datenpräparation.
+Die Vorteile eines Entscheidungsbaumes sind die Interpretierbarkeit, der logarithmische Zusammenhang zwischen Trainingsdauer und Datengröße und die einfache Datenpräparation.
 Außerdem besteht keine Anfälligkeit gegenüber unbedeutenen Attributen.
-Jedoch besteht eine Gefahr des Übertrainierens, was bei einem zu großen Ausbauen des Baumes dazu fürht, dass der Trainingsdatensatz nachgebildet
-wird und die Vorhersagen für einen unabhängigen Testdatensatz somit unpräzise werden.
-Desweiteren kann es zu einer Verzerrung beim Vorhersagen kommen, wenn der Trainingsdatensatz eine Verzerrung aufweist.
-Außerdem sind die Entscheidungsbäume nicht stabil gegenüber Änderungen im Datensatz, wwas zu einer hohen Varianz bei Vorhersagen
+Jedoch besteht eine Gefahr des Übertrainierens, was bei einem zu großen Ausbauen des Baumes dazu führt, dass der Trainingsdatensatz nachgebildet
+wird und die Vorhersagen für einen unabhängigen Testdatensatz unpräzise werden.
+Desweiteren kann es zu einer Verzerrung in den Vorhersagen kommen, wenn der Trainingsdatensatz eine Verzerrung aufweist.
+Entscheidungsbäume besitzen keine Stabilität gegenüber Änderungen im Datensatz, was zu einer hohen Varianz der Ergebnisse
 unterschiedlicher Bäume führt.
-Da der Entscheidungsbaum zu den gierigen Algorithmen gehört, welche die Entscheidung aufgrund des derzeitig besten Gewinn treffen, findet dieses Verfahren sehr schnell ein
-Optimum, jedoch bildet dieses Extremum nicht immer das globale Extremum und somit nicht die optimalste Lösung.
+Da der Entscheidungsbaum zu den gierigen Algorithmen gehört, welche die Entscheidung aufgrund des derzeitig besten Gewinns treffen, findet dieses Verfahren schnell ein
+Optimum, jedoch nicht immer das globale Extremum und somit nicht die optimalste Lösung.
 Die letzten beiden Nachteile können durch die Erweiterung des Entscheidungsbaum zu einem Entscheidungswald behoben werden.
 
-Dieses Verfahren wird Random Forest(RF) genannt. Beim Random Forest werden eine Vielzahl von Entscheidungsbäume die, um Unkorreliertheit der Ergebnisse zu erreichen, mit
-zufällig ausgewählten Teildatensätzen und Attribute trainiert werden. Das Ergebnis des RF ergibt sich durch eine Mittelung über alle Entscheidungsbäume.
+Dieses Verfahren wird Random Forest(RF) genannt. Beim Random Forest werden eine Vielzahl von Entscheidungsbäume, um Unkorreliertheit der Ergebnisse zu erreichen, mit
+zufällig ausgewählten Teildatensätzen und Attribute trainiert. Das Ergebnis des RF ergibt sich durch eine Mittelung über alle Entscheidungsbäume.
 Wenn die Anzahl der Entscheidungsbäume erhöht wird, konvergiert der generalisierte Fehler
 \begin{equation}
   PE = P_{X,y}(mg(X,y)<0)
@@ -187,21 +193,25 @@ und es kann durch eine Vergrößerung des Waldes nicht zum Übertraining kommen\
 \begin{equation}
   mg(X,y) = av_k I(h_k(X)=y) - \max_{j \neq y}av_k I(h_k(X)=j)
 \end{equation}
-die Gewinn Funktion, $h_k(X)$ die Vorhersage der einzelnen Entscheidungsbäume und $I(\cdot)$ die charakteristische Funktion, welche eine $1$ ergibt, wenn der
-Entscheidungsbaum das geforderte Ergebnis liefert und eine $0$ wenn nicht. Wenn die $mg(X,y) > 0$ gilt, sagt der Entscheidungsbaum das richtige Ergebnis vorher.
+die Gewinn Funktion, $h_k(X)$ die Vorhersage der $k$ Entscheidungsbäume und $I(\cdot)$ die charakteristische Funktion, welche eine $1$ ergibt, wenn der
+Entscheidungsbaum das geforderte Ergebnis liefert und eine $0$ wenn nicht.
+Wenn $mg(X,y) > 0$ gilt, sagt der Entscheidungsbaum das richtige Ergebnis vorher.
 
-Um einen unkorrelierten Wald zu erhalten, muss die Auswahl der Teildatensätzen und der Attribute zufällig und unabhängig getroffen werden. Dazu kann unteranderem das Adaboost
-Verfahren oder das Bagging verwendet werden. Das in \textsc{scikit-learn} verwendete Bagging funktioniert, indem aus dem Datensatz $N$ Stichproben der Größe
-$M$ gezogen werden und für die $N$ Entscheidungsbäume verwendet werden. Die $N$ Ergebnisse werden am Ende gemittelt oder zusätzlich mit der Genauigkeit des jeweiligen Ergebnisses gewichtet.
-Auch die Attribute werden in einem Umfang, der festgelegt werden kann, zufällig gezogen.
+Um einen unkorrelierten Wald zu erhalten, muss die Auswahl der Teildatensätze und der Attribute zufällig und unabhängig getroffen werden.
+Dazu kann unter anderem das Adaboost Verfahren oder das Bagging verwendet werden.
+Das in \textsc{scikit-learn} verwendete Bagging funktioniert, indem aus dem Datensatz $N$ Stichproben der Größe $M$ gezogen werden und für die $N$ Entscheidungsbäume verwendet werden.
+Die $N$ Ergebnisse werden am Ende gemittelt oder zusätzlich mit der Genauigkeit des jeweiligen Ergebnisses gewichtet.
+Um die Größe der Datensätze nicht zu verkleinern, ist es möglich die Datensätze mit bootstrapping künstlich zu vergrößern, wobei Datenpunkte durch andere Datenpunkte
+des Datensatzes zufällig ersätzt werden, anstatt sie zufällig auszusortieren.
+Zusätzlich zum Bagging werden bei einem Random Forest die Attribute in einem Umfang, der festgelegt werden kann, zufällig gezogen.
 Hierdurch wird der Trend der einzelnen Ergebnisse größer, die Standardabweichung der Ergebnisses jedoch ungleich geringer,
-was Verzerrung-Varainz-Dilemma genannt wird. Die Standardabweichung wird soweit minimiert, dass es zu keiner Überanzupassung kommt
-und Verzerrung möglichst klein bleibt.
+was Verzerrung-Varainz-Dilemma genannt wird. Die Standardabweichung wird soweit minimiert, dass es zu keiner Überanpassung kommt
+und die Verzerrung möglichst klein bleibt.
 
 Durch Kreuzvalidierung kann das Modell auf Übertraining untersucht werden. Hierbei wird der Datensatz aufgeteilt, um
 den Algorithmus mit einem Teil zu trainieren und mit dem anderen unabhängigen Teil zu testen.
-Die in \textsc{scikit-learn} implementierte Methode stellt die einfache Kreuzvalidierung dar, bei der der Datensatz
-in $k$ Teildatensätze geteilt wird und jeder dieser Datensätze als Validierungsdatensatz
+Die einfache Kreuzvalidierung stellt die in \textsc{scikit-learn} implementierte Methode dar, bei der der Datensatz
+in $k$ Teildatensätze geteilt wird und jeder dieser Datensätze einmal als Validierungsdatensatz
 verwendet wird und $k-1$ Datensätze zum Training dienen.
 
 \section{Energie Rekonstruktion}
@@ -221,17 +231,17 @@ Die geometrischen Hillasparameter sind in \autoref{abb:Hillas} dargestellt.
   \label{abb:Hillas}
 \end{figure}
 Ein weiterer wichtiger Parameter bildet die totale Intensität des Bildes und da das CTA aus mehreren unterschiedlichen Teleskopen besteht, bekommt die Anzahl
-der Teleskope, die das gleiche Schauer gesehen haben, und welche Art von Teleskope dieses Schauer gesehen hat, eine großer Bedeutung für die Anschließende
+der Teleskope, die das gleiche Schauer gesehen haben, und welche Art von Teleskope dieses Schauer gesehen hat, eine große Bedeutung für die Anschließende
 Signal Seperation und Energie Schätzung.
 
 Diese Parameter werden genutzt um die Untergrundschauer von den Photon induzierten Schauern zu trennen.
-Diese Aufgabe wird mit einer klassifizierungs Methode des maschinellen Lernens gelöst und der
+Diese Aufgabe wird mit einer Klassifizierungs Methode des maschinellen Lernens gelöst und der
 Random Forest Klassifier stellt den qualifiziertesten Algorithmus dar.
 Durch das Verhältnis von Signal zu Untergrund von $\frac{1}{1000}$\cite{Cherenkov_Licht} wird eine große Menge Trainingsdaten
 benötigt, um eine gute Trennung zu ermöglichen.
 
 Nach einer erfolgreichen Seperation können diese Parameter genutzt werden, um die Energie des Photons zu schätzen.
-Dies kann durch Regressionsmethoden gelöst werde, wobei der Random Forest wieder den stablisten Algorithmus darstellt\cite{Cherenkov_Licht}.
+Dies kann durch Regressionsmethoden gelöst werde, wobei der Random Forest sich als stablisten Algorithmus erweist\cite{Cherenkov_Licht}.
 
 Die in \autoref{sec:ML} aufgeführten Annahmen für eine erfolgreiche Regressionsanalyse, sind bei diesem Problem bestmöglich erfüllt. Die Trainingsdaten
 werden durch Monte Carlo Simulationen erstellt, die die Wechselwirkung der primär und sekundär Teilchen mit der Atmosphäre und die Reaktion des Teleskopes
@@ -245,9 +255,17 @@ Auch die Varianz des Fehlers geht aufgrund der unterschiedlichen Sensitivitäten
 über den ganzen Energiebereich, was jedoch durch eine Gewichtung ausgeglichen werden könnte.
 
 \section{Performance}
+\label{sec:Per}
 
 Um zu erkennen, ob das weiterentwickelte Modell eine genauere Vorhersage liefert als das Bisherige, muss die
 Performance des Random Forests beurteilt werden können.
+
+Um einen ersten Überblick über die Genauigkeit des Algorithmus zu erhalten, wird die Wahrheit gegen die Vorhersage in einem
+zwei dimensionalen Histogramm aufgetragen.
+Dabei hat die Diagonale die Bedeutung der genauen Vorhersage und eine geringe Streuung der gefüllten Container
+um diese deutet auf einen guten Schätzer hin.
+Die Aussagekraft dieser Abbildung hängt von der Anzahl der Behälter ab und daher wird ein Raster von $300 \times 300$ verwendet.
+
 Ein mögliches Maß, um die Anpassungsgüte von Regressionsmodellen beurteilen zu können, stellt der Determinationskoeffizient dar, welcher
 durch
 \begin{equation}
@@ -265,19 +283,24 @@ nicht gut beschreibt.
 Desweiteren muss die gleiche Anzahl an Datenpunkten vorliegen, um Modelle
 miteinander zu vergleichen.
 
-Um einen ersten Überblick über die Genauigkeit des Algorithmus zu erhalten, wird die Wahrheit gegen die Vorhersage in einem
-zwei dimensionalen Histogramm aufgetragen.
-Dabei hat die Diagonale die Bedeutung der genauen Vorhersage und umso näher die gefüllten Container an dieser Geraden sind, umso besser
-ist der Algorithmus.
-Die Aussagekraft dieser Abbildung hängt von der Anzahl der Behälter ab und daher wird ein Raster von $300 \times 300$ verwendet.
-
 Eine Aussage über die Genauigkeit des Algortihmus kann auch über den relativen Fehler getroffen werden. Dabei spielen der Mittelwert und der
 Interquartile Abstand(IQA) von $\SI{68.26}{\percent}$, der durch
 \begin{equation}
-  IQA68 = Q84-Q16
+  IQA_{68} = Q_{84}-Q_{16}
 \end{equation}
 definiert wird, eine wichtige Rolle.
-Dabei stellt $Q84$ das $\SI{84.13}{\percent}$ Quantil und $Q15$ das $\SI{15.87}{\percent}$ Quantil dar, welche durch die \textsc{numpy}-Bibliotheke
+Dabei stellt $Q_{84}$ das $\SI{84.13}{\percent}$ Quantil und $Q_{15}$ das $\SI{15.87}{\percent}$ Quantil dar, welche durch die \textsc{numpy}-Bibliotheke\cite{scipy}
 bestimmt werden, die das $q$-te Quartil als den $q \cdot N$-ten Wert eines geordneten Datensatzes der Größe $N$ definiert.
 Der Mittelwert ist ein Maß für die Verzerrung und der IQA ist ein Maß für die Auflösung des Schätzers, wobei dies für unterschiedliche
 Energie-Container untersucht wird, da aufgrund der energieabhängigen Statistik auch diese Werte über das Energiespektrum hinweg variieren.
+
+Um die Frage des Informationsgehalts der Attribute zu beantworten, kann zum Beispiel die Wichtigkeit mithilfe von Selektionshäufigkeit, Gini Wichtigkeit oder
+die permutations Richtigkeit bestimmt werden.
+Die in \textsc{scikit-learn} implementierte Methode nutzt die Rangordnung der Attribute in den einzelnen Entscheidungsbäumen, indem die früh und häufig genutzten Attribute
+als wichtiger klassifiziert werden.
+Diese Wichtigkeit kann für jeden Baum ausgelesen werden und als Kastengrafik dargestellt werden.
+Dabei stellt die durchgezogene Linie den Median dar, die Enden des Kastens das $\num{0.25}$- und das $\num{0.75}$-Quartil, die Antennen das $\num{0.125}$- und das
+$\num{0.875}$-Quantil und die Punkte stellen Ausreißer, die außerhalb des $\num{0.75}$-IQA liegen, dar.
+Wenn eine unterschiedliche Zahl an Kategorien oder ein unterschiedlich großer Wertebereich der Attribute vorliegt, besitzt Bootstrapping mit Ersetzen der Datenpunkte
+und die Attribut Selektion bei CART Algorithmen eine Verzerrung, welche sich auf die Bestimmungsmethoden der Wichtigkeit überträgt und somit das Ergebnis verfälschen
+kann\cite{feature_importance}.

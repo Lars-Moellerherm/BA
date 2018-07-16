@@ -1,33 +1,30 @@
 \chapter{Einleitung}
 
-Auf die Erdatmosphäre trifft eine große Menge von hochenergetischer kosmischer Strahlung.
-Im Gegensatz zu der geladenen Teilchenstrahlung erreicht die Gammastrahlung auf direktem Weg die Erden.
-Außerdem ist der Wirkungsquerschnitt im Gegensatz zu der Neutrinostrahlung groß genug, um eine ausreichende Statistik zu erlangen.
-Daher wird versucht mithilfe der Gammastrahlung etwas über die unverstandenen Prozesse im Universum zu erfahren.
-Die Energie der Strahlung liegt deutlich über der bisher erreichten Schwerpunktsenergie des LHC von $\approx\SI{13}{\tera\eV}$\cite{LHC} und weckt
-besonders Interesse für die Entdeckung neuer Physik, die über das Standardmodell hinaus geht.
-Als Beispiel dient die Suche nach Axionen, die in Blazaren und Gamma Ray Bursts enstehen oder die Suche nach Zerfällen der Dunklen Materie.
+Auf die Erdatmosphäre trifft eine große Menge von hochenergetischer kosmischer Strahlung, welche uns viel über unverstandene
+Prozesse im Universum verrät.
+Die Gammastrahlung gelangt auf direktem Weg zur Erde, wodurch ihr Entstehungsort erfasst werden kann.
+Die Energie der Strahlung liegt weit über der bisher erreichten Schwerpunktsenergie des LHC von $\approx\SI{13}{\tera\eV}$\cite{LHC} und weckt
+besonders Interesse für die Entdeckung neuer Physik.
+Als Beispiel dient die Suche Zerfällen der Dunklen Materie oder die Untersuchung der physikalischen Gesetze in extremer Umgebung.
+Auch ein Großteil der Beschleunigungsprozesse von Teilchen im Universum ist noch nicht erklärt.
+Um diese Fragen zu beantworten, muss das Energiespektrum extragalaktischer Quellen genau untersucht werden.
 
-Da CTA jährlich $\SI{3.7}{\peta\byte}$\cite{Rohdaten} an Rohdaten verarbeiten muss, wird eine Computergesteuerte Datenanalyse
-entwickelt und das Feld des maschniellen Lernens liefert die richtigen Werkzeuge für diese Art der Datenanalyse.
-Aufgrund der Monte-Carlo Simulation, die das Luftschauer und die Reaktion des Teleskopes simuliert, kann ein Trainingsdatensatz erzeugt werden, auf dem
-Methoden des überwachten Lernens trainiert werden können.
-Mit diese trainierten Algorithmen der Untergrund vom Signal getrennt werden oder die Energie und Richtung rekonstruiert werden.
+Da das CTA jährlich $\SI{3.7}{\peta\byte}$\cite{Rohdaten} an Rohdaten verarbeiten muss, wird eine computergesteuerte Datenanalyse
+genutzt und das Feld des maschinellen Lernens liefert die richtigen Werkzeuge.
+Aufgrund der Erdgebundenheit des CTA kann die Energie der Gammastrahlung nur indirekt über das atmosphärische Schauer gemessen
+werden.
+Um nun die Ursprungsenergie des Photons zu erfahren, muss die Energie rekonstruiert werden, was mithilfe von Randomforest
+Regressoren durchgeführt wird.
 
-Das Interesse der CTA Organisation liegt bei extreme Objekte im Universum und deren Teilchenbeschleunigungsprozessen.
-Dazu muss das Energiespektrum der Quelle gemessen werden und aufgrund der Erdgebundenheit kann das CTA die Energie der Gammastrahlung nur indirekt über
-das atmosphärische Schauer messen.
-Um nun die Ursprungsenergie des Photons zu erfahren muss die Energie rekonstruiert werden, dies wird mithilfe von Randomforest Regressoren durchgeführt.
-
-Trotz der Tatsache, dass CTA das erste Cherenkov Teleskop Experiment, welches eine größere Anzahl an Teleskopen beinhaltet, wodurch bei einer Vielzahl von Events mehrere
-Teleskope das gleiche Schauer sehen, wird noch für jedes Teleskop eine eigenständige Energie Rekonstruktion durchgeführt. Die einzelnen Ergebnisse variieren gleichverteilt
-um den wahren Wert, daher sollte der Mittelwert deutlich näher an dem wahren Ergebnis liegen.
+Trotz der Tatsache, dass das CTA das erste Cherenkov Teleskop Experiment ist, welches eine größere Anzahl an Teleskopen beinhaltet,
+wodurch bei einer Vielzahl von Events mehrere Teleskope das gleiche Schauer sehen, wird noch für jedes Teleskop eine eigenständige
+Energie Rekonstruktion durchgeführt.
+Wenn angenommen wird, dass die einzelnen Ergebnisse gleichverteilt um den wahren Wert varrieren, sollte ein Mittelwert näher an dem wahren
+Ergebnis liegen.
 Da alle Teleskope einen unterschiedlichen Blickwinkel und Abstand zum Schauer besitzen, hat jedes Teleskop unterschiedlich viel Information und liegt somit
 unterschiedlich nah am wahren Wert.
-
-Eine Gewichtung der einzelnen Ergebnisse, würde diesen Informationsunterschied berücksichtigen.
+Eine Gewichtung der einzelnen Ergebnisse könnte diesen Informationsunterschied berücksichtigen.
 Wenn nun eine erste Schätzung vorgenommen wurde, könnte ein zweiter Regressor eine feinere Vorhersage treffen, indem er sich auf Attribute konzentriert, die
-für eine solche Unterscheidung wichtiger sind.
-
-Wenn der Random Forest auf eine transformierte Energie trainiert wird, die über einen kleineren Energiebereich geht, könnte es dem
-Algorithmus leichter Fallen den richtigen Wert zu schätzen, da eine geringere Streuung existiert.
+dafür wichtig sind.
+Wenn der Random Forest auf eine transformierte Energie trainiert wird, wodurch das Bild des Schätzers kleiner wird, könnte es dem
+Algorithmus leichter Fallen den richtigen Wert zu schätzen.
