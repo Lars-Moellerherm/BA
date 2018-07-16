@@ -10,4 +10,7 @@ from sklearn.utils import shuffle
 import timeit
 
 
-def one_RF():
+data = func.reading_data(True,-1)
+
+number_tel = data[['array_event_id','run_id','num_triggered_telescopes']].drop_duplicates()
+print("Teleskop anzahl im mittel : ",number_tel['num_triggered_telescopes'].mean())
