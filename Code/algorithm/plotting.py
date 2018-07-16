@@ -22,7 +22,7 @@ def plot():
     prediction_wS, truth_wS = np.genfromtxt("good_data/encaps_pred_wS_data.txt",unpack=True)
     prediction_wSi, truth_wSi = np.genfromtxt("good_data/encaps_pred_wSi_data.txt",unpack=True)
     prediction_encaps, truth_encaps = np.genfromtxt("good_data/encaps_encaps_pred_data.txt", unpack=True)
-    """
+
     print('finished with reading data of encapsulated_RF.py ... \n')
     ######Energy PLOTS######
         # first prediction
@@ -60,7 +60,7 @@ def plot():
     plt.savefig("plots/RF/final/RF_encaps.pdf")
     plt.close()
     print("energy plots finished ... \n")
-    """
+
 
     ############### bias and std plot ################
         #Vergleich mean und median
@@ -75,13 +75,13 @@ def plot():
     ax_bias.set_xscale('log')
     ax_bias.set_ylabel("Verzerrung")
     ax_bias.set_xlabel(r'$E_{true}\, / \, TeV$')
-    ax_bias.axhline(y=0,xmin=0,ymin=1,ls='-',c='grey')
+    ax_bias.axhline(y=0,xmin=0,xmax=1,ls='--',c='grey')
     plt.legend()
     plt.tight_layout()
     plt.savefig("plots/RF/final/RF_mean_bias.pdf")
     plt.close()
 
-    """
+
     ax_resolution = plt.gca()
     func.resolution(df=df,bins=bin_edge,prediction_key='prediction',true_energy_key='truth',ax_res=ax_resolution,label='Schätzung',color="r")
     func.resolution(df=df_mean,bins=bin_edge,prediction_key='prediction',true_energy_key='truth',ax_res=ax_resolution,label='Mittelwert',color="b")
@@ -110,6 +110,7 @@ def plot():
     ax_bias.set_xscale('log')
     ax_bias.set_ylabel("Verzerrung")
     ax_bias.set_xlabel(r'$E_{true}\, / \, TeV$')
+    ax_bias.axhline(y=0,xmin=0,xmax=1,ls='--',c='grey')
     plt.legend()
     plt.tight_layout()
     plt.savefig("plots/RF/final/RF_weights_bias.pdf")
@@ -139,6 +140,7 @@ def plot():
     ax_bias.set_xscale('log')
     ax_bias.set_ylabel("Verzerrung")
     ax_bias.set_xlabel(r'$E_{true}\, / \, TeV$')
+    ax_bias.axhline(y=0,xmin=0,xmax=1,ls='--',c='grey')
     plt.legend()
     plt.tight_layout()
     plt.savefig("plots/RF/final/RF_nested_bias.pdf")
@@ -189,11 +191,13 @@ def plot():
     bin_edge = np.logspace(np.log10(0.01),np.log10(max_energy),20)
     ax_bias = plt.gca()
 
+    func.bias(df=df,bins=bin_edge,prediction_key='prediction',true_energy_key='truth',ax_bias=ax_bias,label='Schätzung',color="r")
     func.bias(df=df_nested_trafo,bins=bin_edge,prediction_key='prediction',true_energy_key='truth',ax_bias=ax_bias,label='mit Transformation',color="b")
     func.bias(df=df_nested,bins=bin_edge,prediction_key='prediction',true_energy_key='truth',ax_bias=ax_bias,label='ohne Transformation',color="g")
     ax_bias.set_xscale('log')
     ax_bias.set_ylabel("Verzerrung")
     ax_bias.set_xlabel(r'$E_{true}\, / \, TeV$')
+    ax_bias.axhline(y=0,xmin=0,xmax=1,ls='--',c='grey')
     plt.legend()
     plt.tight_layout()
     plt.savefig("plots/RF/final/trafo_nested_bias.pdf")
@@ -201,6 +205,7 @@ def plot():
 
 
     ax_resolution = plt.gca()
+    func.resolution(df=df,bins=bin_edge,prediction_key='prediction',true_energy_key='truth',ax_res=ax_resolution,label='Schätzung',color="r")
     func.resolution(df=df_nested_trafo,bins=bin_edge,prediction_key='prediction',true_energy_key='truth',ax_res=ax_resolution,label='mit Transformation',color="b")
     func.resolution(df=df_nested,bins=bin_edge,prediction_key='prediction',true_energy_key='truth',ax_res=ax_resolution,label='ohne Transformation',color="g")
     ax_resolution.set_xscale('log')
@@ -212,7 +217,7 @@ def plot():
     plt.close()
 
     print("all plots of encapsulated_RF.py finished \n")
-    """
+
 
 if __name__ == '__main__' :
     plot()

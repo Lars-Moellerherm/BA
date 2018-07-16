@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 from sklearn.metrics import r2_score
 import dask.dataframe as dd
-#from tqdm import tqdm
+from tqdm import tqdm
 
 
 def weighted_mean_over_ID(weight, prediction):

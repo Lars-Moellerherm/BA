@@ -266,18 +266,17 @@ zum Algorithmus aus \ref{sec:nest} verbessert.
 \begin{figure}
   \includegraphics[width=0.7\textwidth]{Plots/trafo_nested_bias.pdf}
   \centering
-  \caption{Darstellung der Verzerrung bei einer Schätzung mit und ohne Transformation der Art \eqref{eqn:trafo}. Die Transformation führt zu einer Verringerung
+  \caption{Darstellung der Verzerrung bei einer verschachtelten Schätzung mit und ohne Transformation der Art \eqref{eqn:trafo}, sowie eine einfache Schätzung. Die Transformation führt zu einer Verringerung
           des relativen Fehlers in geringen Energiebereichen.}
   \label{abb:trafo_bias}
 \end{figure}
 \begin{figure}
   \includegraphics[width=0.7\textwidth]{Plots/trafo_nested_resolution.pdf}
   \centering
-  \caption{Abbildung der Energieauflösung nach einer Transformation des Zielbereichs, welche auf eine Verbesserung in niedrigen Energiebereichen führt.}
+  \caption{Abbildung der Energieauflösung nach einer Transformation des Zielbereichs im Vergleich zu der untransformierten normalen Schätzung und der verschachteleten Schätzung. Die Transformation führt auf eine
+          Verbesserung in niedrigen Energiebereichen.}
   \label{abb:trafo_IQA}
 \end{figure}
 Sowohl der IQA als auch die Verzerrung des relativen Fehlers werden mithilfe der Transformation bei niedrigen Energien geringer.
 Bei $E_\gamma > \SI{30}{\tera\eV}$ muss jedoch eine Verschlechterung der Verzerrung und Auflösung in Kauf genommen werden, welche jedoch eine große Verschlechterung
-bezogen auf den absoluten Fehler bedeutet.
-
-%mean squared error?
+bezogen auf den absoluten Fehler bedeutet, der von $\SI{37.74}{\tera\eV\squared}$ auf $\SI{53.29}{\tera\eV\squared}$ steigt.
