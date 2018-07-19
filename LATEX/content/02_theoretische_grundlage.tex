@@ -179,7 +179,7 @@ Da der Entscheidungsbaum zu den gierigen Algorithmen gehört, welche die Entsche
 Optimum, jedoch nicht immer das globale Extremum und somit nicht die optimalste Lösung.
 Die letzten beiden Nachteile können durch die Erweiterung des Entscheidungsbaum zu einem Entscheidungswald behoben werden.
 
-Dieses Verfahren wird Random Forest(RF) genannt. Beim Random Forest werden eine Vielzahl von Entscheidungsbäume, um Unkorreliertheit der Ergebnisse zu erreichen, mit
+Dieses Verfahren wird Random Forest(RF) genannt. Beim RF werden eine Vielzahl von Entscheidungsbäume, um Unkorreliertheit der Ergebnisse zu erreichen, mit
 zufällig ausgewählten Teildatensätzen und Attribute trainiert. Das Ergebnis des RF ergibt sich durch eine Mittelung über alle Entscheidungsbäume.
 Wenn die Anzahl der Entscheidungsbäume erhöht wird, konvergiert der generalisierte Fehler
 \begin{equation}
@@ -203,7 +203,7 @@ Das in \textsc{scikit-learn} verwendete Bagging funktioniert, indem aus dem Date
 Die $N$ Ergebnisse werden am Ende gemittelt oder zusätzlich mit der Genauigkeit des jeweiligen Ergebnisses gewichtet.
 Um die Größe der Datensätze nicht zu verkleinern, ist es möglich die Datensätze mit bootstrapping künstlich zu vergrößern, wobei Datenpunkte durch andere Datenpunkte
 des Datensatzes zufällig ersätzt werden, anstatt sie zufällig auszusortieren.
-Zusätzlich zum Bagging werden bei einem Random Forest die Attribute in einem Umfang, der festgelegt werden kann, zufällig gezogen.
+Zusätzlich zum Bagging werden bei einem RF die Attribute in einem Umfang, der festgelegt werden kann, zufällig gezogen.
 Hierdurch wird der Trend der einzelnen Ergebnisse größer, die Standardabweichung der Ergebnisses jedoch ungleich geringer,
 was Verzerrung-Varainz-Dilemma genannt wird. Die Standardabweichung wird soweit minimiert, dass es zu keiner Überanpassung kommt
 und die Verzerrung möglichst klein bleibt.
@@ -236,12 +236,12 @@ Signal Seperation und Energie Schätzung.
 
 Diese Parameter werden genutzt um die Untergrundschauer von den Photon induzierten Schauern zu trennen.
 Diese Aufgabe wird mit einer Klassifizierungs Methode des maschinellen Lernens gelöst und der
-Random Forest Klassifier stellt den qualifiziertesten Algorithmus dar.
+RF Klassifier stellt den qualifiziertesten Algorithmus dar.
 Durch das Verhältnis von Signal zu Untergrund von $\frac{1}{1000}$\cite{Cherenkov_Licht} wird eine große Menge Trainingsdaten
 benötigt, um eine gute Trennung zu ermöglichen.
 
 Nach einer erfolgreichen Seperation können diese Parameter genutzt werden, um die Energie des Photons zu schätzen.
-Dies kann durch Regressionsmethoden gelöst werde, wobei der Random Forest sich als stablisten Algorithmus erweist\cite{Cherenkov_Licht}.
+Dies kann durch Regressionsmethoden gelöst werde, wobei der RF sich als stablisten Algorithmus erweist\cite{Cherenkov_Licht}.
 
 Die in \autoref{sec:ML} aufgeführten Annahmen für eine erfolgreiche Regressionsanalyse, sind bei diesem Problem bestmöglich erfüllt. Die Trainingsdaten
 werden durch Monte Carlo Simulationen erstellt, die die Wechselwirkung der primär und sekundär Teilchen mit der Atmosphäre und die Reaktion des Teleskopes
@@ -258,7 +258,7 @@ Auch die Varianz des Fehlers geht aufgrund der unterschiedlichen Sensitivitäten
 \label{sec:Per}
 
 Um zu erkennen, ob das weiterentwickelte Modell eine genauere Vorhersage liefert als das Bisherige, muss die
-Performance des Random Forests beurteilt werden können.
+Performance des RFs beurteilt werden können.
 
 Um einen ersten Überblick über die Genauigkeit des Algorithmus zu erhalten, wird die Wahrheit gegen die Vorhersage in einem
 zwei dimensionalen Histogramm aufgetragen.
@@ -300,13 +300,13 @@ Ein weiteres Maß stellt der gemittelte quadrierte Fehler
 \end{equation}
 dar.
 Wenn dieser Fehler kleiner wird, verringert sich auch der relative Fehler, jedoch ist die Größe der Verringerung abhängig vom Energiebereich.
-Wie in \autoref{sec:RF} beschrieben, wird der Random Forest anhand dieses Kriteriums minimiert.
+Wie in \autoref{sec:RF} beschrieben, wird der RF anhand dieses Kriteriums minimiert.
 
 Die Frage ob der relative Fehler oder der $mse$ minimiert werden soll, hängt von der angestrebten Analyse ab.
 Soll ein Energiespektrum erstellt werden, um ein Potenzgesetz zu analysieren bietet sich die Minimierung des relativen Fehlers an, da die
 Energien logarithmisch histogrammiert werden.
 Ist jedoch die Untersuchung eines Linienspektrums, wie bei der Suche nach Zerfällen der Dunklen Materie, die Absicht der Analyse, dann sollte
-der absolute Fehler in dem zu analysierenden Energiebereich minimiert werden. 
+der absolute Fehler in dem zu analysierenden Energiebereich minimiert werden.
 
 
 Um die Frage des Informationsgehalts der Attribute zu beantworten, kann zum Beispiel die Wichtigkeit mithilfe von Selektionshäufigkeit, Gini Wichtigkeit oder
