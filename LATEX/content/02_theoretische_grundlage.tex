@@ -153,9 +153,9 @@ Bei dieser Optimierung wird in jedem Schritt der mittlere quadratische Fehler
 \end{equation}
 jedes Teildatensatzes $m$ minimiert, mit
 \begin{equation}
-  c_m = \frac{1}{N_m}\sum_{i\in N_m}y_i
+  c_m = \frac{1}{N_m}\sum_{i\in N_m}\hat{y}_i
 \end{equation}
-als Mittelwert der Vorhersage $y_i$ für jeden Datenpunkt $i$.
+als Mittelwert der Vorhersage $\hat{y}_i$ für jeden Datenpunkt $i$ und $y_i$ als wahren Wert.
 Dies wird rekursiv wiederholt und somit der Baum ausgebaut, bis der Algorithmus ein Abbruchkriterium erfüllt.
 Dieses Abbruchkriterium kann eine vorher festgelegte maximale Tiefe
 des Baumes sein, eine minimale Größe des Datensatzes, der getrennt werden soll, oder eine minimale Größe des getrennten Datensatzes. Nach Erreichen der Abbruchbedigung bildet
@@ -293,6 +293,21 @@ Dabei stellt $Q_{84}$ das $\SI{84.13}{\percent}$ Quantil und $Q_{15}$ das $\SI{1
 bestimmt werden, die das $q$-te Quartil als den $q \cdot N$-ten Wert eines geordneten Datensatzes der Größe $N$ definiert.
 Der Mittelwert ist ein Maß für die Verzerrung und der IQA ist ein Maß für die Auflösung des Schätzers, wobei dies für unterschiedliche
 Energie-Container untersucht wird, da aufgrund der energieabhängigen Statistik auch diese Werte über das Energiespektrum hinweg variieren.
+
+Ein weiteres Maß stellt der gemittelte quadrierte Fehler
+\begin{equation}
+  mse = \frac{1}{N} \sum_i (y_i-\hat{y}_i)^2
+\end{equation}
+dar.
+Wenn dieser Fehler kleiner wird, verringert sich auch der relative Fehler, jedoch ist die Größe der Verringerung abhängig vom Energiebereich.
+Wie in \autoref{sec:RF} beschrieben, wird der Random Forest anhand dieses Kriteriums minimiert.
+
+Die Frage ob der relative Fehler oder der $mse$ minimiert werden soll, hängt von der angestrebten Analyse ab.
+Soll ein Energiespektrum erstellt werden, um ein Potenzgesetz zu analysieren bietet sich die Minimierung des relativen Fehlers an, da die
+Energien logarithmisch histogrammiert werden.
+Ist jedoch die Untersuchung eines Linienspektrums, wie bei der Suche nach Zerfällen der Dunklen Materie, die Absicht der Analyse, dann sollte
+der absolute Fehler in dem zu analysierenden Energiebereich minimiert werden. 
+
 
 Um die Frage des Informationsgehalts der Attribute zu beantworten, kann zum Beispiel die Wichtigkeit mithilfe von Selektionshäufigkeit, Gini Wichtigkeit oder
 die permutations Richtigkeit bestimmt werden.
