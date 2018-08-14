@@ -1,40 +1,39 @@
 \chapter{Zusammenfassung und Ausblick}
-Die Energieauflösung des CTA Experiments ist noch nicht bei der Auflösung des MAGIC Experiments von $\num{0.2}$ für
-$\SI{5000}{\giga\eV}$\cite{MAGIC_performance} in allen Energiebereichen angelangt, jedoch erzielen die Methoden dieser
-Arbeit eine deutliche Verbesserung, obwohl keine Schnitte in den Daten vorgenommen wurden.
-
-% Max Paper vorzitieren, um einen aktuellen Auflösungswert von MAGIC zu bekommen
+Durch die in dieser Arbeit genutzten Methoden kann die Performance der Energierekonstruktion deutlich verbessert werden.
+Sowohl die Verzerrung als auch die Auflösung des relativen Fehlers können auf $\SI{25}{\percent}$ gesenkt werden.
 
 \section{Fazit der Arbeit}
 
 Durch das Bilden des arithmetischen Mittels über aller Teleskope ergibt sich kein Performancegewinn, da die Schätzungen
 eine Verzerrung besitzen, die durch eine Mittelwertbildung nicht verbessert werden kann.
-Die Bildung des Median hingegen ermöglicht eine kleine Verbesserung, da einzelne Schätzungen, die möglicherweise
-eine falsche Schätzung aufgrund der geringen Sicht des Teleskopes auf das Schauer abgeben, herausgefiltert werden.
+Die Bildung des Median hingegen ermöglicht eine Verbesserung, da einzelne Schätzungen, die möglicherweise
+eine falsche Schätzung aufgrund der geringen Sicht des Teleskops auf den Schauer abgeben, herausgefiltert werden.
 Eine geeignete Gewichtung bei der Mittelwertbildung, die diesen Effekt beim arithmetischen Mittel erreichen könnte, wurde
 nicht gefunden, da die Fehlschätzungen über einen Bereich von fünf Größenordnungen gehen können.
 Eine Schätzung mithilfe eines zweiten Random Forests, der eventspezifische Informationen und eine
 Schätzung des ersten Algorithmus bekommt, liefert einen enormen Performancegewinn, da durch die erste Schätzung eine
 Trennung vorgenommen werden kann, die eine anschließende energiespezifischere Analyse ermöglicht.
-Das Problem des großen Zielbereichs wird mithilfe einer logarithmischen Transformation gelöst, wodurch ein weitere
+Das Problem des großen Zielbereichs wird mithilfe einer logarithmischen Transformation gelöst, wodurch eine weitere
 Verbesserung der Auflösung und der Verzerrung verzeichnet wird.
 Eine verschachtelte Analyse mit einem transformierten Zielbereich, die jedoch einen nicht parallelisierbaren Zeitaufwand bedeutet,
-führt die Energieschätzung des CTA-Experiments mit einer ungefähren Auflösung von $0.4$ in weiten Teilen des
-Energiebereichs nahe an die Performance des MAGIC Projekts heran.
+führt auf eine Energieschätzung mit einer ungefähren Auflösung von $0.4$ in weiten Teilen des
+Energiebereichs. Die Ergebnisse dieser Arbeit wurden mit Daten erzeugt, auf die noch keine Schnitte gesetzt sind. Solche
+Schnitte führen dazu, dass Ereignisse, die schwer zu schätzen sind, aus der Analyse genommen werden, wodurch die Performance
+weiter verbessert werden kann.
 
-Das abschließende Frage, welche Methode den größten Gewinn bedeutet, kann nicht beantwortet werden.
+Die abschließende Frage, welche Methode den größten Gewinn bedeutet, kann nicht beantwortet werden.
 Die Methode sollte auf das Ziel der Analyse angepasst werden.
-Soll ein gesamtes Energiespektrum untersucht werden, so liefert die verschachtelte, mit \eqref{eqn:trafo} transformierte Methode
+Soll ein gesamtes Energiespektrum untersucht werden, so liefert die verschachtelte und mit \eqref{eqn:trafo} transformierte Methode
 den besten Performancegewinn.
 Strebt die Analyse jedoch eine Untersuchung eines Linienspektrums an, so sollte der quadrierte Fehler minimiert werden, was mithilfe
 der verschachtelten Methode gelingt, jedoch die untersuchte Transformation eine Verschlechterung für große Energien bedeutet.
 
 \section{Perspektiven}
 
-Eine deutliche Verbesserung wird die Hinzunahme des Abstandes von Teleskope und Schauer und die Schätzung des ersten
-Wecheselwirkungspunktes des primär Teilchens mit der Atmosphäre als zusätzliche Attribute bewirken, da diese wichtige
-charakteristische Merkmale für die Energieschätzung sind. Außerdem dürften die Hillas Parameter wichtiger werden, da durch
-die Distanz zum Schauer die Hillasparameter ein Indiz auf die größe des Schauers geben können.
+Eine deutliche Verbesserung wird die Hinzunahme des Abstandes von Teleskop und Schauer und die Schätzung des ersten
+Wechselwirkungspunktes des primären Teilchens mit der Atmosphäre als zusätzliche Attribute bewirken, da dies wichtige
+charakteristische Merkmale für die Energieschätzung sind. Außerdem dürften die Hillasparameter wichtiger werden, da durch
+die Distanz zum Schauer die Hillasparameter ein Indiz auf die Größe des Schauers geben können.
 Dadurch wird die Performance der einfachen Schätzung näher an die des verschachtelten Waldes herankommen.
 Diese Attribute stehen zum Zeitpunkt der Arbeit jedoch nicht funktionsfähig zur Verfügung.
 
@@ -44,11 +43,11 @@ Vielleicht liefern andere Gewichte, Kombinationen von Gewichten oder skalierte G
 
 Von Interesse wäre es andere Transformationen zu testen, die den Zielbereich weiter verkleinern und für eine gleichverteilte
 Statistik in allen Energiebereichen sorgen.
-Vielleicht können auch unterschiedliche Transformationen angewendet werden, jenachdem welcher Energiebereich für die
+Vielleicht können auch unterschiedliche Transformationen angewendet werden, je nachdem welcher Energiebereich für die
 Beobachtung von Interesse ist und somit die beste Performance für jede Analyse individuell herausgeholt werden kann.
 
 Ein großer Grund für den Erfolg des verschachtelten Modells und der Transformationsmethode ist die Tatsache, dass für das
-Ausbauen der Entscheidungbäume ein Kriterium genutzt wir, welches den absoluten Fehler minimiert, wobei das Anforderungsprofil des
+Ausbauen der Entscheidungsbäume ein Kriterium genutzt wir, welches den absoluten Fehler minimiert, wobei das Anforderungsprofil von
 CTA eine Minimierung des relativen Fehlers verlangt.
 Das Entwickeln von anderen Kriterien oder das Nutzen von anderen Regressionsmethoden, die die Minimierung des relativen Fehlers
 anstreben, würden die Analyse anforderungsorientiert verbessern.

@@ -1,25 +1,25 @@
 \thispagestyle{plain}
 
 \section*{Kurzfassung}
-In dieser Arbeit wird die Energie Rekonstruktionsanalyse von hochenergetischen kosmischen Photonen, welche durch das Cherenkov Telescope Array beobachtet
+In dieser Arbeit wird die Energierekonstruktion von hochenergetischen kosmischen Photonen, welche durch das Cherenkov Telescope Array(CTA) beobachtet
 werden, optimiert.
-Bis zu diesem Zeitpunkt wird für jedes Teleskop eine eigenständige Energieschätzung durch Algorithmen des überwachten Maschinellen Lernens durchgeführt.
-Da beim CTA die Möglichkeit besteht, dass mehrere Teleskope ein Event sehen, wird durch Zusammenfassen der einzelnen Ergebnisse die
+Bisher wird für jedes Teleskop eine eigenständige Energieschätzung durch Algorithmen des überwachten maschinellen Lernens durchgeführt.
+Da bei CTA die Möglichkeit besteht, dass mehrere Teleskope den selben Schauer sehen, wird durch das Zusammenfassen der einzelnen Ergebnisse die
 Energieschätzung verbessert.
 Eine einfache oder gewichtete Mittelung über die Schätzungen liefert keinen Performancegewinn, eine verschachtelte und eventspezifische Regression jedoch
 führt auf eine Verringerung des relativen Fehlers und auf eine Verbesserung der Energieauflösung.
-Der große Zielbereich der Analyse führt auf einen starken Performanceverlust bei niedrigen Energien, was durch eine geeignete bijektive Transformation
+Der große Zielbereich der Analyse führt auf einen Performanceverlust bei niedrigen Energien, was durch eine geeignete bijektive Transformation
 geändert wird, wodurch die Schätzung in diesem Energiebereich verbessert werden kann.
-Die getesteten Methoden führen auf eine Viertelung des relativen Fehlers und der Energieauflösung in großen Teilen des Sensitivitätsspektrums des CTA.
+Die getesteten Methoden führen auf eine Verringerung des relativen Fehlers und der Energieauflösung um $\SI{25}{\percent}$ in weiten Teilen des Sensitivitätsspektrums von CTA.
 
 \section*{Abstract}
 \begin{english}
-This thesis is optimizing the energy reconstruction for heigh energy cosmic photons, which are detected by the Cherenkov Telescope Array.
-For now there is a prediction by supervised machine learning regressors for every single telescope.
-By the fact, that CTA is an array of telescopes, which can measure the same event, the analyse can be optimized by summarizing the results of these telescopes.
-The simple or the weighted average over each prediction does not bring Performancegain, but an nested model, which predicts for every event, causes an improvement
-for the relativ error and för the energyresolution of CTA.
-Because of the wide spread image of the estimator there is a big Performanceloss for low energies.
-This can be managed by an Transformation of the output, which ensures an improvment for the Performance.
-These methods are improving the bias of the realtiv error and the energy resolution by an factor of four in a big energy range of CTA.
+In this thesis, a method for the optimization of the energy reconstruction for high energy cosmic photons, which are detected by the Cherenkov Telescope Array will be tested.
+Currently there is a prediction by supervised machine learning regressors for every single telescope.
+Because of the array structure of CTA, the analysis can be optimized by summarizing the results of these telescopes.
+There is no performance gain in the simple or the weighted average over each prediction, but a nested model, which predicts every event, causes an improvement
+of the relative error and for the energy resolution of CTA.
+Because of the estimator´s wide number range, there is a large performance loss for low energies.
+This can be managed by a transformation of the output, which ensures a performance improvment.
+These methods improve the bias of the relative error and the energy resolution by $\SI{25}{\percent}$ in a large energy range of CTA.
 \end{english}

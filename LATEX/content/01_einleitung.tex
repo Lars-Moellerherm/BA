@@ -3,28 +3,28 @@
 Auf die Erdatmosphäre trifft eine große Menge von hochenergetischer kosmischer Strahlung, welche uns viel über unverstandene
 Prozesse im Universum verrät.
 Die Gammastrahlung gelangt auf direktem Weg zur Erde, wodurch ihr Entstehungsort erfasst werden kann.
-Die Energie der Strahlung liegt weit über der bisher erreichten Schwerpunktsenergie des LHC von $\approx\SI{13}{\tera\eV}$\cite{LHC} und weckt
-besonders Interesse für die Entdeckung neuer Physik.
-Als Beispiel dient die Suche Zerfällen der Dunklen Materie oder die Untersuchung der physikalischen Gesetze in extremer Umgebung.
+Die Energie der Strahlung liegt weit über der bisher erreichten Schwerpunktsenergie des LHC von ca. $\SI{13}{\tera\eV}$~\cite{LHC} und weckt
+ein besonderes Interesse an der Entdeckung neuer Physik.
+Beispielsweise dient die Suche nach Zerfällen der Dunklen Materie oder die Untersuchung der physikalischen Gesetze in extremer Umgebung.
 Auch ein Großteil der Beschleunigungsprozesse von Teilchen im Universum ist noch nicht erklärt.
 Um diese Fragen zu beantworten, muss das Energiespektrum extragalaktischer Quellen genau untersucht werden.
 
-Da das CTA jährlich $\SI{3.7}{\peta\byte}$\cite{Rohdaten} an Rohdaten verarbeiten muss, wird eine computergesteuerte Datenanalyse
+Da CTA jährlich $\SI{3.7}{\peta\byte}$~\cite{Rohdaten} an Rohdaten verarbeiten muss, wird eine computergesteuerte Datenanalyse
 genutzt und das Feld des maschinellen Lernens liefert die richtigen Werkzeuge.
-Aufgrund der Erdgebundenheit des CTA kann die Energie der Gammastrahlung nur indirekt über das atmosphärische Schauer gemessen
+Aufgrund der Erdgebundenheit CTA´s kann die Energie der Gammastrahlung nur indirekt über den atmosphärischen Schauer gemessen
 werden.
-Um nun die Ursprungsenergie des Photons zu erfahren, muss die Energie rekonstruiert werden, was mithilfe von Randomforest
+Um die Ursprungsenergie des Photons zu ermitteln, muss die Energie rekonstruiert werden, was mithilfe von Random Forest
 Regressoren durchgeführt wird.
 
-Trotz der Tatsache, dass das CTA das erste Cherenkov Teleskop Experiment ist, welches eine größere Anzahl an Teleskopen beinhaltet,
-wodurch bei einer Vielzahl von Events mehrere Teleskope das gleiche Schauer sehen, wird noch für jedes Teleskop eine eigenständige
+Trotz der Tatsache, dass CTA das erste Cherenkov Teleskop Experiment ist, welches eine größere Anzahl an Teleskopen beinhaltet,
+die das selbe Schauer sehen können, wird für jedes Teleskop eine eigenständige
 Energie Rekonstruktion durchgeführt.
-Wenn angenommen wird, dass die einzelnen Ergebnisse gleichverteilt um den wahren Wert varrieren, sollte ein Mittelwert näher an dem wahren
+Wenn angenommen wird, dass die einzelnen Ergebnisse normalverteilt um den wahren Wert variieren, sollte ein Mittelwert näher an dem wahren
 Ergebnis liegen.
 Da alle Teleskope einen unterschiedlichen Blickwinkel und Abstand zum Schauer besitzen, hat jedes Teleskop unterschiedlich viel Information und liegt somit
 unterschiedlich nah am wahren Wert.
 Eine Gewichtung der einzelnen Ergebnisse könnte diesen Informationsunterschied berücksichtigen.
-Wenn nun eine erste Schätzung vorgenommen wurde, könnte ein zweiter Regressor eine feinere Vorhersage treffen, indem er sich auf Attribute konzentriert, die
-dafür wichtig sind.
-Wenn der Random Forest auf eine transformierte Energie trainiert wird, wodurch das Bild des Schätzers kleiner wird, könnte es dem
+Wenn eine erste Schätzung vorgenommen wurde, könnte ein zweiter Regressor eine feinere Vorhersage treffen, indem er sich auf Attribute konzentriert, die
+für den jeweiligen Energiebereich wichtig sind.
+Wenn der Random Forest auf eine transformierte Energie trainiert wird, wodurch der Zielbereich des Schätzers kleiner wird, könnte es dem
 Algorithmus leichter Fallen den richtigen Wert zu schätzen.

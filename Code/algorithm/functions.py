@@ -170,7 +170,7 @@ def plot_R2_per_bin(prediction, truth, bins):
 
 def reading_data(diffuse,data_size1):
     # Import data in h5py
-    gammas = h5.File("../data/4_gen/gammas.hdf5","r")
+    gammas = h5.File("../data/3_gen/gammas.hdf5","r")
     # Converting to pandas
     gamma_array_df = pd.DataFrame(data=dict(gammas['array_events']))
     gamma_runs_df = pd.DataFrame(data=dict(gammas['runs']))
@@ -188,7 +188,7 @@ def reading_data(diffuse,data_size1):
     gamma_merge = gamma_merge.dropna(axis=1,how='all')
     gamma_merge = gamma_merge.dropna(axis=0)
     data = gamma_merge.iloc[:data_size]
-
+    print("Anzahl an pointlike: ",data.shape)
 
 
     if(diffuse):
@@ -210,6 +210,8 @@ def reading_data(diffuse,data_size1):
         gamma_diffuse_merge = gamma_diffuse_merge.iloc[:data_size]
         data = pd.concat([data,gamma_diffuse_merge])
         data = data.dropna(axis=1)
+        print("Data of diffuse: ",gamma_diffuse_merge.shape)
+        print("Data gesamt: ",data.shape)
 
         print("Using diffused data...")
 
