@@ -134,7 +134,7 @@ def plot():
     df_nested =  pd.DataFrame({'prediction':prediction_encaps,'truth':truth_encaps})
     bin_edge = np.logspace(np.log10(0.01),np.log10(max_energy),20)
     ax_bias = plt.gca()
-    func.bias(df=df,bins=bin_edge,prediction_key='prediction',true_energy_key='truth',ax_bias=ax_bias,label='Schätzung',color="r")
+    #func.bias(df=df,bins=bin_edge,prediction_key='prediction',true_energy_key='truth',ax_bias=ax_bias,label='Schätzung',color="r")
     func.bias(df=df_mean,bins=bin_edge,prediction_key='prediction',true_energy_key='truth',ax_bias=ax_bias,label='Mittelwert',color="b")
     func.bias(df=df_nested,bins=bin_edge,prediction_key='prediction',true_energy_key='truth',ax_bias=ax_bias,label='verschachtelt',color="g")
     ax_bias.set_xscale('log')
@@ -148,7 +148,7 @@ def plot():
 
 
     ax_resolution = plt.gca()
-    func.resolution(df=df,bins=bin_edge,prediction_key='prediction',true_energy_key='truth',ax_res=ax_resolution,label='Schätzung',color="r")
+    #func.resolution(df=df,bins=bin_edge,prediction_key='prediction',true_energy_key='truth',ax_res=ax_resolution,label='Schätzung',color="r")
     func.resolution(df=df_mean,bins=bin_edge,prediction_key='prediction',true_energy_key='truth',ax_res=ax_resolution,label='Mittelwert',color="b")
     func.resolution(df=df_nested,bins=bin_edge,prediction_key='prediction',true_energy_key='truth',ax_res=ax_resolution,label='verschachtelt',color="g")
     ax_resolution.set_xscale('log')
@@ -191,9 +191,9 @@ def plot():
     bin_edge = np.logspace(np.log10(0.01),np.log10(max_energy),20)
     ax_bias = plt.gca()
 
-    func.bias(df=df,bins=bin_edge,prediction_key='prediction',true_energy_key='truth',ax_bias=ax_bias,label='Schätzung',color="r")
-    func.bias(df=df_nested_trafo,bins=bin_edge,prediction_key='prediction',true_energy_key='truth',ax_bias=ax_bias,label='mit Transformation',color="b")
+    func.bias(df=df_mean,bins=bin_edge,prediction_key='prediction',true_energy_key='truth',ax_bias=ax_bias,label='Mittelwert',color="r")
     func.bias(df=df_nested,bins=bin_edge,prediction_key='prediction',true_energy_key='truth',ax_bias=ax_bias,label='ohne Transformation',color="g")
+    func.bias(df=df_nested_trafo,bins=bin_edge,prediction_key='prediction',true_energy_key='truth',ax_bias=ax_bias,label='mit Transformation',color="b")
     ax_bias.set_xscale('log')
     ax_bias.set_ylabel("Verzerrung")
     ax_bias.set_xlabel(r'$E_{true}\, / \, TeV$')
@@ -205,9 +205,9 @@ def plot():
 
 
     ax_resolution = plt.gca()
-    func.resolution(df=df,bins=bin_edge,prediction_key='prediction',true_energy_key='truth',ax_res=ax_resolution,label='Schätzung',color="r")
-    func.resolution(df=df_nested_trafo,bins=bin_edge,prediction_key='prediction',true_energy_key='truth',ax_res=ax_resolution,label='mit Transformation',color="b")
+    func.resolution(df=df_mean,bins=bin_edge,prediction_key='prediction',true_energy_key='truth',ax_res=ax_resolution,label='Mittelwert',color="r")
     func.resolution(df=df_nested,bins=bin_edge,prediction_key='prediction',true_energy_key='truth',ax_res=ax_resolution,label='ohne Transformation',color="g")
+    func.resolution(df=df_nested_trafo,bins=bin_edge,prediction_key='prediction',true_energy_key='truth',ax_res=ax_resolution,label='mit Transformation',color="b")
     ax_resolution.set_xscale('log')
     ax_resolution.set_ylabel("IQA")
     ax_resolution.set_xlabel(r'$E_{true}\, / \, TeV$')

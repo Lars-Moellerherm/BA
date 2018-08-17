@@ -1,5 +1,5 @@
 \chapter{Ergebnisse}
-Aufgrund der Architektur von CTA bietet sich eine Mittelwertbildung über das Array an, um die Performance des Schätzers zu verbessern.
+Aufgrund der Architektur von CTA bietet sich eine Mittelwertbildung über das Array an, um die Qualität des Schätzers zu verbessern.
 Zusätzlich scheint aufgrund der Tatsache, dass die Energie des primären Teilchens proportional zur Schauergröße ist und das
 ganze Array eine bessere Aussage über die Größe treffen kann als einzelne Teleskope, eine Zusammenfassung der
 Information aller Teleskope sinnvoll.
@@ -7,17 +7,17 @@ Da das in \autoref{sec:RF} beschriebene Kriterium sich auf den absoluten Fehler 
 bezieht, muss der Tatsache, dass die richtige Schätzung großer Energien für den Algorithmus einen größeren Gewinn bedeutet,
 durch Transformationen entgegengesteuert werden, um eine gute Energieauflösung in allen Energiebereichen zu erlangen.
 
-\section{Energie Rekonstruktion mit Hilfe eines Random Forest Regressors}
+\section{Energierekonstruktion mit Hilfe eines Random Forest Regressors}
 \label{sec:first}
 
 Um ein Vergleichsergebnis zu erhalten, wird zunächst ein Random Forest Regressor, wie er in \autoref{sec:RF} beschrieben wird, verwendet,
 der eine Energieschätzung für jedes Teleskop vornimmt.
 Für das Training werden nur Gamma Ereignisse verwendet und somit eine erfolgreiche Signal-Untergrund Trennung vorausgesetzt.
-Für ein realitätstreueres Testen werden zerstreute und punktgerichtete Gamma Simulationsdaten verwendet, da in der
-Realität die Signal Extraktion nicht zwischen punktgerichteten Photonen und Photonen, die in der Atmosphäre entstehen oder zu der
+Für ein realitätstreueres Testen werden diffuse und punktgerichtete Gamma-Simulationsdaten verwendet, da in der
+Realität die Signal-Extraktion nicht zwischen punktgerichteten Photonen und Photonen, die in der Atmosphäre entstehen oder zu der
 allgemeinen kosmischen Strahlung gehören, unterscheiden kann.
 
-Als Attribute werden die nicht richtungsabhängigen Hillasparameter verwendet, dazu gehören Intensität, Länge, Weite, Schiefe und Wölbung sowie
+Als Attribute werden die nicht richtungsabhängigen Hillasparameter verwendet, dazu gehören Intensität, Länge, Breite, Schiefe und Wölbung sowie
 die totale Intensität, die von allen Teleskopen aufgenommen wird.
 Zusätzlich werden die Anzahl der ausgelösten Teleskope, SST, MST und LST als Attribute genutzt, sowie die Identifikationsnummer des
 Teleskops, welche für das LST $1$, für das MST $2$ und für das SST $3$ ist.
@@ -26,23 +26,25 @@ Des Weiteren werden die skalierte Länge
 \begin{equation}
   SW = \frac{w- \langle w \rangle}{\sigma_w}
 \end{equation}
-und Weite
+und Breite
 \begin{equation}
   SL = \frac{l - \langle l \rangle}{\sigma_l}
 \end{equation}
 verwendet, wobei der Mittelwert über alle Trainingsdatenwerte genommen wird. Diese Methode nennt sich Scaled Cuts Technik.~\cite[104]{HESS}
 
-Der ganze Datensatz besteht aus $\num{3322938}$ Datenpunkten, wovon $\SI{78}{\percent}$ punktgerichtete Photonen und $\SI{22}{\percent}$ zerstreute Photonen sind,
+Der ganze Datensatz besteht aus $\num{3322938}$ Datenpunkten, wovon $\SI{78}{\percent}$ punktgerichtete Photonen und $\SI{22}{\percent}$ diffuse Photonen sind,
 die in $\SI{33}{\percent}$ Trainings- und $\SI{66}{\percent}$ Testdatensatz aufgeteilt werden.
 Die Aufteilung geschieht jedoch mithilfe der Ereignisnummer, damit bei der Trennung keine Ereignisse getrennt werden.
+Diese Datenpunkte stellen Teleskop-Ereignisse dar.
+Jedes Schauer stellt ein Array-Ereignis dar, was von mehreren Teleskopen gemessen werden kann und somit mehrere Teleskop-Ereignisse beinhalten kann.
 
 Bei dem Training wird ein Random Forest verwendet, der zur Verhinderung des Übertrainings eine maximale Tiefe von $10$ Ebenen besitzt.
 Jeder Baum trainiert mit $\sqrt{N}$ Attributen, wobei $N$ Attribute zur Verfügung stehen, um Korreliertheit der Bäume zu vermeiden,
 was zu gleichen Baumstrukturen führen würde und somit zu bevorzugten Ergebnissen.
 Außerdem besteht der Wald aus $100$ Bäumen, was mit einer größeren Rechenleistung vergrößert werden kann, ohne
 das es, wie in \autoref{sec:RF} erklärt, zum Übertraining kommt.
-Der Algorithmus nutzt das Kriterium der Varianz Reduktion, und da die gering gewählte Tiefe
-ein Übertraining bereits verhindert und das Problem viel Statistik besitzt, werden die Hyperparameter
+Der Algorithmus nutzt das Kriterium der Varianz-Reduktion. Da die gering gewählte Tiefe
+ein Übertraining bereits verhindert und die Ereigniszahl ausreichend groß ist , werden die Hyperparameter
 der minimalen Blatt- und Trenngröße auf ihrer Grundeinstellung von $1$ und $2$ gelassen.
 
 \begin{figure}
@@ -52,16 +54,17 @@ der minimalen Blatt- und Trenngröße auf ihrer Grundeinstellung von $1$ und $2$
           Diagonale zu erkennen sind.}
   \label{abb:Energie_RF}
 \end{figure}
-Dieser trainierte Entscheidungswald wird mit $\num{2193140}$ Datenpunkten getestet und liefert eine Performance, wie sie in \autoref{abb:Energie_RF} zu sehen ist.
+Dieser trainierte Entscheidungswald wird mit $\num{2193140}$ Teleskop-Ereignissen getestet und liefert eine Qualität, wie sie in \autoref{abb:Energie_RF} zu sehen ist.
 Dabei ist eine Überschätzung der Wahrheiten zu beobachten sowie feine horizontale Linien, die auf eine Korreliertheit der Entscheidungsbäume hindeuten.
-Der $R^2$-Wert von $\num{0.60}$ deutet auf eine bessere Beschreibung des Modells als der bloße Mittelwert hin.
-Die Korreliertheit und die Verzerrung kann durch eine geeignetere Wahl der Hyperparameter minimiert werden.
+Der $R^2$-Wert von $\num{0.50}$ deutet auf eine bessere Beschreibung des Modells als der bloße Mittelwert hin.
+Die Korreliertheit und die Verzerrung können durch eine geeignetere Wahl der Hyperparameter minimiert werden.
+Es ist zu betonen, dass durch die Schätzung auf Teleskop-Ereignissen dieser RF mehrere Vorhersagen für das selbe Schauer liefert.
 
 \begin{figure}
   \includegraphics[width=0.7\textwidth]{Plots/feautureimportance_boxplot_firstForest.pdf}
   \centering
   \caption{Darstellung der Wichtigkeit der genutzten Attribute bei der ersten Vorhersage als Kastengrafik. Die Anzahl der ausgelösten SST und die totale Intensität
-          stellen die wichtigsten Attribute dar und die Weite der Hillasellipse trägt kaum zur Schätzung bei.}
+          stellen die wichtigsten Attribute dar und die Breite der Hillasellipse trägt kaum zur Schätzung bei.}
   \label{abb:first_FI}
 \end{figure}
 Wie in \autoref{abb:first_FI} dargestellt, besitzen eventspezifische Attribute wie die Anzahl der ausgelösten Teleskope und die totale Intensität die größte Wichtigkeit und teleskopspezifische Attribute
@@ -73,6 +76,8 @@ wie die Intensität überschätzt, sowie Attribute wie die Teleskopart untersch�
 
 \section{Optimierung durch Mittelwerte und geeignete Gewichte}
 
+Um eine physikalisch sinnvolle Aussage über die Energie des Primärteilchens treffen zu können, müssen die Schätzungen der
+Teleskop-Ereignisse zusammengefasst werden und somit ein Ergebnis für jedes Array-Ereignis gefunden werden.
 Die Energieschätzung der einzelnen Teleskope bei einem Ereignis variiert, obwohl sie den gleichen Schauer beobachten.
 Dies liegt an den unterschiedlichen Arten, Blickwinkeln und Abständen der Teleskope, was dazu führt, dass jedes Teleskop unterschiedlich viel Information über den
 Schauer erfasst.
@@ -82,14 +87,14 @@ Daher wird als Schätzer das arithmetische Mittel und der Median untersucht.
 \begin{figure}
   \includegraphics[width=0.7\textwidth]{Plots/RF_mean_bias.pdf}
   \centering
-  \caption{Darstellung der Verzerrung für verschiedene Energiebereiche. Es sind die Mittelwerte der relativen Fehler für die erste Vorhersage, die Vorhersage
+  \caption{Darstellung der Verzerrung für verschiedene Energiebereiche. Es sind die Mittelwerte der relativen Fehler für die Schätzung der Teleskop-Ereignisse, die Vorhersage
           nach der Mittelwertbildung und der Median der Vorhersagen aufgetragen.}
   \label{abb:mean_median_bias}
 \end{figure}
 \begin{figure}
   \includegraphics[width=0.7\textwidth]{Plots/RF_mean_resolution.pdf}
   \centering
-  \caption{Darstellung des IQA des relativen Fehlers für verschiedene Energiebereiche. Aufgetragen sind die erste Vorhersage, die Vorhersage
+  \caption{Darstellung des IQA des relativen Fehlers für verschiedene Energiebereiche. Aufgetragen sind die Schätzung der Teleskop-Ereignisse, die Vorhersage
           nach der Mittelwert Bildung und der Median der Vorhersagen.}
   \label{abb:mean_median_IQA}
 \end{figure}
@@ -99,15 +104,15 @@ Bei niedrigen Energien führt das arithmetische Mittel auf keine geringere Verze
 Dies liegt daran, dass eine Verzerrung die Annahme verletzt, dass die Ergebnisse um den wahren Wert liegen, stattdessen liegen sie um einen verschobenen
 Wert.
 Das arithmetische Mittel kann eine Verzerrung nicht verringern.
-Nur bei Ereignissen mit einer geringen Verzerrung sorgt das Mitteln für eine bessere Performance, was zum einen bei dem IQA für große Energien zu beobachten
-ist und bei dem gesamten gemittelten quadratischen Fehler, der von $\SI{103.31}{\tera\eV\squared}$ für die erste Schätzung auf $\SI{66.69}{\tera\eV\squared}$ nach einer
+Nur bei Ereignissen mit einer geringen Verzerrung sorgt das Mitteln für eine bessere Qualität, was zum einen bei dem IQA für große Energien zu beobachten
+ist und bei dem gesamten gemittelten quadratischen Fehler, der von $\SI{102.94}{\tera\eV\squared}$ für die erste Schätzung auf $\SI{65.31}{\tera\eV\squared}$ nach einer
 Mittelwertbildung fällt.
 
 Das der Median die Verzerrung verringert liegt daran, dass es bei dem Beobachten von Schauern vorkommen kann, dass einzelne Teleskope im Gegensatz zu anderen
 besser positionierten Teleskopen nur einen geringen Teil des Schauers beobachten und somit weniger Information des Schauers besitzen, was zu einer falsche Vorhersage
 führt.
 Da dies meist nur auf vereinzelte Teleskope zutrifft, liegt der Median der Teleskope richtig.
-Dies zeichnet sich auch durch einen gemittelten quadratischen Fehler von $\SI{68.11}{\tera\eV\squared}$ aus, welcher besser als der Fehler der ersten Schätzung ist und
+Dies zeichnet sich auch durch einen gemittelten quadratischen Fehler von $\SI{66.61}{\tera\eV\squared}$ aus, welcher besser als der Fehler der ersten Schätzung ist und
 vergleichbar mit dem Fehler der Mittelwertbildung ist.
 
 Eine weitere Möglichkeit um das Problem, dass nicht alle Teleskope den Schauer gleich gut sehen, zu beheben, stellt das Mitteln mit einem Gewicht, welches die
@@ -142,19 +147,19 @@ wird ein Gewicht von $0.1$ angelegt.
 \end{figure}
 
 Das Gewichten führt auf eine Energieschätzung, die in \autoref{abb:w_bias} und \autoref{abb:w_IQA} zu sehen ist.
-Beide Gewichte führen nicht auf das gewünschte Ergebnis, wobei die Gewichtung mit der Intensität auf eine Verschlechterung der Performance führt.
+Beide Gewichte führen nicht auf das gewünschte Ergebnis, wobei die Gewichtung mit der Intensität auf eine Verschlechterung der Qualität führt.
 Die Sensitivität scheint zwar ein Indikator für die Sichtbarkeit zu sein, jedoch scheint die Höhe der Gewichtung nicht ausreichend zu sein, um
 die Fehlschätzungen ausreichend zu korrigieren.
 Durch die Energieabhängigkeit der Intensität scheint dieses Attribut als Gewicht ungeeignet zu sein.
-Jedoch verbessert sich der gemittelte quadratische Fehler auf $\SI{60.64}{\tera\eV\squared}$ im Vergleich zu der Gewichtung mit der Sensitivität, wo er bei
-$\SI{66.05}{\tera\eV\squared}$ bleibt.
+Jedoch verbessert sich der gemittelte quadratische Fehler auf $\SI{58.68}{\tera\eV\squared}$ im Vergleich zu der Gewichtung mit der Sensitivität, wo er bei
+$\SI{64.72}{\tera\eV\squared}$ bleibt.
 
-Welche der Methoden die bessere Performance liefert, hängt von der Analyse ab.
+Welche der Methoden die bessere Qualität liefert, hängt von der Analyse ab.
 Soll ein Energiespektrum untersucht werden, wird Wert auf einen geringen relativen Fehler gelegt, was das Nutzen des Medians nahe legt.
 Werden jedoch Linienspektren untersucht, kann der Mittelwert in einigen Energiebereichen die richtige Wahl sein, da dieser auf einen geringeren
 absoluten Fehler führt.
-Der Median sorgt für eine Verbesserung in niedrigen Energiebereichen, jedoch führt er zu einer Verschlechterung bei Energien von $(\num{0.1}-\num{1.0})\,\si{\tera\eV}$.
-In diesem Bereich besitzt CTA jedoch die größte Statistik, womit der Performancegewinn infrage gestellt wird, was durch den
+Der Median sorgt für eine Verbesserung in niedrigen Energiebereichen, jedoch führt er zu einer Verschlechterung bei Energien von $(\num{1}-\num{10})\,\si{\tera\eV}$.
+In diesem Bereich besitzt CTA jedoch die größte Statistik, womit der Qualitätsgewinn infrage gestellt wird, was durch den
 gleichbleibenden gemittelten quadratischen Fehler bestätigt wird.
 
 %Einfacher Mittelwert über gleiches Event; Nutzung von unterschiedlichen Gewichten;
@@ -171,7 +176,7 @@ Schätzungen von den SST, MST und LST.
 \begin{figure}
   \includegraphics[width=0.7\textwidth]{Plots/RF_nested_bias.pdf}
   \centering
-  \caption{Abbildung der Verzerrung nach einer Verschachtelung von zwei Random Forests. Es ist eine deutliche Verbesserung gegenüber der ersten Schätzung
+  \caption{Abbildung der Verzerrung nach einer Verschachtelung von zwei Random Forests. Es ist eine deutliche Verbesserung gegenüber der Mittelwertbildung
             zu erkennen.}
   \label{abb:nest_bias}
 \end{figure}
@@ -183,9 +188,9 @@ Schätzungen von den SST, MST und LST.
 \end{figure}
 
 Der Random Forest wird mit $\num{498081}$ Ereignissen trainiert und getestet.
-In \autoref{abb:nest_bias} und \autoref{abb:nest_IQA} ist die Performance des zweiten Schätzers dargestellt und der gemittelte quadrierte Fehler fällt
-auf $\SI{37.74}{\tera\eV\squared}$.
-Die Verschachtelung der Entscheidungswälder führt auf eine verbesserte Performance in allen Energiebereichen, sowohl bei der Verzerrung als auch bei dem IQA,
+In \autoref{abb:nest_bias} und \autoref{abb:nest_IQA} ist die Qualität des zweiten Schätzers dargestellt und der gemittelte quadrierte Fehler fällt
+auf $\SI{37.18}{\tera\eV\squared}$.
+Die Verschachtelung der Entscheidungswälder führt auf eine verbesserte Qualität in allen Energiebereichen, sowohl bei der Verzerrung als auch bei dem IQA,
 wodurch ein Übertraining durch den zweiten Wald ausgeschlossen werden kann.
 
 Die genutzten Attribute haben eine starke Korrelation aufgrund der Gewinnung der Attribute aus der gleichen Information.
@@ -205,7 +210,7 @@ zu großen Cherenkov-Kegeln führen.
 Eine geringe Anzahl an ausgelösten SST stellt jedoch kein Kriterium für eine niedrige Photonenenergie dar, weil auch die Möglichkeit besteht, dass nur der
 Rand des Schauers beobachtet wird.
 
-Um die Frage zu beantworten, wie der Performancegewinn im Vergleich zum Zeitaufwand steht, wird zunächst die Komplexität für das Ausbauen des Entscheidungswaldes untersucht,
+Um die Frage zu beantworten, wie der Qualitätsgewinn im Vergleich zum Zeitaufwand steht, wird zunächst die Komplexität für das Ausbauen des Entscheidungswaldes untersucht,
 welche im Mittel bei
 \begin{equation}
   \Theta (MK\tilde{N} \log^2\left(\tilde{N}\right))
@@ -223,7 +228,7 @@ Da der Zeitaufwand der Schätzung, welcher
 \begin{equation}
   \Theta\left(M\log\left(\frac{1}{5}N\right)\right)
 \end{equation}
-beträgt~\cite[98]{understanding_RF}, für die angestrebte Echtzeitanalyse von größerem Interesse ist, steht der Performancegewinn noch besser da.
+beträgt~\cite[98]{understanding_RF}, für die angestrebte Echtzeitanalyse von größerem Interesse ist, steht der Qualitätsgewinn noch besser da.
 Außerdem werden die Entscheidungsbäume nicht vollständig ausgebaut, wodurch der Zeitaufwand deutlich verringert wird, jedoch können beide Entscheidungswälder nicht
 parallelisiert werden, wodurch definitiv ein Zeitverlust entsteht.
 
@@ -241,7 +246,7 @@ Eine bijektive Transformation auf $\symbb{R}^+$ mit
   E_{\symup{trafo}}=\ln(E_\gamma +3)
   \label{eqn:trafo}
 \end{equation}
-führt auf eine kleinere Zielmenge des Schätzers, wodurch die Performance weniger stark energieabhängig ist.
+führt auf eine kleinere Zielmenge des Schätzers, wodurch die Qualität weniger stark energieabhängig ist.
 Eine anschließende Rücktransformation mit
 \begin{equation}
   E_\gamma = \exp \left(E_{\symup{trafo}}\right)-3
@@ -261,22 +266,22 @@ in anderen Energiebereichen zufolge hat.
 Der Schätzer scheint mehr Wert auf einen geringen Fehler bei kleinen Energien zu legen.
 Schon das Verschachteln der Algorithmen sorgt für ein Herabsetzen der Grenze, da durch das frühe Trennen der Energiebereiche im Entscheidungsbaum, dem
 Algorithmus die Möglichkeit gegeben wird, sich auf die Verbesserung der niedrigen Energiebereiche zu konzentrieren.
-Die Deutung von \autoref{abb:trafo_bias} und \autoref{abb:trafo_IQA} zeigt, dass die Transformation die Performance im Vergleich
+Die Deutung von \autoref{abb:trafo_bias} und \autoref{abb:trafo_IQA} zeigt, dass die Transformation die Qualität im Vergleich
 zum Algorithmus aus \ref{sec:nest} verbessert.
 \begin{figure}
   \includegraphics[width=0.7\textwidth]{Plots/trafo_nested_bias.pdf}
   \centering
-  \caption{Darstellung der Verzerrung bei einer verschachtelten Schätzung mit und ohne Transformation der Art \eqref{eqn:trafo} sowie eine einfache Schätzung. Die Transformation führt zu einer Verringerung
+  \caption{Darstellung der Verzerrung bei einer verschachtelten Schätzung mit und ohne Transformation der Art \eqref{eqn:trafo} sowie die Mittelwertbildung ohne Transformation. Die Transformation führt zu einer Verringerung
           des relativen Fehlers in niedrigen Energiebereichen.}
   \label{abb:trafo_bias}
 \end{figure}
 \begin{figure}
   \includegraphics[width=0.7\textwidth]{Plots/trafo_nested_resolution.pdf}
   \centering
-  \caption{Abbildung der Energieauflösung nach einer Transformation des Zielbereichs im Vergleich zu der untransformierten normalen Schätzung und der verschachtelten Schätzung. Die Transformation führt auf eine
+  \caption{Abbildung der Energieauflösung nach einer Transformation des Zielbereichs im Vergleich zu der untransformierten gemittelten Schätzung und der verschachtelten Schätzung. Die Transformation führt auf eine
           Verbesserung in niedrigen Energiebereichen.}
   \label{abb:trafo_IQA}
 \end{figure}
 Sowohl der IQA als auch die Verzerrung des relativen Fehlers werden mithilfe der Transformation bei niedrigen Energien geringer.
 Bei $E_\gamma > \SI{30}{\tera\eV}$ muss jedoch eine Verschlechterung der Verzerrung und Auflösung in Kauf genommen werden, welche jedoch eine große Verschlechterung
-bezogen auf den absoluten Fehler bedeutet, der von $\SI{37.74}{\tera\eV\squared}$ auf $\SI{53.29}{\tera\eV\squared}$ steigt.
+bezogen auf den absoluten Fehler bedeutet, der von $\SI{37.18}{\tera\eV\squared}$ auf $\SI{53.65}{\tera\eV\squared}$ steigt.

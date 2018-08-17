@@ -4,13 +4,13 @@
 In dieser Arbeit wird die Energierekonstruktion von hochenergetischen kosmischen Photonen, welche durch das Cherenkov Telescope Array(CTA) beobachtet
 werden, optimiert.
 Bisher wird für jedes Teleskop eine eigenständige Energieschätzung durch Algorithmen des überwachten maschinellen Lernens durchgeführt.
-Da bei CTA die Möglichkeit besteht, dass mehrere Teleskope den selben Schauer sehen, wird durch das Zusammenfassen der einzelnen Ergebnisse die
+Da bei CTA die Möglichkeit besteht, dass mehrere Teleskope den selben Schauer messen, wird durch das Zusammenfassen der einzelnen Ergebnisse die
 Energieschätzung verbessert.
-Eine einfache oder gewichtete Mittelung über die Schätzungen liefert keinen Performancegewinn, eine verschachtelte und eventspezifische Regression jedoch
+Eine einfache oder gewichtete Mittelung über die Schätzungen liefert keinen Qualitätsgewinn, eine verschachtelte und eventspezifische Regression jedoch
 führt auf eine Verringerung des relativen Fehlers und auf eine Verbesserung der Energieauflösung.
-Der große Zielbereich der Analyse führt auf einen Performanceverlust bei niedrigen Energien, was durch eine geeignete bijektive Transformation
+Der große Zielbereich der Analyse führt auf einen Qualitätsverlust bei niedrigen Energien, was durch eine geeignete bijektive Transformation
 geändert wird, wodurch die Schätzung in diesem Energiebereich verbessert werden kann.
-Die getesteten Methoden führen auf eine Verringerung des relativen Fehlers und der Energieauflösung um $\SI{25}{\percent}$ in weiten Teilen des Sensitivitätsspektrums von CTA.
+Die getesteten Methoden führen auf eine Verringerung des relativen Fehlers und der Energieauflösung um $\SI{75}{\percent}$ in weiten Teilen des Sensitivitätsbereichs von CTA.
 
 \section*{Abstract}
 \begin{english}
@@ -21,5 +21,5 @@ There is no performance gain in the simple or the weighted average over each pre
 of the relative error and for the energy resolution of CTA.
 Because of the estimator´s wide number range, there is a large performance loss for low energies.
 This can be managed by a transformation of the output, which ensures a performance improvment.
-These methods improve the bias of the relative error and the energy resolution by $\SI{25}{\percent}$ in a large energy range of CTA.
+These methods improve the bias of the relative error and the energy resolution by $\SI{75}{\percent}$ in a large energy range of CTA.
 \end{english}
