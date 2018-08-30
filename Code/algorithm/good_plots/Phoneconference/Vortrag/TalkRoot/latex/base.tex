@@ -1,0 +1,114 @@
+\documentclass[9pt]{beamer}
+\usepackage{beamerthemesplit,graphicx,wrapfig, slashed, subfigure,verbatim,hyperref,color,colortbl,tabularx}
+\usepackage{amsmath,amssymb}
+\usepackage{atlasphysics}
+\usepackage{helvet} %font helvetica
+\usepackage{units}
+\usepackage{pdftricks}
+\usepackage{pstricks}
+\usepackage{beamerfoils}
+\usepackage[ngerman]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{ulem}
+\usepackage{epstopdf}
+\usepackage{color}
+%\usepackage[onehalfspacing]{setspace}
+\usepackage{icomma}
+\usepackage{subfigure}
+\usepackage{caption}
+
+
+\usecaptiontemplate{
+\tiny
+\structure{\insertcaptionname~\insertcaptionnumber:}
+\insertcaption
+}
+
+
+\makeatletter
+\newcommand*{\textoverline}[1]{$\overline{\hbox{#1}}\m@th$}
+\makeatother
+
+
+%\usepackage{feynmf}
+%\usepackage{biblatex}
+% \usetheme{Hannover}
+\useoutertheme{infolines2}
+%\font\ttfAkkuratLightOffice AkkuratLightOffice-Regular at10pt
+\colorlet{structure}{green!50!black}
+\definecolor{tugreen}{RGB}{132,184,24}
+\definecolor{tugrey}{RGB}{178,179,182}
+\definecolor{tured}{RGB}{205,0,47}
+\setbeamercolor{palette primary}{bg=tugreen,fg=black}
+\setbeamercolor{palette secondary}{bg=tugrey!50!tugreen,fg=black}
+\setbeamercolor{palette quaternary}{fg=black, bg=tugrey}
+\setbeamercolor{caption name}{fg=tugreen}
+\setbeamercolor{palette tertiary}{fg=black,bg=tugrey}
+
+
+\setbeamercolor{palette compare}{bg=white!80!tugreen,fg=black}
+\setbeamercolor{palette misc}{bg=white!80!tugreen,fg=black}
+\setbeamercolor{palette white}{bg=white!99!black,fg=black}
+
+\setbeamercolor{itemize item}{fg=tugreen}
+\setbeamercolor{itemize subitem}{fg=tugreen}
+\setbeamercolor{itemize subsubitem}{fg=tugreen}
+\setbeamercolor{enumerate item}{fg=tugreen}
+\setbeamercolor{enumerate subitem}{fg=tugreen}
+\setbeamertemplate{itemize item}[square]
+\setbeamercolor{title}{fg=black, bg=tugreen}
+\setbeamercolor{frametitle}{fg=black, bg=tugreen}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{frametitle}[default][center]
+
+
+
+\setbeamertemplate{title page}{
+\begin{center}
+ \begin{beamercolorbox}[rounded=true, shadow=true, center,ht=1cm]{title}
+ \begin{center}
+ \usebeamerfont{title}\inserttitle
+ \end{center}
+ \end{beamercolorbox}
+\vspace{1cm}
+ \usebeamerfont{subtitle}\insertsubtitle \\
+ \vspace{1cm}
+ \usebeamerfont{author}\insertauthor \\
+ \vspace{1cm}
+ \insertinstitute
+ \usebeamerfont{date}\insertdate
+\end{center}
+}
+
+
+ \title{\textbf{title}}
+\subtitle{subtitle}
+
+
+\author{Alexander Froch}
+\institute[TU Dortmund]{
+\scriptsize Technische Universität Dortmund \\
+\vspace{0.5cm}}
+
+
+\date{\today}
+
+
+
+
+
+
+
+\MyLogo{\includegraphics[width=3cm]{../images/tud_logo_cmyk.pdf}}
+
+
+\begin{document}
+
+%\frame{\titlepage}
+\LogoOff
+
+
+\end{frame}
+
+\end{document}

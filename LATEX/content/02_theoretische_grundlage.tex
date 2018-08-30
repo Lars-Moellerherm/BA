@@ -1,8 +1,8 @@
 \chapter{Theoretische Grundlagen}
 
-Um die Qualität der Energieschätzung zu verbessern, muss ausgearbeitet werden, welche Anforderungen an die Analyse gestellt
+Um die Qualität der Energieschätzung zu verbessern, wird ausgearbeitet, welche Anforderungen an die Analyse gestellt
 werden, um zu neuen Erkenntnissen in der Astroteilchenphysik zu gelangen.
-Außerdem muss der Random Forest Algorithmus genau verstanden werden, um Möglichkeiten des Qualitätsgewinns zu erarbeiten,
+Außerdem ist ein genaues Verständnis des Random Forest Algorithmus unerlässlig, um Möglichkeiten des Qualitätsgewinns zu erarbeiten,
 wobei am Ende eine sinnvolle Evaluierung der Qualität vorgenommen werden muss.
 
 \section{Gammaastronomie}
@@ -11,8 +11,8 @@ wobei am Ende eine sinnvolle Evaluierung der Qualität vorgenommen werden muss.
 Im Universum gibt es zahlreiche Prozesse, bei denen hochenergetische Teilchen entstehen, oder auf hohe Energien beschleunigt werden.
 Bei diesen Teilchen handelt es sich zum großen Teil um Protonen oder leichte Atomkerne, aber auch Elektronen
 sind Bestandteil der kosmischen Strahlung.
-Ein großer Teil der Beschleunigung geschieht in Druckwellen, wie sie bei Sternexplosionen vorkommen, dabei spielt das Modell der
-Fermi-Beschleunigung erster und zweiter Ordnung eine große Rolle.
+Ein großer Teil der Beschleunigung geschieht in Druckwellen, wie sie bei Sternexplosionen vorkommen, wobei das Modell der
+Fermi-Beschleunigung erster und zweiter Ordnung eine große Rolle spielt.
 %Bei der Fermi-Beschleunigung wird das Medium, indem die Druckwelle propagiert, durch ein Plasma beschrieben, welches Magnetfeldstörungen mit sich führt.
 %Wenn ein geladenes Teilchen auf eine solche Störung, welche sich mit einer Geschwindigkeit $v$ durch das Medium bewegt, trifft, wird es durch die
 %Lorentzkraft mit einem Winkel $\theta$ elastisch gestreut.
@@ -38,14 +38,15 @@ der Teilchenfluss der kosmischen Strahlung durch $\Phi(E) \propto E^{-2.7}$~\cit
 
 Jedoch erklären diese Prozesse nicht den gemessenen Energiefluss von ultrahochenergetischen Teilchen, denn bei Energien von $\SI{3e15}{\eV}$ tritt ein erstes
 \enquote{knee} im Spektrum auf, welches nicht durch die Fermibeschleunigung erklärt wird.
-Die Phänomene die Materie bis auf diese Energien beschleunigen, sind noch nicht vollständig erforscht.
+Die Phänomene, die Materie bis auf diese Energien beschleunigen, sind noch nicht vollständig erforscht.
 Ein möglicher Prozess wäre die Beschleunigung durch elektrische Potentialunterschiede oder der Zerfall von Dunkler Materie.
 
-Diese hochenergetische Teilchenstrahlung erzeugt durch Wechselwirkungen oder Zerfälle Gammastrahlung.
+Diese hochenergetische Teilchenstrahlung erzeugt Gammastrahlung.
 Wichtige Prozesse bei der Erzeugung hochenergetischer Photonen sind die Wechselwirkungen von Photonen und Elektronen, wie
 die inverse Comptonstreuung, bei der das geladene Teilchen Energie auf das Photon
 überträgt. Aber auch die Annihilation, welche den Umkehrprozess der Paarerzeugung darstellt und aus einem Elektron-Positron-Paar
 ein Photon-Paar erzeugt, und die Bremsstrahlung, bei der ein Photon bei der Impulsänderung geladener Teilchen abgestrahlt wird, spielen eine Rolle.
+Eine weitere Möglichkeit Gammastrahlung zu erzeugen ist der Zerfall von Dunkler Materie.
 
 \begin{figure}
   \includegraphics[width=\textwidth]{Plots/Folie5.pdf}
@@ -57,7 +58,7 @@ ein Photon-Paar erzeugt, und die Bremsstrahlung, bei der ein Photon bei der Impu
 \end{figure}
 
 \autoref{abb:Folie5} stellt den Weg der kosmischen Strahlung zur Erde dar, wobei die Photonen nicht mit kosmischen Magnetfeldern wechselwirken
-und somit deren Ursprungsrichtung Rekonstruiert werden kann. Jedoch wechselwirken die Photonen mit interstellarem Staub, der zwischen der Erde und der
+und somit deren Ursprungsrichtung rekonstruiert werden kann. Jedoch wechselwirken die Photonen mit interstellarem Staub, der zwischen der Erde und der
 Quelle ist, wodurch ein Teil der Gammastrahlung nicht zur Erde gelangt.
 
 Diese hochenergetischen Photonen können entweder mithilfe von Satelliten im Weltraum oder mithilfe von Cherenkov-Teleskopen auf
@@ -73,8 +74,7 @@ mit einem Winkel von
 \begin{equation}
  \cos(\theta) = \frac{1}{n\beta}
 \end{equation}
-ausbreiten und von den Cherenkov
-Teleskopen am Boden beobachtet werden können.
+ausbreiten und von den Cherenkov-Teleskopen am Boden beobachtet werden können.
 Diese Art der Beobachtung macht es möglich eine größere Fläche zu observieren, wodurch die Wahrscheinlichkeit ein hochenergetisches
 Photon zu messen größer wird.
 Der Winkel $\theta$ hängt von dem Brechungsindex $n$ der Luft ab, welcher von der Feuchtigkeit und Dichte der Luft abhängt und somit höhenabhängig ist.
@@ -89,17 +89,17 @@ Schauer in der Atmosphäre erzeugen, gibt es einen Untergrund, der separiert wer
 
 Das geplante Cherenkov Teleskop Array wird von einer internationalen Kollaboration von 210 Instituten aus 32 Ländern~\cite{CTA_consortium} geführt
 und bildet den nächsten Schritt in der Hochenergiegammaastronomie.
-Mit einer Gesamtanzahl von 108 Teleskopen hat das Array nach Simulationen zur Folge in seinem Hauptenergiebereich eine Sensitivität von $\SI{0.1}{\percent}$
+Mit einer Gesamtanzahl von 108 Teleskopen hat das Array, nach Simulationen zur Folge, in seinem Hauptenergiebereich eine Sensitivität von $\SI{0.1}{\percent}$
 des Energieflusses des Krebsnebels, wodurch es ungefähr zehn Mal sensitiver als das HESS-Experiment ist~\cite{CTA_paper}.
 Da der Teilchenfluss $\Phi$ der kosmischen Strahlung dem Potenzgesetz $\Phi \propto E^{-2.7}$~\cite[5]{Cosmic_rays} folgt,
 treffen bei einer Energie $E$ von $\SI{1}{\tera\eV}$ noch $\SI{1}{\per\m\squared\per\s}$ Teilchen auf die Erdatmosphäre.
-Um dennoch genug Ereignisse zu beobachten, muss eine möglichst große Effektive Fläche observiert werden, weshalb der Standort in
+Um dennoch genug Ereignisse zu beobachten, muss eine möglichst große effektive Fläche observiert werden, weshalb der Standort in
 Chile eine Fläche von $\approx \SI{4}{\kilo\m\squared}$ abdeckt~\cite{CTA_ob}.
 Durch drei verschiedene Teleskopgrößen kann CTA Photonen mit Energien von $\SI{30}{\giga\eV}$ bis $\SI{300}{\tera\eV}$ detektieren,
 was es ermöglicht, die verschiedenen Beschleunigungsprozesse im Universum zu untersuchen.
 Zu den Arten gehören das LST (Large Sized Telescope) mit einer Spiegelgröße von $\SI{23}{\m}$, das MST (Medium Sized Telescope)
 mit einer Größe von $\SI{11.5}{\m}$ oder $\SI{9.7}{\m}$ und das SST (Small-Sized Telescope), welches eine Größe von $\SI{4.3}{\m}$ oder $\SI{4.0}{\m}$
-besitzt~\cite{CTA_tec} .
+besitzt~\cite{CTA_tec}.
 Die hohe Sensitivität und die niedrige Energieuntergrenze ermöglichen die Entdeckung neuer Quellen mit einer starken Rotverschiebung, die nur bei niedrigen
 Energien sichtbar sind, da die höherenergetische Gammastrahlung mit dem extragalaktischen Hintergrundlicht wechselwirkt und somit nicht beobachtet werden kann.
 Die große Anzahl an Teleskopen führt zusätzlich auf eine bessere Winkelauflösung, was entscheidend bei der Multiwellenlängen-Beobachtung von Quellen ist.
@@ -127,13 +127,13 @@ $L(\symbf{\hat{y}},\symbf{y})$ minimiert wird.
 Wenn $\symbf{\theta}$ aus k Parametern besteht und $(\symbf{X}_i,y_i)$ $N$ Tupel sind, müssen drei Fälle unterschieden werden.
 Im ersten Fall gilt $k>N$, was zu einem unterbestimmten System führt, in dem es nicht genug Datenpunkte gibt, um alle Parameter
 vorherzusagen, wodurch viele Regressionsmethoden zu keinem Ergebnis führen.
-Bei $k = N$ existiert genug Information um ein lineares System exakt zu lösen.
-Im letzten Fall gilt $k<N$, was das System überbestimmt werden lässt, wodurch mehreren Lösungen existieren und
+Bei $k = N$ existiert genug Information, um ein lineares System exakt lösen zu können.
+Im letzten Fall gilt $k<N$, was das System überbestimmt werden lässt, wodurch mehrere Lösungen existieren und
 es wird die Lösung gewählt, die $L(\symbf{\hat{y}},\symbf{y})$ minimiert.
 
 Bei der linearen Regression wird angenommen, dass der Trainingsdatensatz das Problem vollständig repräsentiert und $L(\symbf{\hat{y}},\symbf{y})$ keinen Trend
-und keine Korrelation besitzen.
-Eine weitere Annahme muss sein, dass, wenn die Variable $\symbf{X}_i$ einen Vektor darstellt, für diese Unkorreliertheit und lineare Unabhängigkeit gilt.
+und keine Korrelation besitzt.
+Eine weitere Annahme muss sein, dass, wenn die Variable $\symbf{X}_i$ einen Vektor darstellt, für diesen Unkorreliertheit und lineare Unabhängigkeit gilt.
 Wenn der Fehler von $\symbf{X}$ eine nicht konstante Varianz besitzt, muss dies durch eine gewichtete Methode korrigiert werden.
 
 \section{Random Forest Regressor}
@@ -144,7 +144,8 @@ einen Wald aus mehreren möglichst unkorrelierten Entscheidungsbäumen auf, die 
 
 Ein Entscheidungsbaum wird aufgebaut, indem der Datensatz in Teildatensätze aufgeteilt wird, wobei ein gewähltes Kriterium optimiert wird.
 Dieses Kriterium
-kann die Gini Unreinheit oder der Informationsgewinn sein, bei der Regression wird jedoch häufig die Varianzreduktion verwendet.
+kann die Gini-Unreinheit oder der Informationsgewinn sein.
+Bei der Regression wird jedoch häufig die Varianzreduktion verwendet.
 Bei dieser Optimierung wird in jedem Schritt der mittlere quadratische Fehler
 \begin{equation}
   H(X_m) = \frac{1}{N_m}\sum_{i\in N_m}(y_i-c_m)^2
@@ -161,7 +162,7 @@ $c_m$ des letzten Schrittes die endgültige Vorhersage.
 
 Bei Entscheidungsbäumen gibt es eine Vielzahl von Umsetzungen.
 Die aktuellsten Arten sind der C5.0 und der CART Algorithmus~\cite[1]{CART}.
-Die Besonderheit am C5.0 Algorithmus stellt, im Gegensatz zum CART Algorithmus, die nicht notwendige binäre Trennung des Datensatzes dar,
+Die Besonderheit des C5.0 Algorithmus stellt, im Gegensatz zum CART Algorithmus, die nicht notwendige binäre Trennung des Datensatzes dar,
 jedoch kann mit ihm keine Regression durchgeführt werden.
 Im \textsc{scikit-learn}-Framework~\cite{scikit-learn} wird eine CART Implementierung des Entscheidungsbaumes benutzt, welche zur
 Regression fähig ist und die Varianzreduktion als Optimierungskriterium nutzt.
@@ -200,8 +201,8 @@ und es kann durch eine Vergrößerung des Waldes nicht zum Übertraining kommen~
 \begin{equation}
   mg(X,y) = av_k I(h_k(X)=y) - \max_{j \neq y}av_k I(h_k(X)=j)
 \end{equation}
-die Gewinn Funktion, $h_k(X)$ die Vorhersage des $k$-ten Entscheidungsbaum und $I(\cdot)$ die charakteristische Funktion, welche eine $1$ ergibt, wenn der
-Entscheidungsbaum das geforderte Ergebnis liefert und eine $0$ wenn nicht.
+die Gewinn-Funktion, $h_k(X)$ die Vorhersage des $k$-ten Entscheidungsbaumes und $I(\cdot)$ die charakteristische Funktion, welche eine $1$ ergibt, wenn der
+Entscheidungsbaum das geforderte Ergebnis liefert und eine $0$, wenn nicht.
 Wenn $mg(X,y) > 0$ gilt, sagt der Entscheidungsbaum das richtige Ergebnis vorher.
 
 
@@ -217,7 +218,7 @@ verwendet wird und $k-1$ Datensätze zum Training dienen.
 Um die in \autoref{sec:Gammaastronomie} erwähnten Bilder auszuwerten, muss zunächst die Kamera kalibriert werden, da die Funktionsweise der elektronischen
 Komponenten stark von äußeren Bedingungen beeinflusst wird.
 Der nächste Schritt stellt das Extrahieren der wichtigen Information aus dem Kamerabild in Form der Hillasparameter dar.
-Es werden die Momente der Verteilung im Kamerabild bestimmt, wobei die ersten Momente als $x$-und $y$- Koordinate des Mittelpunktes einer Ellipse und die zweiten Momente als Achsen $w$ und $L$ der Ellipse
+Es werden die Momente der Verteilung im Kamerabild bestimmt, wobei die ersten Momente als $x$- und $y$- Koordinate des Mittelpunktes einer Ellipse und die zweiten Momente als Achsen $w$ und $L$ der Ellipse
 dargestellt werden.
 Weitere Parameter sind die Polarkoordinaten $r$ und $\phi$ des Ellipsenmittelpunkts oder der Rotationswinkel $\psi$
 der Ellipsenhauptachse, welcher relativ zur Verbindungslinie zwischen Ellipsenmittelpunkt und Kameramittelpunkt gemessen wird.
@@ -229,7 +230,7 @@ Die geometrischen Hillasparameter sind in \autoref{abb:Hillas} dargestellt.
             werden verwendet, um die Energie des primären Teilchens zu schätzen.~\cite{Hillas_Max}}
   \label{abb:Hillas}
 \end{figure}
-Ein weiterer wichtiger Parameter bildet die totale Intensität des Bildes und da CTA aus mehreren unterschiedlichen Teleskopen besteht, bekommt die Anzahl
+Einen weiteren wichtigen Parameter bildet die totale Intensität des Bildes und da CTA aus mehreren unterschiedlichen Teleskopen besteht, bekommt die Anzahl
 der Teleskope, die den gleichen Schauer gesehen haben, und welche Art von Teleskop dieses Schauer gesehen hat, eine große Bedeutung für die anschließende
 Signal Separation und Energie Schätzung.
 Diese Parameter werden genutzt um die Untergrundschauer von den photoninduzierten Schauern zu trennen.

@@ -1,4 +1,4 @@
-import itertools
+﻿import itertools
 import functions as func
 import numpy as np
 import matplotlib.pyplot as plt
@@ -63,7 +63,13 @@ def encaps_RF():
         data = data.drop(['scaled_width','scaled_length'],axis=1)
 
 
+
         print("Finished with calculating Mean Scaled Values ... \n")
+        plt.plot(data["telescope_type_id"],data["mc_energy"],".")
+        plt.xlabel("telescope_type")
+        plt.ylabel("mc_energy")
+        plt.savefig("plots/telescope_type.jpg")
+        plt.close()
 
 
     if(args.step > 0 & args.step < 4):
@@ -135,6 +141,19 @@ def encaps_RF():
                 '\tmean squared error: %.2f \n' % mean_squared_error(predictions,y2[:,0]),
                 "Finished with the first prediction ... \n")
 
+        '''
+        ############## Treeinterpreter #################
+        test_dat = X2[:2,:]
+        prediction, bias , contrebutions = ti.predict(RFr, test_dat)
+
+        for i in range(len(test_dat)):
+            print("Instance: ", i)
+            print("Bias: ", bias[i])
+            print("Feuture contribution: ")
+            for c, feauture in sorted(zip(contrebutions[i],names), key = lambda x: -abs(x[0])):
+                print (feauture, round(c,2))
+            print("-"*20)
+        '''
     if(args.step > 1):
 
         ######### gewichteter und nicht gewichteter Mittelwert ######################
@@ -143,6 +162,18 @@ def encaps_RF():
         data_w = pd.concat([X_test_w,pred_w],axis=1).reset_index()
         truth_grouped = y_test.drop_duplicates().set_index(['run_id','array_event_id'])
 
+
+        ################ Intensity als Gewicht?#################
+        rel_err = (data_w["prediction"]-data_w["mc_energy"])/data_w["mc_energy"]
+        plt.scatter(rel_err,data_w["intensity"])
+        plt.xlabel("relativer Fehler")
+        plt.ylabel("Intensität")
+        #plt.xscale("log")
+        plt.yscale("log")
+        plt.tight_layout()
+        plt.savefig("plots/intensity.jpg")
+        plt.close()
+        """
         ######################### Untersuchung der Vorhersagen für ein Event ####################
         data_std = data_w.copy(deep=True)
         pred_std = data_std[['prediction','run_id','array_event_id']].groupby(by=['run_id','array_event_id']).std().fillna(0)
@@ -160,19 +191,25 @@ def encaps_RF():
         plt.savefig("plots/std_pred.pdf")
         plt.close()
 
+
         pred_std = pred_std.sort_values(by="std_Schätzung")
         N = pred_std.shape[0]
         N = int(N*0.5)
         i = pred_std.iloc[N].name
         data_test = data_w.set_index(['run_id','array_event_id'])
         preds_max=data_test.loc[i]
-        ax = preds_max['prediction'].plot(kind="box")
+        xlabel=preds_max.reset_index()
+        xlabel=xlabel[['run_id',"array_event_id"]].drop_duplicates()
+        preds_max["Event"]=preds_max["prediction"]
+        ax = preds_max['Event'].plot(x=" ",kind="box")
         plt.axhline(preds_max['mc_energy'].iloc[1],xmin=0.4,xmax=0.6,color="r",ls="dashed",label="Wahrheit")
         plt.axhline(preds_max['prediction'].mean(),xmin=0.425,xmax=0.575,color="orange",label="Mittelwert")
         ax.text(0.2, 0.95,'Anzahl Teleskope: %i ' % preds_max['num_triggered_telescopes'].iloc[0], ha='center', va='center', transform=ax.transAxes,size='medium',bbox=dict(boxstyle="round",facecolor='grey',alpha=0.1))
         plt.legend()
         plt.ylabel("Energie / TeV")
         plt.yscale('log')
+        ax.set_xlabel("run_id: %i ; array_event_id: %i" % (xlabel["run_id"],xlabel["array_event_id"]))
+        plt.tight_layout()
         plt.savefig("plots/pred1.pdf")
         plt.close()
 
@@ -180,13 +217,18 @@ def encaps_RF():
         i = pred_std.iloc[N].name
         data_test = data_w.set_index(['run_id','array_event_id'])
         preds_max=data_test.loc[i]
-        ax = preds_max['prediction'].plot(kind="box")
+        xlabel=preds_max.reset_index()
+        xlabel=xlabel[['run_id',"array_event_id"]].drop_duplicates()
+        preds_max["Event"]=preds_max["prediction"]
+        ax = preds_max['Event'].plot(x="Hallo",kind="box")
         plt.axhline(preds_max['mc_energy'].iloc[1],xmin=0.4,xmax=0.6,color="r",ls="dashed",label="Wahrheit")
         plt.axhline(preds_max['prediction'].mean(),xmin=0.425,xmax=0.575,color="orange",label="Mittelwert")
         ax.text(0.2, 0.95,'Anzahl Teleskope: %i ' % preds_max['num_triggered_telescopes'].iloc[0], ha='center', va='center', transform=ax.transAxes,size='medium',bbox=dict(boxstyle="round",facecolor='grey',alpha=0.1))
         plt.legend()
         plt.ylabel("Energie / TeV")
+        ax.set_xlabel("run_id: %i ; array_event_id: %i" % (xlabel["run_id"],xlabel["array_event_id"]))
         plt.yscale('log')
+        plt.tight_layout()
         plt.savefig("plots/pred2.pdf")
         plt.close()
 
@@ -194,13 +236,18 @@ def encaps_RF():
         i = pred_std.iloc[N].name
         data_test = data_w.set_index(['run_id','array_event_id'])
         preds_max=data_test.loc[i]
-        ax = preds_max['prediction'].plot(kind="box")
+        xlabel=preds_max.reset_index()
+        xlabel=xlabel[['run_id',"array_event_id"]].drop_duplicates()
+        preds_max["Event"]=preds_max["prediction"]
+        ax = preds_max['Event'].plot(x=" ",kind="box")
         plt.axhline(preds_max['mc_energy'].iloc[1],xmin=0.4,xmax=0.6,color="r",ls="dashed",label="Wahrheit")
         plt.axhline(preds_max['prediction'].mean(),xmin=0.425,xmax=0.575,color="orange",label="Mittelwert")
         ax.text(0.2, 0.95,'Anzahl Teleskope: %i ' % preds_max['num_triggered_telescopes'].iloc[0], ha='center', va='center', transform=ax.transAxes,size='medium',bbox=dict(boxstyle="round",facecolor='grey',alpha=0.1))
         plt.legend()
         plt.ylabel("Energie / TeV")
+        ax.set_xlabel("run_id: %i ; array_event_id: %i" % (xlabel["run_id"],xlabel["array_event_id"]))
         plt.yscale('log')
+        plt.tight_layout()
         plt.savefig("plots/pred3.pdf")
         plt.close()
 
@@ -208,18 +255,20 @@ def encaps_RF():
         i = pred_std.iloc[N].name
         data_test = data_w.set_index(['run_id','array_event_id'])
         preds_max=data_test.loc[i]
-        ax = preds_max['prediction'].plot(kind="box")
+        xlabel=preds_max.reset_index()
+        xlabel=xlabel[['run_id',"array_event_id"]].drop_duplicates()
+        preds_max["Event"]=preds_max["prediction"]
+        ax = preds_max['Event'].plot(x=" ",kind="box")
         plt.axhline(preds_max['mc_energy'].iloc[1],xmin=0.4,xmax=0.6,color="r",ls="dashed",label="Wahrheit")
         plt.axhline(preds_max['prediction'].mean(),xmin=0.425,xmax=0.575,color="orange",label="Mittelwert")
         ax.text(0.2, 0.95,'Anzahl Teleskope: %i ' % preds_max['num_triggered_telescopes'].iloc[0], ha='center', va='center', transform=ax.transAxes,size='medium',bbox=dict(boxstyle="round",facecolor='grey',alpha=0.1))
         plt.legend()
         plt.ylabel("Energie / TeV")
+        ax.set_xlabel("run_id: %i ; array_event_id: %i" % (xlabel["run_id"],xlabel["array_event_id"]))
         plt.yscale('log')
+        plt.tight_layout()
         plt.savefig("plots/pred4.pdf")
         plt.close()
-
-
-
 
 
 
@@ -472,7 +521,7 @@ def encaps_RF():
             for c, feauture in sorted(zip(contrebutions[i],names), key = lambda x: -abs(x[0])):
                 print (feauture, round(c,2))
             print("-"*20)
-
+        """
 
 
 if __name__ == '__main__':

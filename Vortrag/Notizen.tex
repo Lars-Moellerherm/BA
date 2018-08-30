@@ -1,0 +1,247 @@
+\documentclass[
+  bibliography=totoc,     % Literatur im Inhaltsverzeichnis
+  captions=tableheading,  % Tabellenüberschriften
+  titlepage=firstiscover, % Titelseite ist Deckblatt
+]{scrartcl}
+
+% größere Variation von Dateinamen möglich
+\usepackage{grffile}
+\usepackage{multicol}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{xparse}
+\usepackage{braket}
+\usepackage{units}
+\usepackage[locale=DE,separate-uncertainty=true,per-mode=reciprocal,output-decimal-marker={,},]{siunitx}
+\sisetup{
+  round-mode          = places, % Rounds numbers
+  round-precision     = 2, % to 2 places
+}
+\usepackage[section]{placeins}
+\usepackage{pdflscape}
+\usepackage{expl3}
+%Komma als Dezimaltrenner in der mathe Umgebung, um in Umgebungen wie [0, 2] ein Leerzeichen nach dem Komma zu erhalten einfach eins setzen
+\usepackage{icomma}
+\usepackage{cancel}
+
+
+% Verbesserungen am Schriftbild
+\usepackage{microtype}
+
+% Hyperlinks im Dokument
+\usepackage[
+  unicode,        % Unicode in PDF-Attributen erlauben
+  pdfusetitle,    % Titel, Autoren und Datum als PDF-Attribute
+  pdfcreator={},  % ┐ PDF-Attribute säubern
+  pdfproducer={}, % ┘
+]{hyperref}
+% erweiterte Bookmarks im PDF
+\usepackage{bookmark}
+
+% Trennung von Wörtern mit Strichen
+\usepackage[shortcuts]{extdash}
+
+\begin{document}
+  \begin{itemize}
+    \item Folie 3:
+      \begin{itemize}
+        \item geladene Teilchenstrahlung sorgt für auch für Schauer Untergrund;
+        \item Satelliten: Detektionsfläche ist begrenzt: CT Atmosphäre ist Szintillator
+        \item Kosmische Magnetfelder: Magnetare EInheit Gauß!!!!!!!!!!!!!!!!!%$\num{e12}-\SI{e15}{\G}$ ; Galaxien $\num{e-6}-\SI{e-4}{\G}$
+      \end{itemize}
+    \item Folie 4:
+      \begin{itemize}
+        \item SNR´s als hauptquelle bestätigen durch entdeckung neuer SNR
+        \item Pulsarwind Nebel: Pulsarwind = starker Sonnenwind; Nebel= Supernovaeüberreste die durch Pulsar zum rotieren gebracht wird
+        \item haronisches spektrum durch untersuchen der Gammaemissionen untersuchen. Hadronen wechselwirken mit Interstellaren Wolken und erzeugen so gammas
+        \item Gammas mit großer Rotverschiebung machen Paarerzeugung mit hintergrundstrahlung
+        \item EBL: rotverschobene Sterne und die reemission von ISM -> mehr erfahren über Geschichte des Universums
+        \item Neutrinos wären der Beweis für hadronische Beschleunigung p->pi->neutrino
+        \item Objekte mit großer Fluss-Variabilität (GRB) könnten Lorentz-Invarianz Verletzung testen
+        \item Dunkle Materie (Neutralino), extragalaktische Quellen (AGN)
+        \item Was ist wichtig:
+        \begin{itemize}
+          \item Wollen Spektren untersuchen: geringer relativer Fehler
+          \item untersuchung eines Spektrums, jedoch hauptsächlich bei hohen Energien
+          \item Untersuchung von Sepktren
+          \item Genauigkeit bei geringen Energien
+          \item ?
+          \item Untersuchung von Spektren
+          \item Untersuchung eines Spektrums
+          \item Finden eines Linien Spektrums bei bestimmter energie: Absoluter Fehler minimieren
+        \end{itemize}
+      \end{itemize}
+    \item Folie 5:
+        \begin{itemize}
+          \item Schauer: Heitler Model: Bremsstrahlung und Paarerzeugung. Elektron verliert Hälfte nach $R=X_0 \ln2$ ; Photon wechselwirkt durch
+                Paarerzeugung nach gleicher Länge und verteilt Energie gleichmäßig. $X_0$ charakteristische Weglänge
+        \end{itemize}
+    \item Folie 6:
+      \begin{itemize}
+        \item erstes Moment = x,y und r,$\phi$
+        \item zweites Moment = L und w
+        \item phi und psi nicht gleich falls Ellipse anderen winkel hat
+        \item Intensität ist auch Hillas Parameter
+        \item Teilchenseparation schon geschehen, daher nur gamma ereignisse in Daten
+      \end{itemize}
+    \item Folie 7:
+      \begin{itemize}
+        \item RF setzt sich aus möglichst unkorrelierten Entscheidungsbäumen zusammen.
+        \item Jedes Blatt schätzt den Mittelwert der Wahrheiten der Datenpunkte in dem Blatt $c_m$
+        \item Minimieren des Kriterium bis Abbruchbedingung erfüllt(max depth, minimale Blattgröße)
+        \item Kriterium minimiert des absoluten Fehler
+        \item Der genutzte CART kann nur binär trennen. Gibt jedoch auch andere wie C5.0
+
+      \end{itemize}
+    \item Folie 8:
+      \begin{itemize}
+        \item Bagging um zufällige unabhängige Datensätze zu erzeugen. Ziehen von N Datensätzen von der größe M
+        \item Bootstrapping um Datensatz nicht zu verkleinern: Datenpunkte zufällig ersetzen.
+        \item Attribute zufällig ziehen um Verzerrung zu verkleinern jedoch Varianz wird größer.
+        \item Am Ende Mittelwertbildung über alle Bäume
+        \item Kann kein Übertraining entstehen, durch Vergrößerung des Waldes
+      \end{itemize}
+    \item Folie 9:
+      \begin{itemize}
+        \item Jedes Teleskop, welches das Schauer sieht schätzt eigenständig die Energie.
+        \item Benötigen jedoch nur eine Energie für jedes Schauer. Daher Mittelwert bilden.
+        \item Nicht nur Arithmetisches Mittel
+        \item Training eines RF der gleich die Energie des Schauers schätzt. Hat jedoch zusätzlich die gemittelte Schätzung des ersten Waldes -> Verschachtelte Methode
+      \end{itemize}
+    \item Folie 10:
+      \begin{itemize}
+        \item diffuse: kommen zum Beispiel von ww der Teilchenstrahlung mit ISM
+        \item Überschätzen ist zu erkennen.
+        \item Linien durch Korreliertheit der Entscheidungsbäume
+        \item $R^2$-Score: 1 : perfekte Vorhersage; 0 : genauso gut wie einfache Mittelwertbildung; <0 : absolut unbrauchbares Modell
+        \item Mit vorsicht zu genießen: Empfindlich gegenüber Trends(wie hier); gleiche Anzahl an Datenpunkten für vergleich (nicht gegeben)
+        \item $0.5$ wir sind besser als der bloße Mittelwert
+      \end{itemize}
+    \item Folie 11:
+      \begin{itemize}
+        \item ersten Vier Attribute sind Eventspezifisch und nicht Teleskopspezifisch; In dieser Information steckt ja auch mehr über die gesamte
+        Energie die in dem Schauer deponiert ist.
+        \item Hillas Parameter sind durch den Fehlenden Parameter "Abstand zum Schauermittelpunkt" kein Indiz für größe des Schauers
+        \item die skalierte Größe und die größe sind nah beieinander und haben durchaus ausreißer -> Parameter sind nicht unabhängig
+      \end{itemize}
+    \item Folie 12:
+      \begin{itemize}
+        \item verschiedene Mittelwerte austesten
+      \end{itemize}
+    \item Folie 13:
+      \begin{itemize}
+        \item bei geringen Energien ist der Median besser und der Mittelwert bringt keine Verbesserung.
+        \item Ab dem TeV bereich gibt es kaum einen Unterschied zwischen Mittelwert und Median ab 30TeV sogar schlechter als ohne Schätzung
+        \item Hauptsächlich uberschätzen, wie schon in der Migrationsmatrix zu sehen.
+        \item Ähnliches Bild bei Auflösung
+        \item stärkere Fluktuation (nicht geklärt warum)
+        \item Mittelwert aber schlechter als beim bias
+        \item Bei großen Energien keine Verbesserung aber auch keine Verschlechterung
+      \end{itemize}
+    \item Folie 14:
+      \begin{itemize}
+        \item zwei Events herausgesucht.
+        \item einzelne Ausreißer  sorgen dafür, dass das arithmetische Mittel schlechter wird, der Median ist jedoch gut
+        \item Wie kann man berücksichtigen das einige Ausreißer sind und wie kann man Ausreißer erkennen?...
+      \end{itemize}
+    \item Folie 15:
+      \begin{itemize}
+        \item ... Berücksichtigen durch gewichtete Mittelung!
+        \item Mögliche Ursache, ist das das Teleskop nicht das ganze Schauer sieht oder nur weit weg ist -> wenig Intensität
+        \item Zusehen hohe Intensität, geringer relativer Fehler
+        \item Problem: 1) Intensität abhängig von Energie (geringe energie nie viel Intensität) 2) Fehlerverlauf schon durch Eigenschaften des relativen
+              Fehlers bedingt.
+        \item Versuch ist es trotzdem wert, suchen jedoch noch ein anderes Gewicht
+      \end{itemize}
+    \item Folie 16:
+      \begin{itemize}
+        \item Es gibt ja unterschiedliche Teleskope, da sie unterschiedlich sensitiv sind.
+        \item nutzen geschätzte energie für einteilung in Sensitivitätsbereiche. -> Problem, da es nur schätzung ist und somit falsch einsortiert werden kann
+      \end{itemize}
+    \item Folie 17:
+      \begin{itemize}
+        \item Sensitivität verbessert sich deutlich bei geringen energien.
+        \item Die Intensität verschlecht das Ergebnis jedoch.
+        \item Bei großen Energien mach die Gewichtung kaum einen Unterschied (relativer Fehler)
+      \end{itemize}
+    \item Folie 18:
+      \begin{itemize}
+        \item nutzen zweiten Random Forest
+      \end{itemize}
+    \item Folie 19:
+      \begin{itemize}
+        \item deutlich weniger Datenpunkte (logisch)
+        \item immer noch linien -> Korreliertheit
+        \item $R^2$ ist angestiegen von 0.5 auf 0.75, jedoch keine genaue aussage über algortihmus
+        \item liegt enger um die Diagonale
+      \end{itemize}
+    \item Folie 20:
+      \begin{itemize}
+        \item Viele Ausreißer -> viele Attribute kommen alle aus der Schätzung des ersten RF daher strark Korreliert
+        \item Auch hier Spielt das SST ein deutlich größere Rolle als alle anderen
+        \item Die meisten Attribute spielen garkeine Rolle mehr
+        \item Schätzung am wichtigsten -> sehr früh im Baum damit es erste Trennung vornimmt und dann Attribute genutzt werden die wichtig für diesen
+              Energiebereich sind
+      \end{itemize}
+    \item Folie 21:
+      \begin{itemize}
+        \item Verbesserung in allen Energiebereichen
+        \item Bei Auflösung das peak bei 0.1 TeV verschwunden
+        \item größte Verbesserung bei niedrigen Energien
+        \item durch die frühe Energietrennung kann sich der eine zweig auch auf die vorhersage für geringe Energien konzentrieren, was vorher
+              nicht Interessant war da minimieren des absoluten Fehlers
+      \end{itemize}
+    \item Folie 22:
+      \begin{itemize}
+        \item Andere Möglichkeit um dem Algorithmus eine minimierung der geringen Energien interessant zu machen, ist es den Zielbereich zu
+              verkleinern (durch Trafo)
+        \item Nutze den logarithmus als bijektive Transformation
+        \item die $3$ ist willkürlich gewählt, Ziel war nur keine großen energien für sehr kleine x zu erhalten
+      \end{itemize}
+    \item Folie 23:
+      \begin{itemize}
+        \item Wir betrachten die Eventspezifische Schätzung
+        \item Das der Algortihmus kein Interesse an niedrigen Energien hat wird deutlich durch den CUT der hier zusehen ist.
+        \item Cut sieht durch logarithmisierte Skala drastisch aus, für den Algorithmus bedeutet das jedoch kein großen Performanceverlust wenn er alle
+              Energien <0.1TeV auf 0.1TeV schätzt.
+        \item Die Transformation hat jedoch dazu geführt, dass er später abschneidet.
+        \item jedoch ist der $R^2$ score abgesunken. Kein Wunder er wird schlechter für große Energien die mehr wiegen beim $R^2$Score
+        \item muss sich jedoch genauer angeguckt werden.
+      \end{itemize}
+    \item Folie 24:
+      \begin{itemize}
+        \item Deutlich besser bei geringen Energien jedoch leicht schlechter bei hohen Energien
+        \item aber immer Besser als bloße Mittelwertbildung
+        \item Auflösung geht die gleichen Schwankungen wie ohne Trafo durch. -> es ist wirklich nur eine Trafo
+        \item Wir sind bei Verzerrung fast die ganze zeit unter 1 und bei der Auflösung fast die ganze zeit unter 0.5
+      \end{itemize}
+    \item Folie 25:
+      \begin{itemize}
+        \item Man sollte auch den Absoluten Fehler untersuchen. War jedoch nicht Kern meiner Arbeit.
+        \item Eine Mittelung führt Hier auf jedenfall auf eine Besserung egal welches (anderes beim relativen)
+        \item Hier ist Intensität am besten und nicht Snesitivität (anders beim relativen)
+        \item verschachtelung bringt auch hier eine Verbesserung (genauso beim relativen)
+        \item Transformation sorgt bei allen drei schritten zu einer Verschlechterung (anders beim relativen Fehler)
+        \item Bei der Verbesserung des relativen Fehlers wird sich auf den niedrigen Energiebereich konzentriert, da dort noch verbesserung nötig ist
+              und kleine verbesserungen mehr einfluss haben, jedoch leidet meistens der bereich mit großen Energien was großen einfluss auf den Absoluten
+              Fehler hat
+        \item Beste Methode ist die untransformierte verschachtelte Schätzung
+      \end{itemize}
+    \item Folie 26:
+      \begin{itemize}
+        \item KEINE CUTS wie nur Bilder wo ganze Ellipse zu sehen ist
+        \item Es muss auf jedenfall die Methode auf die Aufgabe angepasst werden.
+        \item Für Spektren also relative Fehler: verschachtelte transformierte Methode  : Auflösung und Verzerrung können um 75\% gesenkt werden.
+        \item Linienspektrum bei großen Energien: verschachtelte untransformierte Methode : Absoluter Fehler um 66\% senken
+      \end{itemize}
+    \item Folie 27:
+      \begin{itemize}
+        \item Abstand ist wichtig und führt dazu dassdie Hillas Parameter wichtiger werden, da dadurch diese ein Indiz auf die größe werden.
+        \item Standen nur leider nicht funktionsfähig zur verfügung
+        \item Die Transformation kann Aufgabenspezifische gewählt werden. Diese Tranfo gut für niedrige energien
+        \item Für Linienspektren könnte man Gauß ähnliche Trafos nehmen die den Erwartungswert bei der gesuchten Energie hat und bijektiv sind.
+        \item
+      \end{itemize}
+  \end{itemize}
+\end{document}
