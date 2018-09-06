@@ -58,9 +58,8 @@
 
 \usepackage{hyperref}
 \usepackage{subfigure}
-\usepackage{caption}
-\setbeamerfont{caption}{size=\footnotesize}
-\setbeamertemplate{caption}[numbered]
+\usepackage[labelformat=empty]{caption}
+
 
 
 
@@ -76,7 +75,17 @@
 %Lehrstuhl/Fakultät
 \institute[Experimentelle Physik Vb]{Experimentelle Physik Vb \\  Fakultät Physik}
 
+\AtBeginSection[]{
+  \begin{frame}
+  \vfill
+  \centering
+  \usebeamerfont{title}\insertsectionhead\par%
+  \vfill
+  \end{frame}
+}
+
 \begin{document}
+
 
   \begin{frame}
     \titlepage
@@ -89,7 +98,7 @@
       \column{0.5\textwidth}
       \begin{figure}
         \includegraphics{pictures/CTA_logo.jpg}
-        \caption{\cite{logo}}
+        \caption{}
         \label{}
       \end{figure}
     \end{columns}
@@ -101,7 +110,7 @@
     \frametitle{Botenteilchen}
       \begin{figure}
         \includegraphics[width=0.7\textwidth]{pictures/Folie5.pdf}
-        \caption{basiert auf \cite{Folie5}}
+        \caption{}
         \label{abb:folie5}
       \end{figure}
   \end{frame}
@@ -113,7 +122,7 @@
       \column{0.6\textwidth}
         \begin{figure}
           \includegraphics[width=0.95\textwidth]{pictures/CTA.png}
-          \caption{\cite{CTA}}
+          \caption{CTA hompage (How CTA works)}
           \label{abb:CTA}
         \end{figure}
       \column{0.4\textwidth}
@@ -141,7 +150,7 @@
       \column{0.6\textwidth}
         \begin{figure}
           \includegraphics[width=0.7\textwidth]{pictures/hillas_2.pdf}
-          \caption{\cite{Hillas}}
+          \caption{Max Nöthe}
           \label{abb:Hillas}
         \end{figure}
     \end{columns}
@@ -167,7 +176,7 @@
       \column{0.7\textwidth}
       \begin{figure}
         \includegraphics[width=0.8\textwidth]{pictures/Decisiontree.png}
-        \caption{basiert auf \cite{DT}}
+        \caption{}
         \label{abb:DT}
       \end{figure}
       \column{0.3\textwidth}
@@ -189,7 +198,7 @@
       \column{0.6\textwidth}
       \begin{figure}
         \includegraphics[width=0.9\textwidth]{pictures/RF.jpg}
-        \caption{\cite{RF}}
+        \caption{Pavel Polishchuk}
         \label{abb:RF}
       \end{figure}
       \column{0.4\textwidth}
@@ -211,7 +220,7 @@
     \frametitle{Energierekonstruktion mit dem Random Forest}
     \begin{figure}
       \includegraphics[width=\textwidth]{pictures/Ablauf10.png}
-      \caption{Bilder aus~\cite{ablauf}}
+      \caption{}
       \label{}
     \end{figure}
   \end{frame}
@@ -275,7 +284,7 @@
     \frametitle{Energierekonstruktion mit dem Random Forest}
     \begin{figure}
       \includegraphics[width=\textwidth]{pictures/Ablauf11.png}
-      \caption{Bilder aus~\cite{ablauf}}
+      \caption{}
       \label{}
     \end{figure}
   \end{frame}
@@ -285,8 +294,25 @@
     \begin{columns}
       \column{0.5\textwidth}
       \begin{figure}
+        \includegraphics[width=\textwidth]{pictures/Bias.png}
+        \caption{}
+        \label{}
+      \end{figure}
+      \column{0.5\textwidth}
+      \begin{figure}
         \includegraphics[width=\textwidth]{pictures/RF_mean_bias.pdf}
         \caption{Mittelwert des relativen Fehlers für verschiedene Energiebereiche.}
+        \label{}
+      \end{figure}
+    \end{columns}
+  \end{frame}
+
+  \begin{frame}
+    \begin{columns}
+      \column{0.5\textwidth}
+      \begin{figure}
+        \includegraphics[width=\textwidth]{pictures/resolution.jpg}
+        \caption{}
         \label{}
       \end{figure}
       \column{0.5\textwidth}
@@ -328,7 +354,7 @@
     \frametitle{Sensitivität als Gewicht}
     \begin{figure}
       \includegraphics[width=0.7\textwidth]{pictures/Spec.JPG}
-      \caption{\cite{spec}}
+      \caption{CTA homepage (CTA technology)}
       \label{}
     \end{figure}
     \begin{columns}
@@ -364,7 +390,7 @@
     \frametitle{Energierekonstruktion mit dem Random Forest}
     \begin{figure}
       \includegraphics[width=\textwidth]{pictures/Ablauf12.png}
-      \caption{Bilder aus~\cite{ablauf}}
+      \caption{}
       \label{}
     \end{figure}
   \end{frame}
@@ -429,7 +455,7 @@
     \frametitle{Transformation der Energien}
     \begin{figure}
       \includegraphics[width=0.6\textwidth]{pictures/Ablauf2.png}
-      \caption{Bilder aus~\cite{ablauf,wolfram}}
+      \caption{}
       \label{}
     \end{figure}
     \begin{columns}
@@ -515,8 +541,28 @@
 
   \begin{frame}
     \frametitle{Zusammenfassung der Ergebnisse}
+    \begin{columns}
+      \column{0.5\textwidth}
+      \begin{itemize}
+        \item Es wurden keine Cuts angewendet
+        \item Anpassung der Methode auf die Aufgabenspezifische Analyse
+        \item Beste Auflösung und geringste Verzerrung des relativen Fehlers bei der verschachtelten Methode mit Transformation
+              Es könnte Verzerrung und Auflösung in weiten Bereichen um ca. $\SI{75}{\percent}$ gesenkt werden.
+        \item Geringster mittlerer quadratischer Fehler bei der verschachtelten Methode ohne Transformation.
+              Der absolute Fehler wurde um ca. $\SI{66}{\percent}$ gesenkt
+      \end{itemize}
+      \column{0.5\textwidth}
+      \begin{figure}
+        \centering
+        \parbox{0.49\textwidth}{%
+          \subfigure{\includegraphics[width=0.55\textwidth]{pictures/trafo_nested_bias.pdf}}
+
+          \subfigure{\includegraphics[width=0.55\textwidth]{pictures/trafo_nested_resolution.pdf}}}
+
+      \end{figure}
+    \end{columns}
     \begin{itemize}
-      \item Es würden keine Cuts angewendet!
+      \item Es wurden keine Cuts angewendet
       \item Anpassung der Methode auf die Aufgabenspezifische Analyse
       \item Beste Auflösung und geringste Verzerrung des relativen Fehlers bei der verschachtelten Methode mit Transformation
             Es könnte Verzerrung und Auflösung in weiten Bereichen um ca. $\SI{75}{\percent}$ gesenkt werden.
@@ -529,24 +575,55 @@
 
   \begin{frame}
     \frametitle{Mögliche Perspektiven}
-    \begin{itemize}
-      \item Abstand von Teleskop und Schauer als Attribut hinzunehmen
-      \item Aufgabenspezifische Wahl der Transformation
-      \item Kriterium für Entscheidungsbaum entwickeln welches den absoluten Fehler nutzt
-    \end{itemize}
+    \begin{columns}
+      \column{0.5\textwidth}
+      \begin{itemize}
+        \item Abstand von Teleskop und Schauer und Höhe des Schauers als Attribut hinzunehmen
+        \item Aufgabenspezifische Wahl der Transformation
+        \item Kriterium für Entscheidungsbaum entwickeln welches den absoluten Fehler nutzt
+      \end{itemize}
+      \column{0.25\textwidth}
+      \begin{figure}
+        \includegraphics[width=\textwidth]{pictures/sklearn.png}
+      \end{figure}
+      \begin{figure}
+        \includegraphics[width=\textwidth]{pictures/python.png}
+      \end{figure}
+      \begin{figure}
+        \includegraphics[width=\textwidth]{pictures/numpy.png}
+      \end{figure}
+      \column{0.25\textwidth}
+
+      \vspace{0.6cm}
+
+      \begin{figure}
+        \includegraphics[width=\textwidth]{pictures/matplotlib.png}
+      \end{figure}
+
+      \vspace{0.6cm}
+
+      \begin{figure}
+        \includegraphics[width=\textwidth]{pictures/pandas.png}
+      \end{figure}
+    \end{columns}
   \end{frame}
 
   \section{}
 
-  \begin{frame}
-    \centering
-    \huge{\textbf{Vielen Dank für Ihre Aufmerksamkeit!}}
-
-    \vspace{2cm}
-
-    \large{\textbf{Gibt es Fragen?}}
-  \end{frame}
   \begin{frame}[allowframebreaks]
     \printbibliography
+  \end{frame}
+
+  \begin{frame}
+    \frametitle{Schauer Modell}
+    \begin{figure}
+      \includegraphics{pictures/Heitler.png}
+      \caption{Joseph Matthews}
+      \label{}
+    \end{figure}
+  \end{frame}
+
+  \begin{frame}
+    \frametitle{hallo}
   \end{frame}
 \end{document}
