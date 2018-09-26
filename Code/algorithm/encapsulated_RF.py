@@ -165,7 +165,7 @@ def encaps_RF():
 
         ################ Intensity als Gewicht?#################
         rel_err = (data_w["prediction"]-data_w["mc_energy"])/data_w["mc_energy"]
-        plt.scatter(rel_err,data_w["intensity"])
+        plt.plot(rel_err,data_w["intensity"],'b.')
         plt.xlabel("relativer Fehler")
         plt.ylabel("Intensität")
         #plt.xscale("log")

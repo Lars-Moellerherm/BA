@@ -76,20 +76,22 @@
 \institute[Experimentelle Physik Vb]{Experimentelle Physik Vb \\  Fakultät Physik}
 
 \AtBeginSection[]{
-  \begin{frame}
-  \vfill
-  \centering
-  \usebeamerfont{title}\insertsectionhead\par%
-  \vfill
-  \end{frame}
+    \begin{frame}
+      \vfill
+      \centering
+      \usebeamerfont{title}\insertsectionhead\par%
+      \vfill
+    \end{frame}
 }
 
 \begin{document}
 
 
+
   \begin{frame}
     \titlepage
   \end{frame}
+
 
   \begin{frame}
     \begin{columns}
@@ -127,7 +129,7 @@
         \end{figure}
       \column{0.4\textwidth}
         \begin{itemize}
-          \item Photon wechselwirkt mit der Atmosphäre: Schauer entsteht
+          \item Photon wechselwirkt mit der Atmosphäre: Schauer entsteht.
           \item Lichtgeschwindigkeit in Atmosphäre $\SI{0.03}{\percent}$ langsamer als Vakuum.
           \item Überlichtschnelle geladene Teilchen senden Kegel aus Cherenkov-Licht aus.
           \item Durchmesser: $\SI{250}{\m}$
@@ -142,7 +144,7 @@
         \begin{itemize}
           \item Hillas Parameter, Wölbung und Krümmung
           \item Scaled Cuts Technik: $SV = \frac{v- \langle v \rangle}{\sigma_v}$ für $v=w\text{;}l$~\cite[104]{SV}
-          \item Teleskop-Typ
+          \item Teleskopart
           \item Anzahl der ausgelösten Teleskope, LST, MST und SST
           \item gesamte Intensität
           \item Art des Primärteilchens
@@ -159,10 +161,10 @@
   \begin{frame}
     \frametitle{Aufgabenspektrum}
     \begin{itemize}
-      \item Entdecken neuer glaktischer Gammaquellen (SNR, PWN, Doppelsysteme, galaktische Zentrum)
-      \item Multiwellenlängen- und Multimessenger-Beobachtungen um hadronische Beschleunigungsprozesse zu Untersuchen
-      \item Entdecken neuer Quellen mit großer Rotverschiebung
-      \item Detektieren von Zerfällen der Dunklen Materie
+      \item Entdecken neuer galaktischer Gammaquellen (SNR, PWN, Doppelsysteme, galaktische Zentren).
+      \item Multiwellenlängen- und Multimessenger-Beobachtungen um hadronische Beschleunigungsprozesse zu untersuchen.
+      \item Entdecken neuer Quellen mit großer Rotverschiebung.
+      \item Detektieren von Zerfällen der Dunklen Materie.
       \item \dots
     \end{itemize}
   \end{frame}
@@ -205,10 +207,10 @@
       Warum der Random Forest Algorithmus:
       \begin{itemize}
         \item Interpretierbarkeit
-        \item Zeitkomplexität: $\Omega(n\log(n))$
+        \item Zeitkomplexität: $\Theta_{\symup{pred}}(M\log(N))$
         \item einfache Datenpräparation
         \item nicht anfällig gegen unbedeutende Attribute
-        \item Stabiles Ergebnis
+        \item stabiles Ergebnis
       \end{itemize}
     \end{columns}
   \end{frame}
@@ -228,30 +230,14 @@
   \begin{frame}
     \frametitle{Schätzung jedes Teleskop-Ereignis}
     \begin{columns}
-      \column{0.5\textwidth}
-        \begin{itemize}
-          \item Datensatz:
-            \begin{itemize}
-              \item $\num{3322938}$ Teleskop-Events
-              \item $\num{996653}$ Array-Events
-              \item $\SI{78}{\percent}$ punktgerichtet und $\SI{22}{\percent}$ diffuse
-              \item $\SI{33}{\percent}$ Trainings- und $\SI{66}{\percent}$ Testdatensatz
-            \end{itemize}
-          \item Random Forest:
-            \begin{itemize}
-              \item maximale Tiefe $=\num{10}$
-              \item Größe des Waldes $=\num{100}$
-              \item Anzahl der Attribute $=\sqrt{N}$
-              \item Minimale Blattgröße $=\num{1}$
-            \end{itemize}
-          \item $R^2$-Score:
+      \column{0.3\textwidth}
+          $R^2$-Score:
           \begin{equation*}
             R^2 = 1 - \frac{\sum_i (y_i-\hat{y}_i)^2}{\sum_i (y_i - \overline{y})^2}
           \end{equation*}
-        \end{itemize}
-      \column{0.5\textwidth}
+      \column{0.7\textwidth}
       \begin{figure}
-        \includegraphics[width=1.1\textwidth]{pictures/RF.pdf}
+        \includegraphics[width=0.9\textwidth]{pictures/RF.pdf}
         \caption{}
         \label{}
       \end{figure}
@@ -272,8 +258,8 @@
         Rangordnung der Attribute in jedem Entscheidungsbaum
       \end{block}
       \begin{itemize}
-        \item Aufgrund von Bootstrapping und dem CART-Algorithmus kann eine Verzerrung auftreten
-        \item Attribute mit einer kleinen Anzahl an Kategorien werden unterschätzt
+        \item Aufgrund von Bootstrapping und dem CART-Algorithmus kann eine Verzerrung auftreten.
+        \item Attribute mit einer kleinen Anzahl an Kategorien werden unterschätzt.
       \end{itemize}
     \end{columns}
   \end{frame}
@@ -294,7 +280,7 @@
     \begin{columns}
       \column{0.5\textwidth}
       \begin{figure}
-        \includegraphics[width=\textwidth]{pictures/Bias.png}
+        \includegraphics[width=\textwidth]{pictures/Resolution_bias_plot.pdf}
         \caption{}
         \label{}
       \end{figure}
@@ -308,20 +294,11 @@
   \end{frame}
 
   \begin{frame}
-    \begin{columns}
-      \column{0.5\textwidth}
-      \begin{figure}
-        \includegraphics[width=\textwidth]{pictures/resolution.jpg}
-        \caption{}
-        \label{}
-      \end{figure}
-      \column{0.5\textwidth}
-      \begin{figure}
-        \includegraphics[width=\textwidth]{pictures/RF_mean_resolution.pdf}
-        \caption{Die Hälfte des IQA von $\SI{68,26}{\percent}$ des relativen Fehlers für verschiedene Energiebereiche.}
-        \label{}
-      \end{figure}
-    \end{columns}
+    \begin{figure}
+      \includegraphics[width=0.5\textwidth]{pictures/RF_mean_resolution.pdf}
+      \caption{Die Hälfte des IQA von $\SI{68,26}{\percent}$ des relativen Fehlers für verschiedene Energiebereiche.}
+      \label{}
+    \end{figure}
   \end{frame}
 
   \begin{frame}
@@ -329,13 +306,13 @@
       \column{0.5\textwidth}
       \begin{figure}
         \includegraphics[width=\textwidth]{pictures/pred2.pdf}
-        \caption{Zufällige Vorhersage für das Array-Event:}
+        \caption{}
         \label{}
       \end{figure}
       \column{0.5\textwidth}
       \begin{figure}
         \includegraphics[width=\textwidth]{pictures/pred3.pdf}
-        \caption{Zufällige Vorhersage für das Array-Event:}
+        \caption{}
         \label{}
       \end{figure}
     \end{columns}
@@ -372,13 +349,13 @@
       \column{0.5\textwidth}
       \begin{figure}
         \includegraphics[width=\textwidth]{pictures/RF_weights_bias.pdf}
-        \caption{Mittelwert des relativen Fehlers für verschiedene Energiebereiche.}
+        \caption{}
         \label{}
       \end{figure}
       \column{0.5\textwidth}
       \begin{figure}
         \includegraphics[width=\textwidth]{pictures/RF_weights_resolution.pdf}
-        \caption{Die Hälfte des IQA von $\SI{68,26}{\percent}$ des relativen Fehlers für verschiedene Energiebereiche.}
+        \caption{}
         \label{}
       \end{figure}
     \end{columns}
@@ -407,12 +384,6 @@
           \item Mittelwert der vorherigen Schätzungen
           \item Mittelwert, Standardabweichung, Maximum und Minimum der Schätzungen der SST, MST und LST
         \end{itemize}
-        \item Parameter des Random Forest sind die gleichen
-        \item Datensatz
-        \begin{itemize}
-          \item Traingsdatensatz: $\num{498146}$
-          \item Testdatensatz: $\num{498507}$
-        \end{itemize}
       \end{itemize}
       \column{0.5\textwidth}
       \begin{figure}
@@ -437,13 +408,13 @@
       \column{0.5\textwidth}
       \begin{figure}
         \includegraphics[width=\textwidth]{pictures/RF_nested_bias.pdf}
-        \caption{Mittelwert des relativen Fehlers für verschiedene Energiebereiche.}
+        \caption{}
         \label{}
       \end{figure}
       \column{0.5\textwidth}
       \begin{figure}
         \includegraphics[width=\textwidth]{pictures/RF_nested_resolution.pdf}
-        \caption{Die Hälfte des IQA von $\SI{68,26}{\percent}$ des relativen Fehlers für verschiedene Energiebereiche.}
+        \caption{}
         \label{}
       \end{figure}
     \end{columns}
@@ -495,13 +466,13 @@
       \column{0.5\textwidth}
       \begin{figure}
         \includegraphics[width=\textwidth]{pictures/trafo_nested_bias.pdf}
-        \caption{Mittelwert des relativen Fehlers für verschiedene Energiebereiche.}
+        \caption{}
         \label{}
       \end{figure}
       \column{0.5\textwidth}
       \begin{figure}
         \includegraphics[width=\textwidth]{pictures/trafo_nested_resolution.pdf}
-        \caption{Die Hälfte des IQA von $\SI{68,26}{\percent}$ des relativen Fehlers für verschiedene Energiebereiche.}
+        \caption{}
         \label{}
       \end{figure}
     \end{columns}
@@ -544,12 +515,12 @@
     \begin{columns}
       \column{0.5\textwidth}
       \begin{itemize}
-        \item Es wurden keine Cuts angewendet
-        \item Anpassung der Methode auf die Aufgabenspezifische Analyse
+        \item Es wurden keine Cuts angewendet.
+        \item Anpassung der Methode auf die Aufgabenspezifische Analyse.
         \item Beste Auflösung und geringste Verzerrung des relativen Fehlers bei der verschachtelten Methode mit Transformation
               Es könnte Verzerrung und Auflösung in weiten Bereichen um ca. $\SI{75}{\percent}$ gesenkt werden.
         \item Geringster mittlerer quadratischer Fehler bei der verschachtelten Methode ohne Transformation.
-              Der absolute Fehler wurde um ca. $\SI{66}{\percent}$ gesenkt
+              Der absolute Fehler wurde um ca. $\SI{66}{\percent}$ gesenkt.
       \end{itemize}
       \column{0.5\textwidth}
       \begin{figure}
@@ -561,14 +532,6 @@
 
       \end{figure}
     \end{columns}
-    \begin{itemize}
-      \item Es wurden keine Cuts angewendet
-      \item Anpassung der Methode auf die Aufgabenspezifische Analyse
-      \item Beste Auflösung und geringste Verzerrung des relativen Fehlers bei der verschachtelten Methode mit Transformation
-            Es könnte Verzerrung und Auflösung in weiten Bereichen um ca. $\SI{75}{\percent}$ gesenkt werden.
-      \item Geringster mittlerer quadratischer Fehler bei der verschachtelten Methode ohne Transformation.
-            Der absolute Fehler wurde um ca. $\SI{66}{\percent}$ gesenkt
-    \end{itemize}
   \end{frame}
 
   \subsection{Perspektiven}
@@ -579,8 +542,8 @@
       \column{0.5\textwidth}
       \begin{itemize}
         \item Abstand von Teleskop und Schauer und Höhe des Schauers als Attribut hinzunehmen
-        \item Aufgabenspezifische Wahl der Transformation
-        \item Kriterium für Entscheidungsbaum entwickeln welches den absoluten Fehler nutzt
+        \item aufgabenspezifische Wahl der Transformation
+        \item Kriterium für Entscheidungsbaum entwickeln, welches den absoluten Fehler nutzt
       \end{itemize}
       \column{0.25\textwidth}
       \begin{figure}
@@ -610,20 +573,153 @@
 
   \section{}
 
-  \begin{frame}[allowframebreaks]
+  \begin{frame}
     \printbibliography
   \end{frame}
 
   \begin{frame}
+    \begin{itemize}
+      \item Datensatz:
+        \begin{itemize}
+          \item $\num{3322938}$ Teleskopevents
+          \item $\num{996653}$ Arrayevents
+          \item $\SI{78}{\percent}$ punktgerichtet und $\SI{22}{\percent}$ diffuse
+          \item $\SI{33}{\percent}$ Trainings- und $\SI{66}{\percent}$ Testdatensatz
+        \end{itemize}
+      \item Random Forest:
+        \begin{itemize}
+          \item maximale Tiefe $=\num{10}$
+          \item Größe des Waldes $=\num{100}$
+          \item Anzahl der Attribute $=\sqrt{N}$
+          \item minimale Blattgröße $=\num{1}$
+        \end{itemize}
+    \end{itemize}
+  \end{frame}
+
+  \begin{frame}
     \frametitle{Schauer Modell}
+    \begin{columns}
+      \column{0.5\textwidth}
+      Gamma induziertes Schauer:
+      \begin{itemize}
+        \item $\gamma$
+        \item $e^+ ; e^-$
+      \end{itemize}
+      \column{0.5\textwidth}
+      Proton induziertes Schauer
+      \begin{itemize}
+        \item Hadronische Komponente: Kernfragmente, $\pi$, Kaon, $\dots$
+        \item elektromagnetische Komponente: $\gamma$ von $\pi^0$ zerfall
+        \item Muonen vom Zerfall der geladenen Mesonen
+        \item Neutrios vom Zerfall der geladenen Mesonen und der Muonen
+      \end{itemize}
+    \end{columns}
     \begin{figure}
-      \includegraphics{pictures/Heitler.png}
+      \includegraphics[width=0.7\textwidth]{pictures/Heitler.png}
       \caption{Joseph Matthews}
       \label{}
     \end{figure}
   \end{frame}
 
   \begin{frame}
-    \frametitle{hallo}
+    \begin{figure}
+      \includegraphics[width=0.5\textwidth]{pictures/CherenkovRadiation.png}
+      \caption{wikipedia}
+      \label{}
+    \end{figure}
   \end{frame}
+
+  \begin{frame}
+    \frametitle{Fermi-Beschleunigung}
+    \begin{columns}
+      \column{0.5\textwidth}
+      \textbf{erster Ordnung}
+      \begin{equation*}
+        \left\langle \frac{\delta E}{E} \right\rangle \approx \frac{2}{3}\frac{\delta v}{c} \text{ ,}
+      \end{equation*}
+      $\delta v$ Geschwindigkeitsunterschied hinter und vor der Druckwelle
+      \begin{figure}
+        \includegraphics[width=\textwidth]{pictures/firstorderFermi.JPG}
+        \caption{Mathieu de Naurois}
+        \label{}
+      \end{figure}
+      \column{0.5\textwidth}
+      \textbf{zweiter Ordnung}
+      \begin{equation*}
+        \left\langle \frac{\delta E}{E} \right\rangle = \frac{8}{2}\left(\frac{v}{c}\right)^2\text{ .}
+      \end{equation*}
+      $v$ Druckwellengeschwindigkeit
+      \begin{figure}
+        \includegraphics[width=\textwidth]{pictures/secondorderFermi.JPG}
+        \caption{Mathieu de Naurois}
+        \label{}
+      \end{figure}
+    \end{columns}
+  \end{frame}
+
+  \begin{frame}
+    \frametitle{Gammaquellen}
+    \begin{columns}
+      \column{0.5\textwidth}
+      \begin{figure}
+        \includegraphics[width=0.9\textwidth]{pictures/gamma_sources.JPG}
+        \caption{Mathieu de Naurois}
+        \label{}
+      \end{figure}
+      \column{0.5\textwidth}
+      \begin{figure}
+        \includegraphics[width=0.9\textwidth]{pictures/gammaprocess.JPG}
+        \caption{Mathieu de Naurois}
+        \label{}
+      \end{figure}
+    \end{columns}
+
+  \end{frame}
+
+  \begin{frame}
+    \frametitle{Unfolding}
+    Aufgrund der endlichen Auflösung ist das Signal
+    \begin{equation}
+      g(x) = \int_Y R(x|y) \cdot f(y) \symup{d}y
+       \text{   oder   } y = A\cdot x \text .
+    \end{equation}
+    Um das wirkliche Energiespektrum $f$ zu erhalten, muss entfaltet werden.
+    Methoden zum Entfalten:
+    \begin{itemize}
+      \item mit maximum likelihood fit
+      \item oder mit Bayes' Theorem
+    \end{itemize}
+    Bayes' Theorem:
+    \begin{equation}
+      P(C|E,\Lambda,I) = \frac{P(X|C,\Lambda,I)\cdot P(C|I)}{\sum_C P(E|C,\Lambda ,I)\cdot P(C|I)}
+    \end{equation}
+    I = informationsstand unter der die Analyse gemacht wurde und
+    \begin{equation}
+      \lambda_{ij} = P(E_j|C_i,I)
+    \end{equation}
+    Resolutionmatrix. Mit
+    \begin{equation}
+      \theta_{ij} = \frac{\lambda_{ij}\cdot P(C_i|I)}{\sum_i \lambda_{ij}\cdot P(C_i|I)} = P(C_i|E_j,I)
+    \end{equation}
+    lässt sich dann C berechnen
+  \end{frame}
+
+  \begin{frame}
+    \frametitle{Konvergenz des RF}
+    Wenn die Anzahl der Entscheidungsbäume in einem RF erhöht wird, konvergiert der generalisierte Fehler
+    \begin{equation}
+      PE = P_{X,y}(mg(X,y)<0)
+    \end{equation}
+    gegen
+    \begin{equation}
+      P_{X,y}(P_\theta(h(X,\theta)=y)-\max_{j\neq y}P_\theta(h(X,\theta)=j)<0)
+    \end{equation}
+    und es kann durch eine Vergrößerung des Waldes nicht zum Übertraining kommen.
+    \begin{equation}
+      mg(X,y) = av_k I(h_k(X)=y) - \max_{j \neq y}av_k I(h_k(X)=j)
+    \end{equation}
+    die Gewinn-Funktion, $h_k(X)$ = Vorhersage des $k$-ten Entscheidungsbaumes; $I(\cdot)$ die charakteristische Funktion;
+    $mg(X,y) > 0$ -> richtiges Ergebnis des RF; $\theta$ = für den Entscheidungsbaum gewählte Attribute.
+  \end{frame}
+
 \end{document}
